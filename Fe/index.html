@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container__background">
+        <h1 class="gradient-text">SORTING ALGORITHM VISUALIZER</h1>
+        <div class="content">
+            <div class="box__content--left">
+                <div class="shadow card__boxContentLeft--top card__selectAlgorithm"> 
+                    <label for="selectAlgorithm">Chọn thuật toán sắp xếp</label>
+                    <select name="chonThuatToan" id="ChonThuatToan" class="selection">
+                        <option value="selection">Selection Sort</option>
+                        <option value="bubble">Bubble Sort</option>
+                        <option value="insertion">Insertion Sort</option>
+                        <option value="heap">Heap Sort</option>
+                        <option value="quick">Quick Sort</option>
+                        <option value="merge">Merge Sort</option>
+
+                    </select>
+                </div>
+                <div class="shadow card__boxContentLeft--top card__createDataArray">
+                    <label for="createDataArray">Tạo dữ liệu mảng</label>
+                    <select name="taoDuLieu" id="taoDuLieu" class="selection">
+                        
+                        <option value="random">ngẫu nhiên</option>
+                        <option value="manual">bằng tay</option>
+
+                    </select>
+                </div>
+                <div class="shadow card__functionButton">
+                    <button class="button" id="btn-sort">Sort</button>
+                    <button class="button" id="btn-asc">Tăng dần</button>
+                    <button class="button" id="btn-stop">Stop</button>
+                    <button class="button" id="btn-reset">Reset</button>
+                    <button class="button" id="btn-desc">Giảm dần</button>
+                    <button class="button" id="btn-delete">Delete</button>
+                </div>
+                <div class="shadow card__boxContentLeft--middle card__swapCount">
+                    <label for="swapCount"> Swap Count</label>
+                    <input type="text" name="swapCount" id="swapCount" class="text" placeholder="Value" readonly>
+                </div>
+                <div class="shadow card__boxContentLeft--middle card__sortingSpeed">
+                    <label for="sortingSpeed">Sorting Speed</label>
+                   
+                    <input type="range" class="rangeSpeed" id="rangeSpeed" min="0.5" max="3" step="0.5" value="1">
+                </div>
+                <div class="shadow card__Sort" id="vizCard">
+                    <label for="sort"><u>Sort</u></label>
+                    <div id="viz-container" class="viz-container"></div>
+                    <div id="manual-inputs" style="display:none;"></div>
+                </div>
+            
+            </div>
+            <div class="box__content--right">
+                <div class="shadow card__arraySize">
+                    <label for="arraySize">Array Size</label>
+                     <span id="size-label">8</span>
+                    <input type="range" class="rangeSize" id="rangeSize" min="2" max="15" step="1" value="8">
+                    <button class="button buttonCreate" id="btn-create">Create</button>           
+
+                </div>
+                <div class="shadow card__codeJava"> 
+                    <label for="codeJava"><u>Code java</u></label>
+                    <pre id="code-panel" class="code-panel"></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
