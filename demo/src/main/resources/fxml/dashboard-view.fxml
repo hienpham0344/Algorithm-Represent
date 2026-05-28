@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+        <?import javafx.geometry.Insets?>
+        <?import javafx.scene.control.*?>
+        <?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.example.main.ui.DashboardController">
+
+    <!-- TOP BAR -->
+    <top>
+
+        <HBox alignment="CENTER_LEFT"
+              spacing="12"
+              styleClass="top-bar">
+
+            <padding>
+                <Insets top="12" right="20" bottom="12" left="20"/>
+            </padding>
+
+            <Button text="☰"
+                    onAction="#toggleSidebar"
+                    styleClass="menu-btn"/>
+
+            <Label text="Dashboard"
+                   styleClass="dashboard-title"/>
+
+        </HBox>
+
+    </top>
+
+    <!-- SIDEBAR -->
+    <left>
+
+        <VBox fx:id="sidebar"
+              spacing="18"
+              prefWidth="280"
+              styleClass="sidebar">
+
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+
+            <Button text="Mô phỏng thuật toán sắp xếp"
+                    onAction="#openSortingVisualizer"
+                    styleClass="sidebar-btn"/>
+
+            <Separator/>
+
+            <Label text="Cấu trúc dữ liệu"
+                   styleClass="sidebar-section"/>
+
+            <Button text="Array"
+                    onAction="#openArray"
+                    styleClass="sidebar-btn"/>
+
+            <Button text="LinkedList"
+                    onAction="#openLinkedList"
+                    styleClass="sidebar-btn"/>
+
+            <Button text="Stack"
+                    onAction="#openStack"
+                    styleClass="sidebar-btn"/>
+
+            <Button text="Heap"
+                    onAction="#openHeap"
+                    styleClass="sidebar-btn"/>
+
+            <Button text="Binary Tree"
+                    onAction="#openBinaryTree"
+                    styleClass="sidebar-btn"/>
+
+        </VBox>
+
+    </left>
+
+    <!-- CONTENT -->
+    <center>
+
+        <StackPane fx:id="contentPane"/>
+
+    </center>
+
+</BorderPane>
+
