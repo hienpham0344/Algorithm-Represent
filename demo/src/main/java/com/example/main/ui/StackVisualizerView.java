@@ -64,6 +64,17 @@ public class StackVisualizerView extends BorderPane {
         service.push(45);
         redrawStack(AnimType.NONE, -1);
 
+        setLeft(buildLeftPanel());
+        setCenter(buildVizArea());
+        setBottom(buildBottomPanel());
+
+        service.push(15);
+        service.push(30);
+        service.push(45);
+        redrawStack(AnimType.NONE, -1);
+
+        appendLog("[Hệ Thống]: Đã tải xong ngăn xếp mô phỏng.");
+        appendLog("[Hệ Thống]: Sẵn sàng hoạt động.");
     }
 
     private VBox buildLeftPanel() {
@@ -101,6 +112,11 @@ public class StackVisualizerView extends BorderPane {
         Button btnPop   = makeBtn("Pop (Lấy ra)",   "btn-pop");
         Button btnPeek  = makeBtn("Xem đỉnh (Peek)","btn-peek");
         Button btnReset = makeBtn("Khởi tạo lại",   "btn-reset");
+
+        btnPush.setOnAction(e  -> handlePush());
+        btnPop.setOnAction(e   -> handlePop());
+        btnPeek.setOnAction(e  -> handlePeek());
+        btnReset.setOnAction(e -> handleReset());
 
         HBox row1 = hRow(btnPush, btnPop);
         HBox row2 = hRow(btnPeek, btnReset);
@@ -204,6 +220,64 @@ public class StackVisualizerView extends BorderPane {
         }
         return row;
     }
+    private HBox buildBottomPanel() {
+        Label codeHeader = new Label("<>  Mã giả (Pseudo-code)");
+        codeHeader.getStyleClass().add("panel-header-label");
+        Label codeLang = new Label("C++ / Java style");
+        codeLang.getStyleClass().add("panel-lang-badge");
+        Region sp1 = new Region(); HBox.setHgrow(sp1, Priority.ALWAYS);
+        HBox codeHdr = new HBox(codeHeader, sp1, codeLang);
+        codeHdr.getStyleClass().add("panel-header-box");
+        codeHdr.setAlignment(Pos.CENTER_LEFT);
+
+        codeArea = new TextArea(CODE_IDLE);
+        codeArea.setEditable(false);
+        codeArea.getStyleClass().add("code-area");
+        VBox.setVgrow(codeArea, Priority.ALWAYS);
+
+        VBox codePanel = new VBox(codeHdr, codeArea);
+        codePanel.getStyleClass().add("bottom-panel");
+        HBox.setHgrow(codePanel, Priority.ALWAYS);
+
+        Region vdiv = new Region();
+        vdiv.getStyleClass().add("bottom-divider");
+
+        Label logHeader = new Label(">_  Nhật ký từng bước (Trình biên dịch ảo)");
+        logHeader.getStyleClass().add("panel-header-label");
+        Button btnClear = new Button("🗑 Xóa");
+        btnClear.getStyleClass().add("btn-clear-log");
+        btnClear.setOnAction(e -> {
+            logArea.clear();
+            appendLog("[Hệ Thống]: Nhật ký đã được dọn sạch.");
+        });
+        Region sp2 = new Region(); HBox.setHgrow(sp2, Priority.ALWAYS);
+        HBox logHdr = new HBox(logHeader, sp2, btnClear);
+        logHdr.getStyleClass().add("panel-header-box");
+        logHdr.setAlignment(Pos.CENTER_LEFT);
+
+        logArea = new TextArea();
+        logArea.setEditable(false);
+        logArea.setWrapText(true);
+        logArea.getStyleClass().add("log-area");
+        VBox.setVgrow(logArea, Priority.ALWAYS);
+
+        VBox logPanel = new VBox(logHdr, logArea);
+        logPanel.getStyleClass().add("bottom-panel");
+        HBox.setHgrow(logPanel, Priority.ALWAYS);
+
+        HBox bottom = new HBox(codePanel, vdiv, logPanel);
+        bottom.setPrefHeight(210);
+        return bottom;
+    }
+
+    private void setStatus(String msg) { setStatus(msg, null); }
+    private void setStatus(String msg, Boolean ok) {
+        statusText.setText(msg);
+        if (ok == null)  statusText.setStyle("-fx-text-fill: #C7D2FE;");
+        else if (ok)     statusText.setStyle("-fx-text-fill: #4ADE80;");
+        else             statusText.setStyle("-fx-text-fill: #F87171;");
+    }
+    private void appendLog(String line) { logArea.appendText(line + "\n"); }
     private void playPushAnim(HBox row) {
         row.setScaleX(0); row.setScaleY(0); row.setOpacity(0);
         Timeline tl = new Timeline(
@@ -249,5 +323,101 @@ public class StackVisualizerView extends BorderPane {
     private KeyFrame kf(double ms, javafx.beans.value.WritableValue<Number> prop,
                         double val, Interpolator interp) {
         return new KeyFrame(Duration.millis(ms), new KeyValue(prop, val, interp));
+    }
+    private void handlePush() {
+        if (isSimulating) return;
+        String raw = inputField.getText().trim();
+        if (raw.isEmpty()) {
+            setStatus("⚠ Vui lòng nhập một số nguyên hợp lệ!", false);
+            return;
+        }
+        try {
+            int val = Integer.parseInt(raw);
+            if (service.size() >= 6) {
+                appendLog("✖ [Lỗi]: Chiều cao ngăn xếp giới hạn 6 phần tử trong demo.");
+                setStatus("Stack đã đầy (giới hạn demo: 6 phần tử).", false);
+                return;
+            }
+            isSimulating = true;
+            codeArea.setText(CODE_PUSH);
+            appendLog("⚡ [Đang xử lý]: Đang Push(" + val + ") vào đỉnh Ngăn xếp...");
+            setStatus("Đang chuẩn bị chèn vào...");
+            service.push(val);
+            redrawStack(AnimType.PUSH, 0);
+            appendLog("✔ [Thành công]: Push " + val + " lên đỉnh Ngăn xếp thành công.");
+            setStatus("Đã Push thành công.", true);
+            inputField.clear();
+            isSimulating = false;
+        } catch (NumberFormatException ex) {
+            setStatus("⚠ Giá trị không hợp lệ. Hãy nhập số nguyên.", false);
+        }
+    }
+
+    private void handlePop() {
+        if (isSimulating) return;
+        if (service.isEmpty()) {
+            appendLog("✖ [Lỗi]: Ngăn xếp rỗng (Stack Underflow). Không thể Pop!");
+            setStatus("Ngăn xếp rỗng, không thể Pop.", false);
+            return;
+        }
+        isSimulating = true;
+        codeArea.setText(CODE_POP);
+        int topVal = service.toList().get(0);
+        appendLog("⚡ [Đang xử lý]: Đang Pop(" + topVal + ") ra khỏi Ngăn xếp...");
+        setStatus("Đang trích xuất dữ liệu từ đỉnh (POP)...");
+
+        stackFrame.getChildren().clear();
+        List<Integer> items = service.toList();
+        HBox topRow = null;
+        for (int i = 0; i < items.size(); i++) {
+            HBox row = buildCellRow(items.get(i), i == 0);
+            stackFrame.getChildren().add(row);
+            if (i == 0) topRow = row;
+        }
+        if (topRow == null) { isSimulating = false; return; }
+
+        final HBox finalTopRow = topRow;
+        playPopAnim(finalTopRow, () -> {
+            service.pop();
+            redrawStack(AnimType.NONE, -1);
+            appendLog("✔ [Thành công]: Pop(" + topVal + ") ra khỏi Ngăn xếp thành công.");
+            setStatus("Pop thành công.", true);
+            isSimulating = false;
+        });
+    }
+
+    private void handlePeek() {
+        if (isSimulating) return;
+        if (service.isEmpty()) {
+            appendLog("✖ [Lỗi]: Ngăn xếp rỗng. Peek = NULL!");
+            setStatus("Ngăn xếp rỗng.", false);
+            return;
+        }
+        isSimulating = true;
+        codeArea.setText(CODE_PEEK);
+        int peeked = service.toList().get(0);
+        appendLog("⚡ [Đang xử lý]: Đang đọc giá trị đỉnh...");
+        setStatus("Kiểm tra giá trị đỉnh ngăn xếp...");
+        redrawStack(AnimType.PEEK, 0);
+        PauseTransition pause = new PauseTransition(Duration.millis(1800));
+        pause.setOnFinished(e -> {
+            appendLog("✔ [Thành công]: Giá trị đỉnh hiện tại: " + peeked);
+            setStatus("Peek: " + peeked, true);
+            isSimulating = false;
+        });
+        pause.play();
+    }
+
+    private void handleReset() {
+        if (isSimulating) return;
+        service.reset();
+        service.push(15);
+        service.push(30);
+        service.push(45);
+        codeArea.setText(CODE_IDLE);
+        redrawStack(AnimType.NONE, -1);
+        appendLog("[Nhật ký]: Đã làm mới Ngăn xếp về trạng thái mặc định.");
+        setStatus("Đã khởi tạo lại.", true);
+        inputField.clear();
     }
 }
