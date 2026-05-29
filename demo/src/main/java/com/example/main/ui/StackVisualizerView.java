@@ -1,10 +1,12 @@
 package com.example.main.ui;
 
 import com.example.main.service.StackService;
+import javafx.animation.*;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.util.Duration;
 
 import java.util.List;
 
@@ -169,7 +171,16 @@ public class StackVisualizerView extends BorderPane {
         for (int i = 0; i < items.size(); i++) {
             HBox row = buildCellRow(items.get(i), i == 0);
             stackFrame.getChildren().add(row);
+
+            if (i == animIdx) {
+                switch (type) {
+                    case PUSH -> playPushAnim(row);
+                    case PEEK -> playPeekAnim(row);
+                    default   -> {}
+                }
+            }
         }
+
     }
 
     private HBox buildCellRow(int value, boolean isTop) {
@@ -192,5 +203,51 @@ public class StackVisualizerView extends BorderPane {
             row.getChildren().add(cell);
         }
         return row;
+    }
+    private void playPushAnim(HBox row) {
+        row.setScaleX(0); row.setScaleY(0); row.setOpacity(0);
+        Timeline tl = new Timeline(
+                kf(0,   row.scaleXProperty(), 0,    Interpolator.LINEAR),
+                kf(0,   row.scaleYProperty(), 0,    Interpolator.LINEAR),
+                kf(0,   row.opacityProperty(), 0,   Interpolator.LINEAR),
+                kf(200, row.scaleXProperty(), 1.15, Interpolator.EASE_OUT),
+                kf(200, row.scaleYProperty(), 1.15, Interpolator.EASE_OUT),
+                kf(200, row.opacityProperty(), 1.0, Interpolator.LINEAR),
+                kf(320, row.scaleXProperty(), 1.0,  Interpolator.EASE_IN),
+                kf(320, row.scaleYProperty(), 1.0,  Interpolator.EASE_IN)
+        );
+        tl.play();
+    }
+
+    private void playPeekAnim(HBox row) {
+        if (row.getChildren().isEmpty()) return;
+        var cell = row.getChildren().get(0);
+        ScaleTransition st = new ScaleTransition(Duration.millis(400), cell);
+        st.setFromX(1.0); st.setToX(1.1);
+        st.setFromY(1.0); st.setToY(1.1);
+        st.setCycleCount(4);
+        st.setAutoReverse(true);
+        st.setInterpolator(Interpolator.EASE_BOTH);
+        st.play();
+    }
+
+    private void playPopAnim(HBox targetRow, Runnable onDone) {
+        Timeline tl = new Timeline(
+                kf(0,   targetRow.translateYProperty(), 0,   Interpolator.LINEAR),
+                kf(0,   targetRow.scaleXProperty(),     1.0, Interpolator.LINEAR),
+                kf(0,   targetRow.scaleYProperty(),     1.0, Interpolator.LINEAR),
+                kf(0,   targetRow.opacityProperty(),    1.0, Interpolator.LINEAR),
+                kf(350, targetRow.translateYProperty(), -28, Interpolator.EASE_IN),
+                kf(350, targetRow.scaleXProperty(),    0.85, Interpolator.EASE_IN),
+                kf(350, targetRow.scaleYProperty(),    0.85, Interpolator.EASE_IN),
+                kf(350, targetRow.opacityProperty(),    0.0, Interpolator.EASE_IN)
+        );
+        tl.setOnFinished(e -> onDone.run());
+        tl.play();
+    }
+
+    private KeyFrame kf(double ms, javafx.beans.value.WritableValue<Number> prop,
+                        double val, Interpolator interp) {
+        return new KeyFrame(Duration.millis(ms), new KeyValue(prop, val, interp));
     }
 }
