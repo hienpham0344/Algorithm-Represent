@@ -6,6 +6,8 @@ import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 
+import java.util.List;
+
 public class StackVisualizerView extends BorderPane {
 
     private final StackService service = new StackService();
@@ -51,7 +53,15 @@ public class StackVisualizerView extends BorderPane {
                 getClass().getResource("/styles/stack.css").toExternalForm()
         );
         getStyleClass().add("stack-root");
-        setLeft(buildLeftPanel());  // thêm dòng này
+        setLeft(buildLeftPanel());
+        setCenter(buildVizArea());
+
+        // init data
+        service.push(15);
+        service.push(30);
+        service.push(45);
+        redrawStack(AnimType.NONE, -1);
+
     }
 
     private VBox buildLeftPanel() {
@@ -130,6 +140,57 @@ public class StackVisualizerView extends BorderPane {
         HBox row = new HBox(8, a, b);
         HBox.setHgrow(a, Priority.ALWAYS);
         HBox.setHgrow(b, Priority.ALWAYS);
+        return row;
+    }
+    private StackPane buildVizArea() {
+        stackFrame = new VBox(8);
+        stackFrame.setAlignment(Pos.CENTER);
+        stackFrame.getStyleClass().add("stack-frame");
+
+        StackPane wrapper = new StackPane(stackFrame);
+        wrapper.setAlignment(Pos.CENTER);
+        wrapper.getStyleClass().add("viz-area");
+        return wrapper;
+    }
+
+    private void redrawStack(AnimType type, int animIdx) {
+        stackFrame.getChildren().clear();
+
+        List<Integer> items = service.toList();
+
+        if (items.isEmpty()) {
+            Label empty = new Label("Stack Rỗng");
+            empty.getStyleClass().add("stack-empty-label");
+            empty.setPadding(new Insets(24, 0, 24, 0));
+            stackFrame.getChildren().add(empty);
+            return;
+        }
+
+        for (int i = 0; i < items.size(); i++) {
+            HBox row = buildCellRow(items.get(i), i == 0);
+            stackFrame.getChildren().add(row);
+        }
+    }
+
+    private HBox buildCellRow(int value, boolean isTop) {
+        Label valLabel = new Label(String.valueOf(value));
+        valLabel.getStyleClass().add(isTop ? "stack-cell-value-top" : "stack-cell-value");
+
+        StackPane cell = new StackPane(valLabel);
+        cell.getStyleClass().add(isTop ? "stack-cell-top" : "stack-cell");
+        cell.setPrefWidth(190);
+        cell.setPrefHeight(52);
+
+        HBox row = new HBox(10);
+        row.setAlignment(Pos.CENTER_LEFT);
+
+        if (isTop) {
+            Label badge = new Label("TOP (ĐỈNH)");
+            badge.getStyleClass().add("stack-top-badge");
+            row.getChildren().addAll(cell, badge);
+        } else {
+            row.getChildren().add(cell);
+        }
         return row;
     }
 }
