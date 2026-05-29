@@ -1,4 +1,4 @@
-/*
+
 
 
 .stack-root {
@@ -7,8 +7,8 @@
 }
 
 
-*/
-/* ── LEFT PANEL ── *//*
+
+/* ── LEFT PANEL ── */
 
 
 .left-panel {
@@ -56,8 +56,7 @@
 }
 
 
-*/
-/* ── BUTTONS ── *//*
+/* ── BUTTONS ── */
 
 
 .btn-push {
@@ -109,8 +108,7 @@
 .btn-reset:pressed { -fx-background-color: #1E293B; }
 
 
-*/
-/* ── STATUS BOX ── *//*
+/* ── STATUS BOX ── */
 
 
 .status-box {
@@ -140,8 +138,7 @@
 }
 
 
-*/
-/* ── VIZ AREA ── *//*
+/* ── VIZ AREA ── */
 
 
 .viz-area {
@@ -161,8 +158,7 @@
 }
 
 
-*/
-/* Cell bình thường *//*
+/* Cell bình thường */
 
 
 .stack-cell {
@@ -174,8 +170,7 @@
 }
 
 
-*/
-/* Cell TOP *//*
+/* Cell TOP */
 
 
 .stack-cell-top {
@@ -218,8 +213,7 @@
 }
 
 
-*/
-/* ── BOTTOM PANEL ── *//*
+/* ── BOTTOM PANEL ── */
 
 
 .bottom-panel {
@@ -286,4 +280,3 @@
     -fx-min-width: 1;
     -fx-max-width: 1;
 }
-*/
