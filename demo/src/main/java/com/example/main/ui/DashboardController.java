@@ -64,7 +64,12 @@ public class DashboardController {
 
     @FXML
     public void openStack() {
-        System.out.println("Stack");
+        StackVisualizerView view = new StackVisualizerView();
+        contentPane.getChildren().setAll(view);
+
+        sidebar.setVisible(false);
+        sidebar.setManaged(false);
+        sidebarVisible = false;
     }
 
     @FXML
