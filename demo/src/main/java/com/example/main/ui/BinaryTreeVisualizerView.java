@@ -1,34 +1,38 @@
 package com.example.main.ui;
 
 import com.example.main.service.BinaryTreeService;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
+import javafx.util.Duration;
+
+import java.util.List;
 
 public class BinaryTreeVisualizerView extends BorderPane {
 
     private final BinaryTreeService service = new BinaryTreeService();
-
     private TextField inputField;
     private Pane vizPane;
     private TextArea pseudoCodeArea;
     private TextArea activityLogArea;
     private Label statusText;
+    private Button btnInsert, btnSearch, btnDelete, btnReset;
+    private Slider speedSlider;
+    private int currentSearchValue = -1;
+    private int foundValue = -1;
 
     public BinaryTreeVisualizerView() {
-        getStylesheets().add(
-                getClass().getResource("/styles/tree.css").toExternalForm()
-        );
+        getStylesheets().add(getClass().getResource("/styles/tree.css").toExternalForm());
         getStyleClass().add("tree-root");
 
-        // Set Layout
         setLeft(buildLeftPanel());
         setCenter(buildCenterArea());
 
-        // Khởi tạo cây mẫu giống trong ảnh của bạn
         logActivity("[System]: Binary Search Tree initialized. Ready.");
         service.insert(50);
         service.insert(30);
@@ -59,31 +63,30 @@ public class BinaryTreeVisualizerView extends BorderPane {
         inputField.setPromptText("e.g. 55");
         inputField.getStyleClass().add("input-field");
 
-        // Buttons
-        Button btnInsert = createButton("+ Insert Node", "btn-purple");
+        btnInsert = createButton("+ Insert Node", "btn-purple");
         btnInsert.setOnAction(e -> executeOp("INSERT"));
 
-        Button btnSearch = createButton("⌕ Search Node", "btn-green");
+        btnSearch = createButton("⌕ Search Node", "btn-green");
         btnSearch.setOnAction(e -> executeOp("SEARCH"));
 
-        Button btnDelete = createButton("🗑 Delete Node", "btn-red");
+        btnDelete = createButton("🗑 Delete Node", "btn-red");
         btnDelete.setOnAction(e -> executeOp("DELETE"));
 
-        Button btnReset = createButton("⟳ Reset", "btn-gray");
+        btnReset = createButton("⟳ Reset", "btn-gray");
         btnReset.setOnAction(e -> {
             service.clear();
+            foundValue = -1;
+            currentSearchValue = -1;
             logActivity("Đã xóa toàn bộ cây (Reset).");
-            setPseudoCode("// Cây đã được làm sạch.");
+            setPseudoCode("function reset():\n  tree.root = null");
             redrawTree();
         });
 
-        // Grid 2x2 cho các nút
         GridPane btnGrid = new GridPane();
         btnGrid.setHgap(10); btnGrid.setVgap(10);
         btnGrid.add(btnInsert, 0, 0); btnGrid.add(btnSearch, 1, 0);
         btnGrid.add(btnDelete, 0, 1); btnGrid.add(btnReset, 1, 1);
 
-        // Buộc các nút giãn đều
         ColumnConstraints cc = new ColumnConstraints();
         cc.setPercentWidth(50);
         btnGrid.getColumnConstraints().addAll(cc, cc);
@@ -108,29 +111,37 @@ public class BinaryTreeVisualizerView extends BorderPane {
     }
 
     private VBox buildCenterArea() {
-        // Top: Canvas vẽ cây
-        vizPane = new Pane();
-        StackPane canvasWrapper = new StackPane(vizPane);
-        canvasWrapper.getStyleClass().add("viz-area");
-        VBox.setVgrow(canvasWrapper, Priority.ALWAYS); // Chiếm toàn bộ không gian trống
+        speedSlider = new Slider(0.5, 3.0, 1.5);
+        speedSlider.setPrefWidth(120);
 
-        // Bottom: Pseudo-code & Activity Log
+        Label speedLabel = new Label("⏱ Speed:");
+        speedLabel.setStyle("-fx-text-fill: #94A3B8; -fx-font-size: 12px; -fx-font-weight: bold;");
+
+        HBox topBar = new HBox(8, speedLabel, speedSlider);
+        topBar.setAlignment(Pos.CENTER_RIGHT);
+        topBar.setPadding(new Insets(16, 24, 0, 0));
+
+        vizPane = new Pane();
+        VBox.setVgrow(vizPane, Priority.ALWAYS);
+
+        VBox canvasContainer = new VBox(topBar, vizPane);
+        canvasContainer.getStyleClass().add("viz-area");
+        VBox.setVgrow(canvasContainer, Priority.ALWAYS);
+
         HBox bottomPanels = new HBox();
         bottomPanels.setPrefHeight(200);
 
-        // Pseudo Code Panel
         VBox pseudoBox = new VBox();
         pseudoBox.getStyleClass().add("bottom-panel");
         HBox.setHgrow(pseudoBox, Priority.ALWAYS);
         Label lblPseudo = new Label("< > PSEUDO-CODE");
         lblPseudo.getStyleClass().add("panel-header");
-        pseudoCodeArea = new TextArea("// Select an operation to view pseudo-code.");
+        pseudoCodeArea = new TextArea();
         pseudoCodeArea.getStyleClass().add("code-area");
         pseudoCodeArea.setEditable(false);
         VBox.setVgrow(pseudoCodeArea, Priority.ALWAYS);
         pseudoBox.getChildren().addAll(lblPseudo, pseudoCodeArea);
 
-        // Activity Log Panel
         VBox logBox = new VBox();
         logBox.getStyleClass().add("bottom-panel");
         HBox.setHgrow(logBox, Priority.ALWAYS);
@@ -144,55 +155,99 @@ public class BinaryTreeVisualizerView extends BorderPane {
 
         bottomPanels.getChildren().addAll(pseudoBox, logBox);
 
-        return new VBox(canvasWrapper, bottomPanels);
+        return new VBox(canvasContainer, bottomPanels);
     }
 
     private void executeOp(String type) {
+        foundValue = -1;
+        currentSearchValue = -1;
+        redrawTree();
+
         try {
             int val = Integer.parseInt(inputField.getText().trim());
-            BinaryTreeService.Result res = null;
 
-            switch (type) {
-                case "INSERT" -> {
-                    res = service.insert(val);
-                    setPseudoCode("function insert(node, key):\n  if node is null return new Node(key)\n  if key < node.key\n    node.left = insert(node.left, key)\n  else\n    node.right = insert(node.right, key)\n  return node");
-                }
-                case "DELETE" -> {
-                    res = service.delete(val);
-                    setPseudoCode("function delete(node, key):\n  if node is null return null\n  if key < node.key node.left = delete(node.left, key)\n  else if key > node.key node.right = delete(node.right, key)\n  else:\n    if left is null return right\n    if right is null return left\n    node.key = min(node.right)\n    node.right = delete(node.right, node.key)\n  return node");
-                }
-                case "SEARCH" -> {
-                    res = service.search(val);
-                    setPseudoCode("function search(node, key):\n  if node is null or node.key == key\n    return node\n  if key < node.key\n    return search(node.left, key)\n  return search(node.right, key)");
-                }
-            }
+            if (type.equals("SEARCH")) {
+                setPseudoCode("function search(node, key):\n  if node is null or node.key == key\n    return node\n  if key < node.key\n    return search(node.left, key)\n  return search(node.right, key)");
+                BinaryTreeService.SearchResult res = service.search(val);
 
-            if (res != null) {
-                statusText.setText(res.success() ? "Thành công!" : "Thất bại!");
-                logActivity(res.message());
+                animatePath(res.path(), () -> {
+                    if (res.success()) foundValue = val;
+                    statusText.setText(res.success() ? "Đã tìm thấy!" : "Không tìm thấy!");
+                    logActivity(res.message());
+                    redrawTree();
+                });
+
+            } else if (type.equals("INSERT")) {
+                setPseudoCode("function insert(node, key):\n  if node is null return new Node(key)\n  if key < node.key\n    node.left = insert(node.left, key)\n  else\n    node.right = insert(node.right, key)\n  return node");
+                BinaryTreeService.SearchResult searchRes = service.search(val);
+
+                animatePath(searchRes.path(), () -> {
+                    BinaryTreeService.Result res = service.insert(val);
+                    statusText.setText(res.success() ? "Thành công!" : "Thất bại!");
+                    logActivity(res.message());
+                    redrawTree();
+                });
+
+            } else if (type.equals("DELETE")) {
+                setPseudoCode("function delete(node, key):\n  if node is null return null\n  if key < node.key node.left = delete(node.left, key)\n  else if key > node.key node.right = delete(node.right, key)\n  else:\n    if left is null return right\n    if right is null return left\n    node.key = min(node.right)\n    node.right = delete(node.right, node.key)\n  return node");
+                BinaryTreeService.SearchResult searchRes = service.search(val);
+
+                animatePath(searchRes.path(), () -> {
+                    BinaryTreeService.Result res = service.delete(val);
+                    statusText.setText(res.success() ? "Thành công!" : "Thất bại!");
+                    logActivity(res.message());
+                    redrawTree();
+                });
             }
 
             inputField.clear();
-            redrawTree();
         } catch (NumberFormatException ex) {
             statusText.setText("Lỗi đầu vào.");
             logActivity("[Error]: Vui lòng nhập số nguyên hợp lệ.");
         }
     }
 
-    private void logActivity(String msg) {
-        activityLogArea.appendText(msg + "\n");
+    private void animatePath(List<Integer> path, Runnable onComplete) {
+        setControlsDisabled(true);
+
+        double speed = speedSlider.getValue();
+        double delayMs = 1200 / speed;
+
+        Timeline timeline = new Timeline();
+
+        for (int i = 0; i < path.size(); i++) {
+            int val = path.get(i);
+
+            KeyFrame kf = new KeyFrame(Duration.millis(i * delayMs), e -> {
+                currentSearchValue = val;
+                redrawTree();
+                logActivity("[Traverse]: Đang duyệt qua nút " + val + "...");
+            });
+            timeline.getKeyFrames().add(kf);
+        }
+
+        KeyFrame end = new KeyFrame(Duration.millis(path.size() * delayMs), e -> {
+            currentSearchValue = -1;
+            onComplete.run();
+            setControlsDisabled(false);
+        });
+        timeline.getKeyFrames().add(end);
+
+        timeline.play();
     }
 
-    private void setPseudoCode(String code) {
-        pseudoCodeArea.setText(code);
+    private void setControlsDisabled(boolean disabled) {
+        btnInsert.setDisable(disabled);
+        btnSearch.setDisable(disabled);
+        btnDelete.setDisable(disabled);
+        btnReset.setDisable(disabled);
+        inputField.setDisable(disabled);
     }
 
     private void redrawTree() {
         vizPane.getChildren().clear();
         BinaryTreeService.Node root = service.getRoot();
         if (root != null) {
-            // Canh giữa tương đối so với màn hình (X=500, Y=40)
             drawNode(root, 500, 40, 200);
         }
     }
@@ -219,7 +274,14 @@ public class BinaryTreeVisualizerView extends BorderPane {
         }
 
         Circle circle = new Circle(22);
-        circle.getStyleClass().add("tree-node");
+
+        if (node.value == foundValue) {
+            circle.getStyleClass().add("tree-node-found");
+        } else if (node.value == currentSearchValue) {
+            circle.getStyleClass().add("tree-node-highlight");
+        } else {
+            circle.getStyleClass().add("tree-node");
+        }
 
         Label lbl = new Label(String.valueOf(node.value));
         lbl.getStyleClass().add("tree-value");
@@ -229,5 +291,13 @@ public class BinaryTreeVisualizerView extends BorderPane {
         nodeView.setLayoutY(y - 22);
 
         vizPane.getChildren().add(nodeView);
+    }
+
+    private void logActivity(String msg) {
+        activityLogArea.appendText(msg + "\n");
+    }
+
+    private void setPseudoCode(String code) {
+        pseudoCodeArea.setText(code);
     }
 }

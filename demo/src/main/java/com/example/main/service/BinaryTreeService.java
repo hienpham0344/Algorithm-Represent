@@ -1,5 +1,8 @@
 package com.example.main.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class BinaryTreeService {
 
     public static class Node {
@@ -16,7 +19,8 @@ public class BinaryTreeService {
 
     public record Result(boolean success, String message) {}
 
-    // 1. THÊM NODE (INSERT)
+    public record SearchResult(boolean success, String message, List<Integer> path) {}
+
     public Result insert(int value) {
         if (root == null) {
             root = new Node(value);
@@ -44,7 +48,6 @@ public class BinaryTreeService {
         return new Result(false, "Giá trị " + value + " đã tồn tại trong cây.");
     }
 
-    // 2. XÓA NODE (DELETE)
     public Result delete(int value) {
         if (!contains(root, value)) {
             return new Result(false, "Không tìm thấy giá trị " + value + " để xóa.");
@@ -79,12 +82,18 @@ public class BinaryTreeService {
         return minVal;
     }
 
-    // 3. TÌM KIẾM NODE (SEARCH)
-    public Result search(int value) {
-        if (contains(root, value)) {
-            return new Result(true, "Tìm thấy nút " + value + " trong cây.");
+    public SearchResult search(int value) {
+        List<Integer> path = new ArrayList<>();
+        Node current = root;
+
+        while (current != null) {
+            path.add(current.value);
+            if (value == current.value) {
+                return new SearchResult(true, "Tìm thấy nút " + value + " trong cây.", path);
+            }
+            current = value < current.value ? current.left : current.right;
         }
-        return new Result(false, "Không tìm thấy nút " + value + " trong cây.");
+        return new SearchResult(false, "Không tìm thấy nút " + value + " trong cây.", path);
     }
 
     private boolean contains(Node current, int value) {
