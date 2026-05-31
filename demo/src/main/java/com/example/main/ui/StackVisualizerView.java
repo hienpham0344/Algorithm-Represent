@@ -21,6 +21,8 @@ public class StackVisualizerView extends BorderPane {
     private Label     statusText;
     private boolean   isSimulating = false;
 
+    private Slider    speedSlider;
+    private Animation currentAnimation;
 //Dữ liệu mã giả ứng của các buttons để nạp vào codeArea(mã giả)
     private static final String CODE_IDLE =
             "// Chọn một hành động để trực quan hóa mã giả\n";
@@ -79,33 +81,32 @@ public class StackVisualizerView extends BorderPane {
         panel.setMaxWidth(265);
         panel.setPadding(new Insets(22, 18, 22, 18));
 
-        Label title = new Label("Ngăn xếp (Stack - LIFO)");
+        Label title = new Label("STACK (LIFO)");
         title.getStyleClass().add("ds-title");
         title.setWrapText(true);
 
         Label desc = new Label(
-                "Hoạt động theo nguyên lý 'Vào sau – Ra trước' " +
-                        "(Last In, First Out). Hai thao tác cơ bản nhất là " +
-                        "Push (Thêm vào đỉnh) và Pop (Lấy ra từ đỉnh)."
+                "Operates on the 'Last In, First Out' (LIFO) principle. " +
+                        "The two most basic operations are Push (add to the top) and Pop (remove from the top)."
         );
         desc.getStyleClass().add("ds-desc");
         desc.setWrapText(true);
 
-        Label sectionOp = new Label("TÁC VỤ THAO TÁC");
+        Label sectionOp = new Label("OPRATIONS");
         sectionOp.getStyleClass().add("section-label");
 
-        Label inputLabel = new Label("Giá trị phần tử (Số nguyên):");
+        Label inputLabel = new Label("Element Value:");
         inputLabel.getStyleClass().add("input-label");
 
         inputField = new TextField();
-        inputField.setPromptText("Ví dụ: 42");
+        inputField.setPromptText("Example: 42");
         inputField.getStyleClass().add("input-field");
         inputField.setMaxWidth(Double.MAX_VALUE);
 
-        Button btnPush  = makeBtn("Push (Đẩy vào)", "btn-push");
-        Button btnPop   = makeBtn("Pop (Lấy ra)",   "btn-pop");
-        Button btnPeek  = makeBtn("Xem đỉnh (Peek)","btn-peek");
-        Button btnReset = makeBtn("Khởi tạo lại",   "btn-reset");
+        Button btnPush  = makeBtn("↴  Push", "btn-push");
+        Button btnPop   = makeBtn("↷  Pop",   "btn-pop");
+        Button btnPeek  = makeBtn("⚇  Peek","btn-peek");
+        Button btnReset = makeBtn("⟳  Reset",   "btn-reset");
 
         btnPush.setOnAction(e  -> handlePush());
         btnPop.setOnAction(e   -> handlePop());
@@ -115,7 +116,25 @@ public class StackVisualizerView extends BorderPane {
         HBox row1 = hRow(btnPush, btnPop);
         HBox row2 = hRow(btnPeek, btnReset);
 
-        Label statusHeader = new Label("ℹ  TRẠNG THÁI MÔ PHỎNG");
+        Label speedLabel = new Label("⏱ Speed:");
+        speedLabel.getStyleClass().add("input-label");
+
+        speedSlider = new Slider(0.2, 3.0, 1.0);
+        speedSlider.getStyleClass().add("speed-slider");
+        speedSlider.setShowTickMarks(true);
+        speedSlider.setShowTickLabels(true);
+        speedSlider.setMajorTickUnit(1.0);
+        speedSlider.setBlockIncrement(0.1);
+        speedSlider.setMaxWidth(Double.MAX_VALUE);
+
+        speedSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if (currentAnimation != null && currentAnimation.getStatus() == Animation.Status.RUNNING) {
+                currentAnimation.setRate(newValue.doubleValue());
+            }
+        });
+        VBox speedBox = new VBox(5, speedLabel, speedSlider);
+
+        Label statusHeader = new Label("ℹ  SIMULATION STATUS");
         statusHeader.getStyleClass().add("status-header");
         statusText = new Label("Hệ thống đã sẵn sàng. Hãy chọn một thao tác.");
         statusText.getStyleClass().add("status-text");
@@ -130,7 +149,7 @@ public class StackVisualizerView extends BorderPane {
         panel.getChildren().addAll(
                 title, desc, divider(),
                 sectionOp, inputLabel, inputField,
-                row1, row2, divider(), statusBox
+                row1, row2,speedBox, divider(), statusBox
         );
         return panel;
     }
@@ -178,7 +197,7 @@ public class StackVisualizerView extends BorderPane {
         List<Integer> items = service.toList();
 
         if (items.isEmpty()) {
-            Label empty = new Label("STACK RỖNG");
+            Label empty = new Label("STACK EMPTY");
             empty.getStyleClass().add("stack-empty-label");
 
             VBox emptyBox = new VBox(empty);
@@ -244,7 +263,7 @@ public class StackVisualizerView extends BorderPane {
 
 
         if (isTop) {
-            Label badge = new Label("TOP (ĐỈNH)");
+            Label badge = new Label("TOP");
             badge.getStyleClass().add("stack-top-badge");
 
             grid.add(badge, 2, 0);
@@ -260,7 +279,7 @@ public class StackVisualizerView extends BorderPane {
         return row;
     }
     private HBox buildBottomPanel() {
-        Label codeHeader = new Label("Pseudo-code");
+        Label codeHeader = new Label("PSEUDO-CODE");
         codeHeader.getStyleClass().add("panel-header-label");
         Label codeLang = new Label("Java code");
         codeLang.getStyleClass().add("panel-lang-badge");
@@ -286,9 +305,9 @@ public class StackVisualizerView extends BorderPane {
         Region vdiv = new Region();
         vdiv.getStyleClass().add("bottom-divider");
 
-        Label logHeader = new Label(" Nhật ký từng bước");
+        Label logHeader = new Label("ACTIVITY LOG");
         logHeader.getStyleClass().add("panel-header-label");
-        Button btnClear = new Button("🗑 Xóa");
+        Button btnClear = new Button("🗑 Clear");
         btnClear.getStyleClass().add("btn-clear-log");
         btnClear.setOnAction(e -> {
             logArea.clear();
@@ -349,7 +368,10 @@ public class StackVisualizerView extends BorderPane {
                 kf(320, row.scaleXProperty(), 1.0,  Interpolator.EASE_IN),
                 kf(320, row.scaleYProperty(), 1.0,  Interpolator.EASE_IN)
         );
+        currentAnimation = tl;
+        tl.setRate(speedSlider.getValue());
         tl.play();
+
     }
 
     private void playPeekAnim(HBox row) {
@@ -361,6 +383,9 @@ public class StackVisualizerView extends BorderPane {
         st.setCycleCount(4);
         st.setAutoReverse(true);
         st.setInterpolator(Interpolator.EASE_BOTH);
+
+        currentAnimation = st;
+        st.setRate(speedSlider.getValue());
         st.play();
     }
 
@@ -376,6 +401,8 @@ public class StackVisualizerView extends BorderPane {
                 kf(350, targetRow.opacityProperty(),    0.0, Interpolator.EASE_IN)
         );
         tl.setOnFinished(e -> onDone.run());
+        currentAnimation = tl;
+        tl.setRate(speedSlider.getValue());
         tl.play();
     }
 
