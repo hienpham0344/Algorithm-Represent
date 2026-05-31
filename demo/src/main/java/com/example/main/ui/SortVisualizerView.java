@@ -38,12 +38,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
-/**
- * Main UI — mirrors the original 3-zone layout:
- *   TOP ROW  : [Algorithm picker] [Data source] [Array size]
- *   ROW 2    : [Buttons row]      [Speed]
- *   BOTTOM   : [Sort chart ─ wide]              [Java code]
- */
+
 public class SortVisualizerView extends VBox {
 
     // ── Algorithm display names ──────────────────────────────────────────
@@ -74,16 +69,16 @@ public class SortVisualizerView extends VBox {
     private final Slider  speedSlider  = new Slider(0.5, 3.0, 1.0);
     private final TextArea manualInput = new TextArea("42, 17, 88, 6, 31, 59, 12, 75");
     private final Label   swapValueLabel = new Label("0");
-    private final Label   statusLabel  = new Label("Tạo mảng để bắt đầu.");
+    private final Label   statusLabel  = new Label("Creating an array to get started.");
 
     // Buttons
     private final Button sortButton   = new Button("Sort");
-    private final Button tangDanBtn   = new Button("Tăng dần");
-    private final Button giamDanBtn   = new Button("Giảm dần");
+    private final Button tangDanBtn   = new Button("Ascending");
+    private final Button giamDanBtn   = new Button("Descending");
     private final Button stopButton   = new Button("Stop");
     private final Button resetButton  = new Button("Reset");
     private final Button deleteButton = new Button("Delete");
-    private final Button createButton = new Button("Tạo mảng");
+    private final Button createButton = new Button("Create Array");
 
     // Panels
     private final HBox  chartPane = new HBox();
@@ -148,11 +143,11 @@ public class SortVisualizerView extends VBox {
         algorithmBox.getSelectionModel().select("selection");
         algorithmBox.setMaxWidth(Double.MAX_VALUE);
 
-        VBox algoCard = labeledCard("Chọn thuật toán sắp xếp", algorithmBox);
+        VBox algoCard = labeledCard("Select a sorting algorithm", algorithmBox);
         HBox.setHgrow(algoCard, Priority.ALWAYS);
 
         // Data source picker
-        dataSourceBox.getItems().addAll("Ngẫu nhiên", "Nhập tay");
+        dataSourceBox.getItems().addAll("Random", "Manual Entry");
         dataSourceBox.getSelectionModel().select(0);
         dataSourceBox.setMaxWidth(Double.MAX_VALUE);
         manualInput.setPrefRowCount(2);
@@ -160,7 +155,7 @@ public class SortVisualizerView extends VBox {
         manualInput.setPromptText("VD: 5, 1, 9, 3");
         manualInput.setVisible(false);
         manualInput.setManaged(false);
-        VBox dataSourceCard = labeledCard("Tạo dữ liệu mảng", new VBox(8, dataSourceBox, manualInput));
+        VBox dataSourceCard = labeledCard("Generate array data", new VBox(8, dataSourceBox, manualInput));
         HBox.setHgrow(dataSourceCard, Priority.ALWAYS);
 
         // Array size
@@ -322,7 +317,7 @@ public class SortVisualizerView extends VBox {
                 sizeRangeLabel.setText("2 -> " + nv.intValue()));
 
         dataSourceBox.valueProperty().addListener((o, ov, nv) -> {
-            boolean manual = "Nhập tay".equals(nv);
+            boolean manual = "Manual Entry".equals(nv);
             manualInput.setVisible(manual);
             manualInput.setManaged(manual);
             sizeSlider.setDisable(manual);
@@ -340,7 +335,7 @@ public class SortVisualizerView extends VBox {
     }
 
     // ── Array operations ─────────────────────────────────────────────────
-    private boolean isManual() { return "Nhập tay".equals(dataSourceBox.getValue()); }
+    private boolean isManual() { return "Manual Entry".equals(dataSourceBox.getValue()); }
 
     private void createArray() {
         stopAnimation();
@@ -350,7 +345,7 @@ public class SortVisualizerView extends VBox {
 
         int[] array = isManual() ? parseManualInput() : randomArray((int) sizeSlider.getValue());
         if (array.length == 0) {
-            statusLabel.setText("Dữ liệu rỗng hoặc không hợp lệ.");
+            statusLabel.setText("Empty or invalid data.");
             currentArray = originalArray = new int[0];
             refreshChart(currentArray, -1, -1, null);
             return;
@@ -358,21 +353,21 @@ public class SortVisualizerView extends VBox {
         originalArray = array.clone();
         currentArray  = array.clone();
         steps = List.of();
-        statusLabel.setText("Mảng đã sẵn sàng — nhấn Sort để bắt đầu.");
+        statusLabel.setText("rray is ready — click Sort to start.");
         refreshChart(currentArray, -1, -1, null);
         renderCode();
         updateButtons(false);
     }
 
     private void sort(boolean ascending) {
-        if (currentArray.length == 0) { statusLabel.setText("Tạo mảng trước đã."); return; }
+        if (currentArray.length == 0) { statusLabel.setText("Please create an array first."); return; }
         stopAnimation();
         sortedIndices.clear();
         swapCount = 0; stepIndex = 0;
         swapValueLabel.setText("0");
 
         int[] source = isManual() ? parseManualInput() : currentArray.clone();
-        if (source.length == 0) { statusLabel.setText("Dữ liệu rỗng hoặc không hợp lệ."); return; }
+        if (source.length == 0) { statusLabel.setText("Empty or invalid data."); return; }
 
         originalArray = source.clone();
         currentArray  = source.clone();
@@ -380,12 +375,12 @@ public class SortVisualizerView extends VBox {
         SortStrategy strategy = strategies.get(algorithmBox.getValue());
         steps = strategy.sort(source, ascending);
         if (steps.isEmpty()) {
-            statusLabel.setText("Không tạo được bước hoạt ảnh.");
+            statusLabel.setText("Failed to create animation step.");
             refreshChart(currentArray, -1, -1, null);
             return;
         }
         paused = false;
-        statusLabel.setText(ascending ? "Đang sắp xếp tăng dần…" : "Đang sắp xếp giảm dần…");
+        statusLabel.setText(ascending ? "Sorting ascending..." : "Sorting descending...");
         stopButton.setText("Stop");
         playTimeline();
     }
@@ -416,7 +411,7 @@ public class SortVisualizerView extends VBox {
         stopAnimation();
         for (int i = 0; i < currentArray.length; i++) sortedIndices.add(i);
         refreshChart(currentArray, -1, -1, null);
-        statusLabel.setText("✓ Hoàn tất — " + swapCount + " lần hoán đổi.");
+        statusLabel.setText("✓ Completed — " + swapCount + " swaps.");
         updateButtons(false);
     }
 
@@ -426,12 +421,12 @@ public class SortVisualizerView extends VBox {
             paused = false;
             timeline.play();
             stopButton.setText("Stop");
-            statusLabel.setText("Tiếp tục…");
+            statusLabel.setText("Resuming...");
         } else {
             paused = true;
             timeline.pause();
             stopButton.setText("Resume");
-            statusLabel.setText("Đã tạm dừng.");
+            statusLabel.setText("Paused.");
         }
     }
 
@@ -443,7 +438,7 @@ public class SortVisualizerView extends VBox {
         swapValueLabel.setText("0");
         refreshChart(currentArray, -1, -1, null);
         renderCode();
-        statusLabel.setText(currentArray.length == 0 ? "Không có gì để reset." : "Đã reset mảng.");
+        statusLabel.setText(currentArray.length == 0 ? "Nothing to reset." : "Array reset.");
         updateButtons(false);
     }
 
@@ -455,7 +450,7 @@ public class SortVisualizerView extends VBox {
         swapValueLabel.setText("0");
         refreshChart(currentArray, -1, -1, null);
         renderCode();
-        statusLabel.setText("Đã xóa mảng.");
+        statusLabel.setText("Array deleted.");
         updateButtons(false);
     }
 
@@ -498,7 +493,7 @@ public class SortVisualizerView extends VBox {
     private void refreshChart(int[] values, int fi, int si, String stepType) {
         chartPane.getChildren().clear();
         if (values.length == 0) {
-            Label empty = new Label("Chưa có dữ liệu — nhấn \"Tạo mảng\"");
+            Label empty = new Label("No data available — Click \"Create Array\"");
             empty.getStyleClass().add("empty-state");
             chartPane.getChildren().add(empty);
             return;

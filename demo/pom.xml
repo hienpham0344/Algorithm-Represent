@@ -14,7 +14,7 @@
         <maven.compiler.release>17</maven.compiler.release>
         <javafx.version>21.0.7</javafx.version>
         <junit.version>5.10.2</junit.version>
-        <main.class>com.example.main.AlgorithmPresent</main.class>
+        <main.class>com.example.main.Main</main.class>
     </properties>
 
     <dependencies>

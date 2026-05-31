@@ -43,7 +43,7 @@ public class DashboardController {
         SortVisualizerView visualizer = new SortVisualizerView();
 
         visualizer.getStylesheets().add(
-                getClass().getResource("/styles/app.css").toExternalForm()
+                getClass().getResource("/styles/sort.css").toExternalForm()
         );
 
         contentPane.getChildren().setAll(visualizer);
@@ -95,7 +95,12 @@ public class DashboardController {
 
     @FXML
     public void openBinaryTree() {
-        System.out.println("Binary Tree");
+        BinaryTreeVisualizerView view = new BinaryTreeVisualizerView();
+        contentPane.getChildren().setAll(view);
+
+        sidebar.setVisible(false);
+        sidebar.setManaged(false);
+        sidebarVisible = false;
     }
 }
 

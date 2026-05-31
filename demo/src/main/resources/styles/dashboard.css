@@ -44,6 +44,9 @@
     -fx-background-radius: 8;
     -fx-max-width: Infinity;
     -fx-pref-width: 10000;
+        -fx-font-family: roboto;
+        -fx-font-weight: bold;
+
 }
 
 .sidebar-btn:hover {

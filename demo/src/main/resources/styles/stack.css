@@ -24,20 +24,23 @@
 }
 
 .ds-desc {
-    -fx-font-size: 12px;
+    -fx-font-size: 14px;
     -fx-text-fill: #94A3B8;
     -fx-wrap-text: true;
+    -fx-font-family: roboto;
 }
 
 .section-label {
-    -fx-font-size: 10px;
+    -fx-font-size: 12px;
     -fx-font-weight: bold;
     -fx-text-fill: #64748B;
+    -fx-font-family: roboto;
 }
 
 .input-label {
-    -fx-font-size: 11px;
+    -fx-font-size: 12px;
     -fx-text-fill: #94A3B8;
+    -fx-font-family: roboto;
 }
 
 .input-field {
@@ -62,8 +65,9 @@
 .btn-push {
     -fx-background-color: #4F46E5;
     -fx-text-fill: white;
-    -fx-font-size: 12px;
+    -fx-font-size: 14px;
     -fx-font-weight: bold;
+    -fx-font-family: roboto;
     -fx-background-radius: 8;
     -fx-cursor: hand;
     -fx-padding: 9 0 9 0;
@@ -74,11 +78,13 @@
 .btn-pop {
     -fx-background-color: #DC2626;
     -fx-text-fill: white;
-    -fx-font-size: 12px;
+    -fx-font-size: 14px;
     -fx-font-weight: bold;
     -fx-background-radius: 8;
     -fx-cursor: hand;
     -fx-padding: 9 0 9 0;
+        -fx-font-family: roboto;
+
 }
 .btn-pop:hover    { -fx-background-color: #EF4444; }
 .btn-pop:pressed  { -fx-background-color: #991B1B; }
@@ -86,11 +92,13 @@
 .btn-peek {
     -fx-background-color: #059669;
     -fx-text-fill: white;
-    -fx-font-size: 12px;
+    -fx-font-size: 14px;
     -fx-font-weight: bold;
     -fx-background-radius: 8;
     -fx-cursor: hand;
     -fx-padding: 9 0 9 0;
+        -fx-font-family: roboto;
+
 }
 .btn-peek:hover    { -fx-background-color: #10B981; }
 .btn-peek:pressed  { -fx-background-color: #065F46; }
@@ -98,11 +106,13 @@
 .btn-reset {
     -fx-background-color: #334155;
     -fx-text-fill: #CBD5E1;
-    -fx-font-size: 12px;
+    -fx-font-size: 14px;
     -fx-font-weight: bold;
     -fx-background-radius: 8;
     -fx-cursor: hand;
     -fx-padding: 9 0 9 0;
+        -fx-font-family: roboto;
+
 }
 .btn-reset:hover   { -fx-background-color: #475569; }
 .btn-reset:pressed { -fx-background-color: #1E293B; }
@@ -120,9 +130,11 @@
 }
 
 .status-header {
-    -fx-font-size: 10px;
+    -fx-font-size: 12px;
     -fx-font-weight: bold;
     -fx-text-fill: #818CF8;
+        -fx-font-family: roboto;
+
 }
 
 .status-text {
@@ -149,12 +161,20 @@
 
 
 .stack-frame {
-    -fx-border-color: #334155;
-    -fx-border-width: 0 3 4 3;
-    -fx-border-radius: 0 0 12 12;
-    -fx-background-color: transparent;
-    -fx-padding: 12 10 10 10;
-    -fx-spacing: 8;
+    -fx-alignment: bottom-center; /* Xếp từ đáy lên */
+        -fx-spacing: 8;
+
+        /* Viền chiếc xô đựng */
+        -fx-border-width: 0 3px 3px 3px;
+        -fx-border-color: transparent #3A4765 #3A4765 #3A4765;
+        -fx-border-radius: 0 0 12px 12px;
+
+        /* Khoảng đệm bên trong xô */
+        -fx-padding: 15px 20px 15px 20px;
+
+        /* Khóa chiều rộng cố định */
+        -fx-min-width: 300px;
+        -fx-max-width: 300px;
 }
 
 
@@ -207,9 +227,9 @@
 }
 
 .stack-empty-label {
-    -fx-font-size: 13px;
-    -fx-text-fill: #475569;
-    -fx-font-style: italic;
+    -fx-text-fill: #6B7280;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
 }
 
 
@@ -267,10 +287,12 @@
 .btn-clear-log {
     -fx-background-color: transparent;
     -fx-text-fill: #64748B;
-    -fx-font-size: 11px;
+    -fx-font-size: 12px;
     -fx-cursor: hand;
     -fx-padding: 2 6 2 6;
     -fx-background-radius: 4;
+        -fx-font-family: roboto
+
 }
 .btn-clear-log:hover { -fx-text-fill: #EF4444; }
 
@@ -279,4 +301,20 @@
     -fx-pref-width: 1;
     -fx-min-width: 1;
     -fx-max-width: 1;
+}
+.speed-slider {
+    -fx-padding: 5 0 5 0;
+}
+.speed-slider .track {
+    -fx-background-color: #1E293B;
+    -fx-background-radius: 4;
+    -fx-pref-height: 6px;
+}
+.speed-slider .thumb {
+    -fx-background-color: #38BDF8;
+    -fx-background-radius: 10;
+    -fx-padding: 7;
+}
+.speed-slider .thumb:hover {
+    -fx-background-color: #0EA5E9;
 }
