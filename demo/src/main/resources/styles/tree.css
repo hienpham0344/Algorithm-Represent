@@ -1,0 +1,88 @@
+.tree-root {
+    -fx-background-color: #09090b; /* Màu nền cực tối */
+    -fx-font-family: "Segoe UI", sans-serif;
+}
+
+/* ── LEFT PANEL ── */
+.left-panel {
+    -fx-background-color: #11141e;
+    -fx-border-color: #1f2937;
+    -fx-border-width: 0 1 0 0;
+}
+.ds-title { -fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #F1F5F9; }
+.ds-desc { -fx-font-size: 12px; -fx-text-fill: #94A3B8; }
+.section-label { -fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #64748B; }
+
+.input-field {
+    -fx-background-color: #1e2536;
+    -fx-text-fill: #F1F5F9;
+    -fx-border-color: #334155;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-font-size: 14px;
+    -fx-padding: 8 12;
+}
+
+/* ── BUTTONS ── */
+.btn-action {
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+    -fx-padding: 8 0;
+}
+.btn-purple { -fx-background-color: #8b5cf6; }
+.btn-purple:hover { -fx-background-color: #7c3aed; }
+.btn-green  { -fx-background-color: #10b981; }
+.btn-green:hover { -fx-background-color: #059669; }
+.btn-red    { -fx-background-color: #ef4444; }
+.btn-red:hover { -fx-background-color: #dc2626; }
+.btn-gray   { -fx-background-color: #374151; }
+.btn-gray:hover { -fx-background-color: #1f2937; }
+
+/* ── TREE NODES & LINES ── */
+.viz-area {
+    -fx-background-color: #09090b;
+}
+.tree-node {
+    -fx-fill: #1e1b4b;
+    -fx-stroke: #6366f1;
+    -fx-stroke-width: 2;
+}
+.tree-value {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #e0e7ff;
+}
+.tree-line {
+    -fx-stroke: #475569;
+    -fx-stroke-width: 2;
+}
+
+/* ── BOTTOM PANELS (CODE & LOG) ── */
+.bottom-panel {
+    -fx-background-color: #11141e;
+    -fx-border-color: #1f2937;
+    -fx-border-width: 1 0 0 0;
+}
+.panel-header {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #94A3B8;
+    -fx-padding: 8;
+    -fx-border-color: #1f2937;
+    -fx-border-width: 0 0 1 0;
+}
+.code-area {
+    -fx-control-inner-background: #09090b;
+    -fx-text-fill: #cbd5e1;
+    -fx-font-family: "Courier New", monospace;
+    -fx-font-size: 12px;
+}
+.log-area {
+    -fx-control-inner-background: #09090b;
+    -fx-text-fill: #4ade80;
+    -fx-font-family: "Courier New", monospace;
+    -fx-font-size: 12px;
+}
