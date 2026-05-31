@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane styleClass="queue-root" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.main.ui.QueueController">
+
+    <!-- ══ LEFT PANEL ══ -->
+    <left>
+        <VBox maxWidth="265" minWidth="265" prefHeight="393.0" prefWidth="647.0" spacing="0" styleClass="left-panel">
+
+            <padding>
+                <Insets bottom="22" left="18" right="18" top="22" />
+            </padding>
+
+            <Label styleClass="ds-title" text="Hàng đợi (Queue - FIFO)" wrapText="true" />
+
+            <Label styleClass="ds-desc" text="Hoạt động theo nguyên lý 'Vào trước – Ra trước' (First In, First Out). Enqueue thêm vào REAR, Dequeue lấy từ FRONT." wrapText="true">
+                <VBox.margin><Insets top="8" /></VBox.margin>
+            </Label>
+
+            <Region maxWidth="Infinity" prefHeight="1" styleClass="divider-line">
+                <VBox.margin><Insets bottom="14" top="14" /></VBox.margin>
+            </Region>
+
+            <Label styleClass="section-label" text="MODULE INFO" />
+
+            <GridPane hgap="8" vgap="0">
+                <VBox.margin><Insets bottom="0" top="10" /></VBox.margin>
+                <columnConstraints>
+                    <ColumnConstraints hgrow="ALWAYS" />
+                    <ColumnConstraints hgrow="ALWAYS" />
+                </columnConstraints>
+
+                <VBox styleClass="info-card" GridPane.columnIndex="0">
+                    <Label styleClass="info-card-label" text="ENQUEUE" />
+                    <Label styleClass="info-card-value-green" text="O(1)" />
+                </VBox>
+
+                <VBox styleClass="info-card" GridPane.columnIndex="1">
+                    <VBox.margin><Insets left="4" /></VBox.margin>
+                    <Label styleClass="info-card-label" text="DEQUEUE" />
+                    <Label styleClass="info-card-value-green" text="O(1)" />
+                </VBox>
+            <rowConstraints>
+               <RowConstraints />
+            </rowConstraints>
+            </GridPane>
+
+            <Region maxWidth="Infinity" prefHeight="1" styleClass="divider-line">
+                <VBox.margin><Insets bottom="14" top="14" /></VBox.margin>
+            </Region>
+
+        </VBox>
+    </left>
+
+    <!-- CENTER placeholder -->
+    <center>
+        <StackPane fx:id="vizPane" styleClass="viz-area" />
+    </center>
+
+</BorderPane>

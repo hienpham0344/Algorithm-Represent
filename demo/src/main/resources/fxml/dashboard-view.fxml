@@ -1,80 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.example.main.ui.DashboardController">
+<BorderPane xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.main.ui.DashboardController">
 
     <!-- TOP BAR -->
     <top>
-        <HBox alignment="CENTER_LEFT"
-              spacing="12"
-              styleClass="top-bar">
+        <HBox alignment="CENTER_LEFT" spacing="12" styleClass="top-bar">
             <padding>
-                <Insets top="10" right="20" bottom="10" left="16"/>
+                <Insets bottom="10" left="16" right="20" top="10" />
             </padding>
 
-            <Button text="☰"
-                    onAction="#toggleSidebar"
-                    styleClass="menu-btn"/>
+            <Button onAction="#toggleSidebar" styleClass="menu-btn" text="☰" />
 
-            <Label text="Algorithm Visualizer"
-                   styleClass="dashboard-title"/>
+            <Label styleClass="dashboard-title" text="Algorithm Visualizer" />
         </HBox>
     </top>
 
     <!-- SIDEBAR -->
     <left>
-        <VBox fx:id="sidebar"
-              spacing="4"
-              prefWidth="240"
-              styleClass="sidebar">
+        <VBox fx:id="sidebar" prefHeight="0.0" prefWidth="273.0" spacing="4" styleClass="sidebar">
             <padding>
-                <Insets top="16" right="12" bottom="16" left="12"/>
+                <Insets bottom="16" left="12" right="12" top="16" />
             </padding>
 
             <!-- Sorting Section -->
-            <Label text="THUẬT TOÁN"
-                   styleClass="sidebar-section"/>
+            <Label styleClass="sidebar-section" text="THUẬT TOÁN" />
 
-            <Button text="⚙  Mô phỏng sắp xếp"
-                    onAction="#openSortingVisualizer"
-                    styleClass="sidebar-btn, sidebar-btn-active"/>
+            <Button onAction="#openSortingVisualizer" styleClass="sidebar-btn, sidebar-btn-active" text="⚙  Mô phỏng sắp xếp" />
 
             <!-- Data Structures Section -->
-            <Label text="CẤU TRÚC DỮ LIỆU"
-                   styleClass="sidebar-section"/>
+            <Label styleClass="sidebar-section" text="CẤU TRÚC DỮ LIỆU" />
 
-            <Button text="▦  Array"
-                    onAction="#openArray"
-                    styleClass="sidebar-btn"/>
+            <Button onAction="#openArray" styleClass="sidebar-btn" text="▦  Array" />
 
-            <Button text="⬡  LinkedList"
-                    onAction="#openLinkedList"
-                    styleClass="sidebar-btn"/>
+            <Button onAction="#openLinkedList" styleClass="sidebar-btn" text="⬡  LinkedList" />
 
-            <Button text="⏫  Stack"
-                    onAction="#openStack"
-                    styleClass="sidebar-btn"/>
+            <Button onAction="#openStack" styleClass="sidebar-btn" text="⏫  Stack" />
 
-            <Button text="△  Heap"
-                    onAction="#openHeap"
-                    styleClass="sidebar-btn"/>
+            <Button onAction="#openQueue" styleClass="sidebar-btn" text="△  Queue" />
 
-            <Button text="⌥  Binary Tree"
-                    onAction="#openBinaryTree"
-                    styleClass="sidebar-btn"/>
+            <Button onAction="#openBinaryTree" styleClass="sidebar-btn" text="⌥  Binary Tree" />
 
         </VBox>
     </left>
 
     <!-- CONTENT -->
     <center>
-        <StackPane fx:id="contentPane"
-                   style="-fx-background-color: #F8FAFC;"/>
+        <StackPane fx:id="contentPane" style="-fx-background-color: #F8FAFC;" />
     </center>
 
 </BorderPane>

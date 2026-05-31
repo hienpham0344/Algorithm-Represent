@@ -2,6 +2,8 @@
 package com.example.main.ui;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
@@ -73,8 +75,22 @@ public class DashboardController {
     }
 
     @FXML
-    public void openHeap() {
-        System.out.println("Heap");
+    public void openQueue() {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/fxml/queue-view.fxml")
+            );
+            Parent view = loader.load();
+            view.getStylesheets().add(
+                    getClass().getResource("/styles/queue.css").toExternalForm()
+            );
+            contentPane.getChildren().setAll(view);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        sidebar.setVisible(false);
+        sidebar.setManaged(false);
+        sidebarVisible = false;
     }
 
     @FXML
