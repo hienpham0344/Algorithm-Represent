@@ -38,12 +38,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
-/**
- * Main UI — mirrors the original 3-zone layout:
- *   TOP ROW  : [Algorithm picker] [Data source] [Array size]
- *   ROW 2    : [Buttons row]      [Speed]
- *   BOTTOM   : [Sort chart ─ wide]              [Java code]
- */
+
 public class SortVisualizerView extends VBox {
 
     // ── Algorithm display names ──────────────────────────────────────────

@@ -149,12 +149,20 @@
 
 
 .stack-frame {
-    -fx-border-color: #334155;
-    -fx-border-width: 0 3 4 3;
-    -fx-border-radius: 0 0 12 12;
-    -fx-background-color: transparent;
-    -fx-padding: 12 10 10 10;
-    -fx-spacing: 8;
+    -fx-alignment: bottom-center; /* Xếp từ đáy lên */
+        -fx-spacing: 8;
+
+        /* Viền chiếc xô đựng */
+        -fx-border-width: 0 3px 3px 3px;
+        -fx-border-color: transparent #3A4765 #3A4765 #3A4765;
+        -fx-border-radius: 0 0 12px 12px;
+
+        /* Khoảng đệm bên trong xô */
+        -fx-padding: 15px 20px 15px 20px;
+
+        /* Khóa chiều rộng cố định */
+        -fx-min-width: 300px;
+        -fx-max-width: 300px;
 }
 
 
@@ -207,9 +215,9 @@
 }
 
 .stack-empty-label {
-    -fx-font-size: 13px;
-    -fx-text-fill: #475569;
-    -fx-font-style: italic;
+    -fx-text-fill: #6B7280;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
 }
 
 

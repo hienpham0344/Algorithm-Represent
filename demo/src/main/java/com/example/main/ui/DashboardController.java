@@ -43,7 +43,7 @@ public class DashboardController {
         SortVisualizerView visualizer = new SortVisualizerView();
 
         visualizer.getStylesheets().add(
-                getClass().getResource("/styles/app.css").toExternalForm()
+                getClass().getResource("/styles/sort.css").toExternalForm()
         );
 
         contentPane.getChildren().setAll(visualizer);

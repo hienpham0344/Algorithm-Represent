@@ -11,7 +11,7 @@ public class AlgorithmPresent extends Application {
     public void start(Stage stage) {
         SortVisualizerView root = new SortVisualizerView();
         Scene scene = new Scene(root, 1400, 860);
-        scene.getStylesheets().add(getClass().getResource("/styles/app.css").toExternalForm());
+        scene.getStylesheets().add(getClass().getResource("/styles/sort.css").toExternalForm());
 
         stage.setTitle("Sorting Algorithm Visualizer");
         stage.setMinWidth(1200);
