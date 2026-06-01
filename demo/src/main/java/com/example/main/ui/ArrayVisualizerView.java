@@ -84,6 +84,16 @@ public class ArrayVisualizerView extends BorderPane {
 
         getStyleClass().add("array-root");
 
+        // giúp cho screen cuộn xuống được
+        ScrollPane leftScrollPane = new ScrollPane(buildLeftPanel());
+        leftScrollPane.getStyleClass().add("left-scroll-pane");
+        leftScrollPane.setFitToWidth(true);
+        leftScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        leftScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        leftScrollPane.setPrefWidth(285);
+        leftScrollPane.setMinWidth(285);
+        leftScrollPane.setMaxWidth(285);
+
         setLeft(buildLeftPanel());
         setCenter(buildVizArea());
 
