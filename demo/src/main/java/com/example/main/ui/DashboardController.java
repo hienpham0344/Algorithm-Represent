@@ -66,7 +66,19 @@ public class DashboardController {
 
     @FXML
     public void openLinkedList() {
-        System.out.println("LinkedList");
+        try {
+        Parent view = FXMLLoader.load(
+            getClass().getResource("/fxml/LinkedList.fxml")
+        );
+
+        contentPane.getChildren().setAll(view);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+                sidebar.setVisible(false);
+                sidebar.setManaged(false);
+                sidebarVisible = false;
     }
 
     @FXML

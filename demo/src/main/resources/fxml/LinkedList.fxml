@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17.0.12"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.main.ui.LinkedListController"
+            stylesheets="@../styles/linkedlist.css"
+            styleClass="linked-root">
+
+    <!-- LEFT CONTROL PANEL -->
+    <left>
+        <VBox prefWidth="260" spacing="16" styleClass="left-panel">
+            <padding>
+                <Insets top="18" right="16" bottom="18" left="16"/>
+            </padding>
+
+            <Label text="ⓘ MODULE INFO" styleClass="section-title"/>
+            <Label text="Linked List" styleClass="module-title"/>
+            <Label text="Dynamic chain of nodes linked by pointers.&#10;O(1) head insert, O(N) traversal.&#10;No contiguous memory required."
+                   wrapText="true"
+                   styleClass="description"/>
+
+            <HBox spacing="8">
+                <VBox styleClass="info-card">
+                    <Label text="TIME" styleClass="card-title"/>
+                    <Label text="O(N)" styleClass="card-value"/>
+                    <Label text="traverse" styleClass="card-note"/>
+                </VBox>
+
+                <VBox styleClass="info-card">
+                    <Label text="SPACE" styleClass="card-title"/>
+                    <Label text="O(n)" styleClass="card-value cyan"/>
+                </VBox>
+
+                <VBox styleClass="info-card">
+                    <Label text="STABLE" styleClass="card-title"/>
+                    <Label text="N/A" styleClass="card-value green"/>
+                </VBox>
+            </HBox>
+
+            <Separator/>
+
+            <Label text="⚙ OPERATIONS" styleClass="section-title"/>
+            <Label text="Element Value" styleClass="small-label"/>
+
+            <TextField fx:id="inputField"
+                       promptText="e.g. 42"
+                       styleClass="input-field"/>
+
+            <GridPane hgap="8" vgap="8">
+                <Button text="← Add Head" onAction="#handleAddHead" styleClass="btn-add-head" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                <Button text="→ Add Tail" onAction="#handleAddTail" styleClass="btn-add-tail" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                <Button text="🗑 Delete Head" onAction="#handleDeleteHead" styleClass="btn-delete" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                <Button text="🗑 Delete Tail" onAction="#handleDeleteTail" styleClass="btn-delete" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                <Button text="🔍 Search" onAction="#handleSearch" styleClass="btn-search" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                <Button text="↻ Reset" onAction="#handleReset" styleClass="btn-reset" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+            </GridPane>
+
+            <Separator/>
+
+            <Label text="〽 SIMULATION STATUS" styleClass="section-title"/>
+
+            <TextArea fx:id="statusArea"
+                      text="Ready to start simulation."
+                      editable="false"
+                      wrapText="true"
+                      styleClass="status-area"
+                      VBox.vgrow="ALWAYS"/>
+        </VBox>
+    </left>
+
+    <!-- MAIN CONTENT -->
+    <center>
+        <VBox styleClass="main-area">
+
+            <Label text="▱ VISUALIZATION CANVAS" styleClass="canvas-title"/>
+
+            <Pane fx:id="canvasPane"
+                  prefHeight="430"
+                  styleClass="canvas-pane"
+                  VBox.vgrow="ALWAYS"/>
+
+            <HBox spacing="12" styleClass="bottom-area">
+                <VBox spacing="8" HBox.hgrow="ALWAYS">
+                    <Label text="◇ PSEUDO-CODE" styleClass="section-title"/>
+                    <TextArea fx:id="pseudoCodeArea"
+                              text="// Select an operation to view pseudo-code."
+                              editable="false"
+                              styleClass="code-area"
+                              VBox.vgrow="ALWAYS"/>
+                </VBox>
+
+                <VBox spacing="8" HBox.hgrow="ALWAYS">
+                    <Label text="⌁ ACTIVITY LOG" styleClass="section-title"/>
+                    <TextArea fx:id="logArea"
+                              text="[System]: DSA Visualizer initialized. Ready."
+                              editable="false"
+                              styleClass="code-area"
+                              VBox.vgrow="ALWAYS"/>
+                </VBox>
+            </HBox>
+        </VBox>
+    </center>
+
+</BorderPane>
