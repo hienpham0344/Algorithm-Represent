@@ -126,8 +126,9 @@ public class ArrayVisualizerView extends BorderPane {
         panel.setMaxWidth(285);
         panel.setPadding(new Insets(22, 18, 22, 18));
 
-        Label title = new Label("Array");
+        Label title = new Label("ARRAY");
         title.getStyleClass().add("ds-title");
+        title.setWrapText(true);
 
         Label desc = new Label(
                 "Arrays store values in indexed positions. Access by index is O(1), " +
@@ -238,32 +239,23 @@ public class ArrayVisualizerView extends BorderPane {
     }
 
     private HBox buildBottomPanel() {
-        HBox bottom = new HBox();
-        bottom.getStyleClass().add("bottom-panel");
-        bottom.setPrefHeight(205);
-        bottom.setMinHeight(180);
-
-        VBox codeBox = new VBox();
-        codeBox.getStyleClass().add("array-bottom-box");
-        HBox.setHgrow(codeBox, Priority.ALWAYS);
-
-        HBox codeHeader = panelHeader("<>  PSEUDO-CODE", "Array");
+        HBox codeHeader = panelHeader("<>  PSEUDO-CODE", "Java code");
         codeArea = new TextArea();
         codeArea.getStyleClass().add("code-area");
         codeArea.setEditable(false);
         codeArea.setWrapText(false);
         VBox.setVgrow(codeArea, Priority.ALWAYS);
-        codeBox.getChildren().addAll(codeHeader, codeArea);
+        VBox codeBox = new VBox(codeHeader, codeArea);
+        codeBox.getStyleClass().add("bottom-panel");
+        HBox.setHgrow(codeBox, Priority.ALWAYS);
+        codeBox.setPrefWidth(0);
+        codeBox.setMaxHeight(Double.MAX_VALUE);
 
         Region divider = new Region();
         divider.getStyleClass().add("bottom-divider");
 
-        VBox logBox = new VBox();
-        logBox.getStyleClass().add("array-bottom-box");
-        HBox.setHgrow(logBox, Priority.ALWAYS);
-
         HBox logHeader = panelHeader(">_  ACTIVITY LOG", null);
-        Button clearBtn = new Button("Clear");
+        Button clearBtn = new Button("🗑 Clear");
         clearBtn.getStyleClass().add("btn-clear-log");
         clearBtn.setOnAction(e -> logArea.clear());
         logHeader.getChildren().add(clearBtn);
@@ -273,9 +265,16 @@ public class ArrayVisualizerView extends BorderPane {
         logArea.setEditable(false);
         logArea.setWrapText(true);
         VBox.setVgrow(logArea, Priority.ALWAYS);
-        logBox.getChildren().addAll(logHeader, logArea);
+        VBox logBox = new VBox(logHeader, logArea);
+        logBox.getStyleClass().add("bottom-panel");
+        HBox.setHgrow(logBox, Priority.ALWAYS);
+        logBox.setPrefWidth(0);
+        logBox.setMaxHeight(Double.MAX_VALUE);
 
-        bottom.getChildren().addAll(codeBox, divider, logBox);
+        HBox bottom = new HBox(codeBox, divider, logBox);
+        bottom.setPrefHeight(210);
+        bottom.setMinHeight(180);
+        bottom.setFillHeight(true);
         return bottom;
     }
 
@@ -283,6 +282,9 @@ public class ArrayVisualizerView extends BorderPane {
         HBox header = new HBox();
         header.getStyleClass().add("panel-header-box");
         header.setAlignment(Pos.CENTER_LEFT);
+        header.setPrefHeight(40);
+        header.setMinHeight(40);
+        header.setMaxHeight(40);
 
         Label titleLabel = new Label(title);
         titleLabel.getStyleClass().add("panel-header-label");

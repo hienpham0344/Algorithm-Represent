@@ -3,6 +3,10 @@
     -fx-font-family: "Segoe UI", sans-serif;
 }
 
+.array-main-content {
+    -fx-background-color: #020817;
+}
+
 /* ── INFO CARDS ── */
 
 .array-info-card {
@@ -41,6 +45,14 @@
     -fx-font-weight: bold;
     -fx-alignment: center;
     -fx-text-alignment: center;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+    -fx-padding: 8 4 8 4;
+}
+
+.array-op-button:disabled {
+    -fx-opacity: 0.55;
+    -fx-cursor: default;
 }
 
 .btn-array-insert {
@@ -142,6 +154,26 @@
     -fx-alignment: center;
 }
 
+.array-viz-scroll {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-border-width: 0;
+}
+
+.array-viz-scroll > .viewport {
+    -fx-background-color: transparent;
+}
+
+.array-viz-scroll .scroll-bar:horizontal {
+    -fx-background-color: transparent;
+    -fx-pref-height: 10;
+}
+
+.array-viz-scroll .scroll-bar:horizontal .thumb {
+    -fx-background-color: #334155;
+    -fx-background-radius: 8;
+}
+
 .array-cell {
     -fx-background-color: rgba(30, 41, 59, 0.95);
     -fx-border-color: #475569;
@@ -169,12 +201,6 @@
     -fx-font-size: 11px;
     -fx-font-family: "Courier New", monospace;
     -fx-text-fill: #94A3B8;
-}
-
-/* ── BOTTOM ── */
-
-.array-bottom-box {
-    -fx-background-color: transparent;
 }
 
 /* ── SCROLL PANE ── */
