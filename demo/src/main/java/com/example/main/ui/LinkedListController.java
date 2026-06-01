@@ -5,6 +5,7 @@ import java.util.List;
 import com.example.main.service.LinkedListService;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.Slider;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
@@ -13,6 +14,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
+import javafx.animation.TranslateTransition;
+import javafx.util.Duration;
 
 public class LinkedListController {
 
@@ -21,7 +24,9 @@ public class LinkedListController {
     @FXML private TextArea statusArea;
     @FXML private TextArea pseudoCodeArea;
     @FXML private TextArea logArea;
+    @FXML private Slider speedSlider;
     private final LinkedListService service = new LinkedListService();
+
     @FXML
     public void initialize() {
         logArea.appendText("\nSwitched to Linked List.");
@@ -57,6 +62,20 @@ public class LinkedListController {
     }
     }
 
+    private double getAnimationTime() {
+    double speed = speedSlider.getValue();
+    return 800 / speed;
+    }
+
+    private void playNodeAnimation(StackPane node) {
+    TranslateTransition transition = new TranslateTransition();
+    transition.setNode(node);
+    transition.setDuration(Duration.millis(getAnimationTime()));
+    transition.setFromY(-30);
+    transition.setToY(0);
+    transition.play();
+    }
+
     private void renderList() {
 
     canvasPane.getChildren().clear();
@@ -69,10 +88,10 @@ public class LinkedListController {
     for (int i = 0; i < values.size(); i++) {
 
         StackPane node = createNode(values.get(i));
-
+        
         node.setLayoutX(startX + i * 130);
         node.setLayoutY(y);
-
+        playNodeAnimation(node);
         canvasPane.getChildren().add(node);
 
         // ARROW

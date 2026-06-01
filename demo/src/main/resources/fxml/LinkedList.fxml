@@ -7,7 +7,7 @@
 <BorderPane xmlns="http://javafx.com/javafx/17.0.12"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.example.main.ui.LinkedListController"
-            stylesheets="@../styles/linkedlist.css"
+            stylesheets="@../styles/LinkedList.css"
             styleClass="linked-root">
 
     <!-- LEFT CONTROL PANEL -->
@@ -22,24 +22,6 @@
             <Label text="Dynamic chain of nodes linked by pointers.&#10;O(1) head insert, O(N) traversal.&#10;No contiguous memory required."
                    wrapText="true"
                    styleClass="description"/>
-
-            <HBox spacing="8">
-                <VBox styleClass="info-card">
-                    <Label text="TIME" styleClass="card-title"/>
-                    <Label text="O(N)" styleClass="card-value"/>
-                    <Label text="traverse" styleClass="card-note"/>
-                </VBox>
-
-                <VBox styleClass="info-card">
-                    <Label text="SPACE" styleClass="card-title"/>
-                    <Label text="O(n)" styleClass="card-value cyan"/>
-                </VBox>
-
-                <VBox styleClass="info-card">
-                    <Label text="STABLE" styleClass="card-title"/>
-                    <Label text="N/A" styleClass="card-value green"/>
-                </VBox>
-            </HBox>
 
             <Separator/>
 
@@ -61,6 +43,22 @@
                 <Button text="↻ Reset" onAction="#handleReset" styleClass="btn-reset" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
             </GridPane>
 
+            <!-- SPEED CONTROL -->
+                <VBox spacing="8" styleClass="speed-box">
+                    <Label text="⏱ Speed:" styleClass="speed-label"/>
+
+                    <Slider fx:id="speedSlider"
+                            min="0.2"
+                            max="3"
+                            value="1"
+                            majorTickUnit="1"
+                            minorTickCount="4"
+                            showTickMarks="true"
+                            showTickLabels="true"
+                            blockIncrement="0.2"
+                            styleClass="speed-slider"/>
+                </VBox>
+
             <Separator/>
 
             <Label text="〽 SIMULATION STATUS" styleClass="section-title"/>
@@ -69,42 +67,41 @@
                       text="Ready to start simulation."
                       editable="false"
                       wrapText="true"
-                      styleClass="status-area"
-                      VBox.vgrow="ALWAYS"/>
+                      prefHeight="240"
+                      styleClass="status-area"/>
         </VBox>
     </left>
 
-    <!-- MAIN CONTENT -->
+    <!-- VISUALIZATION CANVAS -->
     <center>
-        <VBox styleClass="main-area">
-
-            <Label text="▱ VISUALIZATION CANVAS" styleClass="canvas-title"/>
-
-            <Pane fx:id="canvasPane"
-                  prefHeight="430"
-                  styleClass="canvas-pane"
-                  VBox.vgrow="ALWAYS"/>
-
-            <HBox spacing="12" styleClass="bottom-area">
-                <VBox spacing="8" HBox.hgrow="ALWAYS">
-                    <Label text="◇ PSEUDO-CODE" styleClass="section-title"/>
-                    <TextArea fx:id="pseudoCodeArea"
-                              text="// Select an operation to view pseudo-code."
-                              editable="false"
-                              styleClass="code-area"
-                              VBox.vgrow="ALWAYS"/>
-                </VBox>
-
-                <VBox spacing="8" HBox.hgrow="ALWAYS">
-                    <Label text="⌁ ACTIVITY LOG" styleClass="section-title"/>
-                    <TextArea fx:id="logArea"
-                              text="[System]: DSA Visualizer initialized. Ready."
-                              editable="false"
-                              styleClass="code-area"
-                              VBox.vgrow="ALWAYS"/>
-                </VBox>
-            </HBox>
-        </VBox>
+        <Pane fx:id="canvasPane"
+              prefHeight="430"
+              styleClass="canvas-pane"/>
     </center>
+
+    <!-- BOTTOM PANEL -->
+    <bottom>
+        <HBox spacing="12" styleClass="bottom-area" prefHeight="210">
+
+            <VBox spacing="8" HBox.hgrow="ALWAYS">
+                <Label text="◇ PSEUDO-CODE" styleClass="section-title"/>
+                <TextArea fx:id="pseudoCodeArea"
+                          text="// Select an operation to view pseudo-code."
+                          editable="false"
+                          styleClass="code-area"
+                          VBox.vgrow="ALWAYS"/>
+            </VBox>
+
+            <VBox spacing="8" HBox.hgrow="ALWAYS">
+                <Label text="⌁ ACTIVITY LOG" styleClass="section-title"/>
+                <TextArea fx:id="logArea"
+                          text="[System]: DSA Visualizer initialized. Ready."
+                          editable="false"
+                          styleClass="code-area"
+                          VBox.vgrow="ALWAYS"/>
+            </VBox>
+
+        </HBox>
+    </bottom>
 
 </BorderPane>
