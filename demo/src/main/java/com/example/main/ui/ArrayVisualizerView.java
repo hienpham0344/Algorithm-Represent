@@ -97,7 +97,7 @@ public class ArrayVisualizerView extends BorderPane {
 
         BorderPane mainContent = new BorderPane();
         mainContent.getStyleClass().add("array-main-content");
-        mainContent.setTop(buildMainToolbar());
+        // mainContent.setTop(buildMainToolbar());
         mainContent.setCenter(buildVizArea());
         mainContent.setBottom(buildBottomPanel());
 
@@ -129,17 +129,12 @@ public class ArrayVisualizerView extends BorderPane {
         desc.getStyleClass().add("ds-desc");
         desc.setWrapText(true);
 
-        HBox infoRow = new HBox(8,
-                makeInfoCard("ACCESS", "O(1)"),
-                makeInfoCard("SEARCH", "O(n)"),
-                makeInfoCard("SPACE", "O(n)")
-        );
-
         Label sectionOp = new Label("OPERATIONS");
         sectionOp.getStyleClass().add("section-label");
 
-        Label valueLabel = new Label("Value");
+        Label valueLabel = new Label("Element Value");
         valueLabel.getStyleClass().add("input-label");
+
         valueField = new TextField();
         valueField.setPromptText("Example: 42");
         valueField.getStyleClass().add("input-field");
@@ -148,6 +143,7 @@ public class ArrayVisualizerView extends BorderPane {
 
         Label indexLabel = new Label("Index");
         indexLabel.getStyleClass().add("input-label");
+
         indexField = new TextField();
         indexField.setPromptText("Example: 2");
         indexField.getStyleClass().add("input-field");
@@ -156,6 +152,9 @@ public class ArrayVisualizerView extends BorderPane {
 
         Region operationGap = new Region();
         operationGap.setPrefHeight(5);
+
+        Region speedGap = new Region();
+        speedGap.setPrefHeight(5);
 
         Button btnInsertEnd = makeBtn("Insert End", "btn-array-insert");
         Button btnDeleteEnd = makeBtn("Delete End", "btn-array-delete");
@@ -175,6 +174,25 @@ public class ArrayVisualizerView extends BorderPane {
         btnRandomize.setOnAction(e -> handleRandomize());
         btnReset.setOnAction(e -> handleReset());
 
+        Label speedLabel = new Label("Speed:");
+        speedLabel.getStyleClass().add("input-label");
+
+        speedSlider = new Slider(0.2, 3.0, 1.0);
+        speedSlider.getStyleClass().add("speed-slider");
+        speedSlider.setShowTickMarks(true);
+        speedSlider.setShowTickLabels(true);
+        speedSlider.setMajorTickUnit(1.0);
+        speedSlider.setBlockIncrement(0.1);
+        speedSlider.setMaxWidth(Double.MAX_VALUE);
+
+        speedSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if (animation != null && animation.getStatus() == Animation.Status.RUNNING) {
+                animation.setRate(newValue.doubleValue());
+            }
+        });
+        VBox speedBox = new VBox(5, speedLabel, speedSlider);
+        speedBox.setMaxWidth(229);
+
         Label statusHeader = new Label("SIMULATION STATUS");
         statusHeader.getStyleClass().add("status-header");
         statusText = new Label();
@@ -184,46 +202,47 @@ public class ArrayVisualizerView extends BorderPane {
         VBox statusBox = new VBox(6, statusHeader, statusText);
         statusBox.getStyleClass().add("status-box");
         statusBox.setPadding(new Insets(12, 14, 12, 14));
+        VBox.setVgrow(statusBox, Priority.ALWAYS);  //Luôn kéo giãn hộp để lấp đầy khoản trống thừa
 
         panel.getChildren().addAll(
-                title, desc, infoRow, divider(),
+                title, desc, divider(),
                 sectionOp, valueBox,
                 indexBox, operationGap,
                 hRow(btnInsertEnd, btnDeleteEnd),
                 hRow(btnInsertAt, btnDeleteAt),
                 hRow(btnUpdateAt, btnSearch),
                 hRow(btnRandomize, btnReset),
-                divider(), statusBox
+                speedGap, speedBox, divider(), statusBox
         );
         return panel;
     }
 
-    private HBox buildMainToolbar() {
-        Label speedLabel = new Label("Speed");
-        speedLabel.getStyleClass().add("input-label");
-        HBox.setMargin(speedLabel, new Insets(0, 0, 18, 0));
-
-        speedSlider = new Slider(0.2, 3.0, 1.0);
-        speedSlider.getStyleClass().add("speed-slider");
-        speedSlider.setShowTickMarks(true);
-        speedSlider.setShowTickLabels(true);
-        speedSlider.setMajorTickUnit(1.0);
-        speedSlider.setBlockIncrement(0.1);
-        speedSlider.setPrefWidth(210);
-
-        speedSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
-            if (animation != null && animation.getStatus() == Animation.Status.RUNNING) {
-                animation.setRate(newValue.doubleValue());
-            }
-        });
-
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-        HBox toolbar = new HBox(10, spacer,  speedLabel, speedSlider);
-        toolbar.getStyleClass().add("array-toolbar");
-        toolbar.setAlignment(Pos.CENTER_RIGHT);
-        return toolbar;
-    }
+//    private HBox buildMainToolbar() {
+//        Label speedLabel = new Label("Speed");
+//        speedLabel.getStyleClass().add("input-label");
+//        HBox.setMargin(speedLabel, new Insets(0, 0, 18, 0));
+//
+//        speedSlider = new Slider(0.2, 3.0, 1.0);
+//        speedSlider.getStyleClass().add("speed-slider");
+//        speedSlider.setShowTickMarks(true);
+//        speedSlider.setShowTickLabels(true);
+//        speedSlider.setMajorTickUnit(1.0);
+//        speedSlider.setBlockIncrement(0.1);
+//        speedSlider.setPrefWidth(210);
+//
+//        speedSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+//            if (animation != null && animation.getStatus() == Animation.Status.RUNNING) {
+//                animation.setRate(newValue.doubleValue());
+//            }
+//        });
+//
+//        Region spacer = new Region();
+//        HBox.setHgrow(spacer, Priority.ALWAYS);
+//        HBox toolbar = new HBox(10, spacer,  speedLabel, speedSlider);
+//        toolbar.getStyleClass().add("array-toolbar");
+//        toolbar.setAlignment(Pos.CENTER_RIGHT);
+//        return toolbar;
+//    }
 
     private HBox makeInfoCard(String label, String value) {
         Label labelText = new Label(label);
