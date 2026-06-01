@@ -1,16 +1,31 @@
 package com.example.main.ui;
 
 import com.example.main.service.ArrayService;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.util.Duration;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ArrayVisualizerView extends BorderPane {
 
     private final ArrayService service = new ArrayService();
+    private final List<Button> actionButtons = new ArrayList<>();
 
     private TextField valueField;
     private TextField indexField;
@@ -18,27 +33,28 @@ public class ArrayVisualizerView extends BorderPane {
     private Label statusText;
     private TextArea codeArea;
     private TextArea logArea;
+    private Timeline animation;
     private int highlightedIndex = -1;
 
     private static final String CODE_IDLE =
-            "// Chọn một thao tác để xem mã giả.\n";
+            "// Choose an operation to view pseudo-code.\n";
 
     private static final String CODE_INSERT_END =
-            "// Insert End: Thêm phần tử vào cuối mảng\n" +
+            "// Insert End: append a value to the array\n" +
                     "void insertEnd(int value) {\n" +
                     "    array[size] = value;\n" +
                     "    size++;\n" +
                     "}\n";
 
     private static final String CODE_DELETE_END =
-            "// Delete End: Xóa phần tử cuối mảng\n" +
+            "// Delete End: remove the last value\n" +
                     "void deleteEnd() {\n" +
                     "    if (size == 0) return;\n" +
                     "    size--;\n" +
                     "}\n";
 
     private static final String CODE_INSERT_AT =
-            "// Insert at Index: Chèn phần tử tại vị trí index\n" +
+            "// Insert at Index: shift values right, then insert\n" +
                     "void insertAt(int index, int value) {\n" +
                     "    if (index < 0 || index > size) return;\n" +
                     "    for (int i = size; i > index; i--) {\n" +
@@ -49,7 +65,7 @@ public class ArrayVisualizerView extends BorderPane {
                     "}\n";
 
     private static final String CODE_DELETE_AT =
-            "// Delete at Index: Xóa phần tử tại vị trí index\n" +
+            "// Delete at Index: shift values left after removal\n" +
                     "void deleteAt(int index) {\n" +
                     "    if (index < 0 || index >= size) return;\n" +
                     "    for (int i = index; i < size - 1; i++) {\n" +
@@ -59,14 +75,14 @@ public class ArrayVisualizerView extends BorderPane {
                     "}\n";
 
     private static final String CODE_UPDATE_AT =
-            "// Update at Index: Cập nhật giá trị tại vị trí index\n" +
+            "// Update at Index: replace one value\n" +
                     "void updateAt(int index, int value) {\n" +
                     "    if (index < 0 || index >= size) return;\n" +
                     "    array[index] = value;\n" +
                     "}\n";
 
     private static final String CODE_SEARCH =
-            "// Search: Tìm kiếm giá trị trong mảng\n" +
+            "// Search: scan values from left to right\n" +
                     "int search(int value) {\n" +
                     "    for (int i = 0; i < size; i++) {\n" +
                     "        if (array[i] == value) return i;\n" +
@@ -75,16 +91,10 @@ public class ArrayVisualizerView extends BorderPane {
                     "}\n";
 
     public ArrayVisualizerView() {
-        getStylesheets().add(
-                getClass().getResource("/styles/stack.css").toExternalForm()
-        );
-        getStylesheets().add(
-                getClass().getResource("/styles/array.css").toExternalForm()
-        );
-
+        getStylesheets().add(getClass().getResource("/styles/stack.css").toExternalForm());
+        getStylesheets().add(getClass().getResource("/styles/array.css").toExternalForm());
         getStyleClass().add("array-root");
 
-        // giúp cho screen cuộn xuống được
         ScrollPane leftScrollPane = new ScrollPane(buildLeftPanel());
         leftScrollPane.getStyleClass().add("left-scroll-pane");
         leftScrollPane.setFitToWidth(true);
@@ -94,19 +104,18 @@ public class ArrayVisualizerView extends BorderPane {
         leftScrollPane.setMinWidth(285);
         leftScrollPane.setMaxWidth(285);
 
-        setLeft(buildLeftPanel());
-        setCenter(buildVizArea());
-
-        //để cho bottom panel không kéo dài qua left panel
         BorderPane mainContent = new BorderPane();
+        mainContent.getStyleClass().add("array-main-content");
         mainContent.setCenter(buildVizArea());
         mainContent.setBottom(buildBottomPanel());
-        //setBottom(buildBottomPanel());
+
+        setLeft(leftScrollPane);
+        setCenter(mainContent);
 
         redrawArray();
-        setStatus("[Hệ Thống]: Đã tải xong mảng mô phỏng.");
+        setStatus("Ready. Choose an array operation.");
         setCode(CODE_IDLE);
-        addLog("[Hệ Thống] Sẵn sàng hoạt đông");
+        addLog("[SYSTEM] Array visualizer loaded.");
     }
 
     private VBox buildLeftPanel() {
@@ -117,41 +126,36 @@ public class ArrayVisualizerView extends BorderPane {
         panel.setMaxWidth(285);
         panel.setPadding(new Insets(22, 18, 22, 18));
 
-        Label title = new Label("Mảng (Array)");
+        Label title = new Label("Array");
         title.getStyleClass().add("ds-title");
 
         Label desc = new Label(
-                "Các phần tử được lưu liền kề nhau trong bộ nhớ. " +
-                        "Truy cập nhanh qua chỉ số (O(1)), " +
-                        "nhưng việc chèn/xóa ở vị trí bất kỳ sẽ tốn O(N) " +
-                        "vì phải dịch chuyển các phần tử phía sau."
+                "Arrays store values in indexed positions. Access by index is O(1), " +
+                        "while inserting or deleting in the middle costs O(n) because values must shift."
         );
         desc.getStyleClass().add("ds-desc");
         desc.setWrapText(true);
 
-        HBox infoRow = new HBox(8);
-        infoRow.getChildren().addAll(
+        HBox infoRow = new HBox(8,
                 makeInfoCard("ACCESS", "O(1)"),
                 makeInfoCard("SEARCH", "O(n)"),
                 makeInfoCard("SPACE", "O(n)")
         );
 
-        Label sectionOp = new Label("TÁC VỤ THAO TÁC");
+        Label sectionOp = new Label("OPERATIONS");
         sectionOp.getStyleClass().add("section-label");
 
-        Label valueLabel = new Label("Giá trị phần tử:");
+        Label valueLabel = new Label("Value");
         valueLabel.getStyleClass().add("input-label");
-
         valueField = new TextField();
-        valueField.setPromptText("Ví dụ: 42");
+        valueField.setPromptText("Example: 42");
         valueField.getStyleClass().add("input-field");
         valueField.setMaxWidth(Double.MAX_VALUE);
 
-        Label indexLabel = new Label("Vị trí index:");
+        Label indexLabel = new Label("Index");
         indexLabel.getStyleClass().add("input-label");
-
         indexField = new TextField();
-        indexField.setPromptText("Ví dụ: 2");
+        indexField.setPromptText("Example: 2");
         indexField.getStyleClass().add("input-field");
         indexField.setMaxWidth(Double.MAX_VALUE);
 
@@ -173,23 +177,24 @@ public class ArrayVisualizerView extends BorderPane {
         btnRandomize.setOnAction(e -> handleRandomize());
         btnReset.setOnAction(e -> handleReset());
 
-        Label statusHeader = new Label("ℹ  TRẠNG THÁI MÔ PHỎNG");
+        Label statusHeader = new Label("SIMULATION STATUS");
         statusHeader.getStyleClass().add("status-header");
-        statusText = new Label("Hệ thống đã sẵn sàng. Hãy chọn một thao tác.");
+        statusText = new Label();
         statusText.getStyleClass().add("status-text");
         statusText.setWrapText(true);
 
         VBox statusBox = new VBox(6, statusHeader, statusText);
         statusBox.getStyleClass().add("status-box");
         statusBox.setPadding(new Insets(12, 14, 12, 14));
-        VBox.setVgrow(statusBox, Priority.ALWAYS);
 
         panel.getChildren().addAll(
                 title, desc, infoRow, divider(),
                 sectionOp, valueLabel, valueField,
                 indexLabel, indexField,
-                hRow(btnInsertEnd, btnDeleteEnd), hRow(btnInsertAt, btnDeleteAt),
-                hRow(btnUpdateAt, btnSearch), hRow(btnRandomize, btnReset),
+                hRow(btnInsertEnd, btnDeleteEnd),
+                hRow(btnInsertAt, btnDeleteAt),
+                hRow(btnUpdateAt, btnSearch),
+                hRow(btnRandomize, btnReset),
                 divider(), statusBox
         );
         return panel;
@@ -205,18 +210,16 @@ public class ArrayVisualizerView extends BorderPane {
         VBox box = new VBox(4, labelText, valueText);
         box.getStyleClass().add("array-info-card");
         box.setAlignment(Pos.CENTER);
+        box.setMaxWidth(Double.MAX_VALUE);
 
         HBox wrapper = new HBox(box);
-        HBox.setHgrow(wrapper, Priority.ALWAYS);
         wrapper.setMaxWidth(Double.MAX_VALUE);
-
-        box.setMaxWidth(Double.MAX_VALUE);
         HBox.setHgrow(box, Priority.ALWAYS);
-
+        HBox.setHgrow(wrapper, Priority.ALWAYS);
         return wrapper;
     }
 
-    private StackPane buildVizArea() {
+    private Node buildVizArea() {
         arrayFrame = new HBox(10);
         arrayFrame.setAlignment(Pos.CENTER);
         arrayFrame.getStyleClass().add("array-frame");
@@ -225,40 +228,31 @@ public class ArrayVisualizerView extends BorderPane {
         wrapper.setAlignment(Pos.CENTER);
         wrapper.getStyleClass().add("viz-area");
 
-        return wrapper;
+        ScrollPane scrollPane = new ScrollPane(wrapper);
+        scrollPane.getStyleClass().add("array-viz-scroll");
+        scrollPane.setFitToHeight(true);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        return scrollPane;
     }
 
     private HBox buildBottomPanel() {
         HBox bottom = new HBox();
         bottom.getStyleClass().add("bottom-panel");
-        bottom.setPrefHeight(190);
-        bottom.setMinHeight(170);
+        bottom.setPrefHeight(205);
+        bottom.setMinHeight(180);
 
         VBox codeBox = new VBox();
-        codeBox.setPrefWidth(520);
         codeBox.getStyleClass().add("array-bottom-box");
+        HBox.setHgrow(codeBox, Priority.ALWAYS);
 
-        HBox codeHeader = new HBox();
-        codeHeader.getStyleClass().add("panel-header-box");
-        codeHeader.setAlignment(Pos.CENTER_LEFT);
-
-        Label codeTitle = new Label("<>  PSEUDO-CODE");
-        codeTitle.getStyleClass().add("panel-header-label");
-
-        Region codeSpacer = new Region();
-        HBox.setHgrow(codeSpacer, Priority.ALWAYS);
-
-        Label badge = new Label("C++ style");
-        badge.getStyleClass().add("panel-lang-badge");
-
-        codeHeader.getChildren().addAll(codeTitle, codeSpacer, badge);
-
+        HBox codeHeader = panelHeader("<>  PSEUDO-CODE", "Array");
         codeArea = new TextArea();
         codeArea.getStyleClass().add("code-area");
         codeArea.setEditable(false);
         codeArea.setWrapText(false);
         VBox.setVgrow(codeArea, Priority.ALWAYS);
-
         codeBox.getChildren().addAll(codeHeader, codeArea);
 
         Region divider = new Region();
@@ -268,121 +262,199 @@ public class ArrayVisualizerView extends BorderPane {
         logBox.getStyleClass().add("array-bottom-box");
         HBox.setHgrow(logBox, Priority.ALWAYS);
 
-        HBox logHeader = new HBox();
-        logHeader.getStyleClass().add("panel-header-box");
-        logHeader.setAlignment(Pos.CENTER_LEFT);
-
-        Label logTitle = new Label(">_  ACTIVITY LOG");
-        logTitle.getStyleClass().add("panel-header-label");
-
-        Region logSpacer = new Region();
-        HBox.setHgrow(logSpacer, Priority.ALWAYS);
-
+        HBox logHeader = panelHeader(">_  ACTIVITY LOG", null);
         Button clearBtn = new Button("Clear");
         clearBtn.getStyleClass().add("btn-clear-log");
         clearBtn.setOnAction(e -> logArea.clear());
-
-        logHeader.getChildren().addAll(logTitle, logSpacer, clearBtn);
+        logHeader.getChildren().add(clearBtn);
 
         logArea = new TextArea();
         logArea.getStyleClass().add("log-area");
         logArea.setEditable(false);
         logArea.setWrapText(true);
         VBox.setVgrow(logArea, Priority.ALWAYS);
-
         logBox.getChildren().addAll(logHeader, logArea);
 
         bottom.getChildren().addAll(codeBox, divider, logBox);
-
         return bottom;
+    }
+
+    private HBox panelHeader(String title, String badgeText) {
+        HBox header = new HBox();
+        header.getStyleClass().add("panel-header-box");
+        header.setAlignment(Pos.CENTER_LEFT);
+
+        Label titleLabel = new Label(title);
+        titleLabel.getStyleClass().add("panel-header-label");
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        header.getChildren().addAll(titleLabel, spacer);
+
+        if (badgeText != null) {
+            Label badge = new Label(badgeText);
+            badge.getStyleClass().add("panel-lang-badge");
+            header.getChildren().add(badge);
+        }
+        return header;
     }
 
     private void handleInsertEnd() {
         Integer value = readValue();
         if (value == null) return;
 
-        ArrayService.Result result = service.insertEnd(value);
-        highlightedIndex = result.index() == null ? -1 : result.index();
-
         setCode(CODE_INSERT_END);
-        afterAction(result);
+        runOperationAnimation("Appending value at the end...", List.of(service.size()), () -> {
+            ArrayService.Result result = service.insertEnd(value);
+            highlightedIndex = result.index() == null ? -1 : result.index();
+            afterAction(result);
+        });
     }
 
     private void handleDeleteEnd() {
-        ArrayService.Result result = service.deleteEnd();
-        highlightedIndex = -1;
-
         setCode(CODE_DELETE_END);
-        afterAction(result);
+        int lastIndex = service.size() - 1;
+        runOperationAnimation("Removing the last value...", lastIndex >= 0 ? List.of(lastIndex) : List.of(), () -> {
+            ArrayService.Result result = service.deleteEnd();
+            highlightedIndex = -1;
+            afterAction(result);
+        });
     }
 
     private void handleInsertAt() {
         Integer value = readValue();
         Integer index = readIndex();
-
         if (value == null || index == null) return;
 
-        ArrayService.Result result = service.insertAt(index, value);
-        highlightedIndex = result.success() && result.index() != null ? result.index() : -1;
-
         setCode(CODE_INSERT_AT);
-        afterAction(result);
+        if (index < 0 || index > service.size()) {
+            afterAction(service.insertAt(index, value));
+            return;
+        }
+
+        runOperationAnimation("Shifting values to the right...", indicesDescending(service.size() - 1, index), () -> {
+            ArrayService.Result result = service.insertAt(index, value);
+            highlightedIndex = result.success() && result.index() != null ? result.index() : -1;
+            afterAction(result);
+        });
     }
 
     private void handleDeleteAt() {
         Integer index = readIndex();
-
         if (index == null) return;
 
-        ArrayService.Result result = service.deleteAt(index);
-        highlightedIndex = -1;
-
         setCode(CODE_DELETE_AT);
-        afterAction(result);
+        if (index < 0 || index >= service.size()) {
+            afterAction(service.deleteAt(index));
+            return;
+        }
+
+        runOperationAnimation("Shifting values to the left...", indicesAscending(index, service.size() - 1), () -> {
+            ArrayService.Result result = service.deleteAt(index);
+            highlightedIndex = -1;
+            afterAction(result);
+        });
     }
 
     private void handleUpdateAt() {
         Integer value = readValue();
         Integer index = readIndex();
-
         if (value == null || index == null) return;
 
-        ArrayService.Result result = service.updateAt(index, value);
-        highlightedIndex = result.success() && result.index() != null ? result.index() : -1;
-
         setCode(CODE_UPDATE_AT);
-        afterAction(result);
+        if (index < 0 || index >= service.size()) {
+            afterAction(service.updateAt(index, value));
+            return;
+        }
+
+        runOperationAnimation("Updating one indexed value...", List.of(index), () -> {
+            ArrayService.Result result = service.updateAt(index, value);
+            highlightedIndex = result.success() && result.index() != null ? result.index() : -1;
+            afterAction(result);
+        });
     }
 
     private void handleSearch() {
         Integer value = readValue();
-
         if (value == null) return;
 
-        ArrayService.Result result = service.search(value);
-        highlightedIndex = result.success() && result.index() != null ? result.index() : -1;
-
         setCode(CODE_SEARCH);
-        afterAction(result);
+        int targetIndex = service.indexOf(value);
+        int end = targetIndex >= 0 ? targetIndex : service.size() - 1;
+        runOperationAnimation("Scanning values from left to right...", indicesAscending(0, end), () -> {
+            ArrayService.Result result = service.search(value);
+            highlightedIndex = result.success() && result.index() != null ? result.index() : -1;
+            afterAction(result);
+        });
     }
 
     private void handleRandomize() {
+        stopAnimation();
         ArrayService.Result result = service.randomize();
         highlightedIndex = -1;
-
         setCode(CODE_IDLE);
         afterAction(result);
     }
 
     private void handleReset() {
+        stopAnimation();
         ArrayService.Result result = service.reset();
         highlightedIndex = -1;
-
         valueField.clear();
         indexField.clear();
-
         setCode(CODE_IDLE);
         afterAction(result);
+    }
+
+    private void runOperationAnimation(String message, List<Integer> indices, Runnable onFinished) {
+        stopAnimation();
+        setControlsDisabled(true);
+        setStatus(message);
+        addLog("[STEP] " + message);
+
+        if (indices.isEmpty()) {
+            onFinished.run();
+            setControlsDisabled(false);
+            return;
+        }
+
+        final int[] step = {0};
+        animation = new Timeline(new KeyFrame(Duration.millis(320), e -> {
+            if (step[0] >= indices.size()) {
+                stopAnimation();
+                onFinished.run();
+                setControlsDisabled(false);
+                return;
+            }
+
+            highlightedIndex = indices.get(step[0]++);
+            redrawArray();
+        }));
+        animation.setCycleCount(Timeline.INDEFINITE);
+        animation.play();
+    }
+
+    private void stopAnimation() {
+        if (animation != null) {
+            animation.stop();
+            animation = null;
+        }
+    }
+
+    private List<Integer> indicesAscending(int start, int end) {
+        List<Integer> indices = new ArrayList<>();
+        for (int i = Math.max(0, start); i <= end; i++) {
+            indices.add(i);
+        }
+        return indices;
+    }
+
+    private List<Integer> indicesDescending(int start, int end) {
+        List<Integer> indices = new ArrayList<>();
+        for (int i = start; i >= Math.max(0, end); i--) {
+            indices.add(i);
+        }
+        return indices;
     }
 
     private void afterAction(ArrayService.Result result) {
@@ -393,36 +465,34 @@ public class ArrayVisualizerView extends BorderPane {
 
     private Integer readValue() {
         String text = valueField.getText().trim();
-
         if (text.isEmpty()) {
-            setStatus("Vui lòng nhập giá trị phần tử.");
-            addLog("[ERROR] Chưa nhập giá trị phần tử.");
+            setStatus("Enter a value first.");
+            addLog("[ERROR] Missing value.");
             return null;
         }
 
         try {
             return Integer.parseInt(text);
         } catch (NumberFormatException e) {
-            setStatus("Giá trị phần tử phải là số nguyên.");
-            addLog("[ERROR] Giá trị phần tử không hợp lệ: " + text);
+            setStatus("Value must be an integer.");
+            addLog("[ERROR] Invalid value: " + text);
             return null;
         }
     }
 
     private Integer readIndex() {
         String text = indexField.getText().trim();
-
         if (text.isEmpty()) {
-            setStatus("Vui lòng nhập index.");
-            addLog("[ERROR] Chưa nhập index.");
+            setStatus("Enter an index first.");
+            addLog("[ERROR] Missing index.");
             return null;
         }
 
         try {
             return Integer.parseInt(text);
         } catch (NumberFormatException e) {
-            setStatus("Index phải là số nguyên.");
-            addLog("[ERROR] Index không hợp lệ: " + text);
+            setStatus("Index must be an integer.");
+            addLog("[ERROR] Invalid index: " + text);
             return null;
         }
     }
@@ -431,17 +501,15 @@ public class ArrayVisualizerView extends BorderPane {
         arrayFrame.getChildren().clear();
 
         List<Integer> items = service.toList();
-
         if (items.isEmpty()) {
-            Label empty = new Label("Array rỗng");
+            Label empty = new Label("Array is empty");
             empty.getStyleClass().add("stack-empty-label");
             arrayFrame.getChildren().add(empty);
             return;
         }
 
         for (int i = 0; i < items.size(); i++) {
-            VBox cellBox = buildArrayCell(items.get(i), i, i == highlightedIndex);
-            arrayFrame.getChildren().add(cellBox);
+            arrayFrame.getChildren().add(buildArrayCell(items.get(i), i, i == highlightedIndex));
         }
     }
 
@@ -459,47 +527,36 @@ public class ArrayVisualizerView extends BorderPane {
 
         VBox box = new VBox(7, cell, indexLabel);
         box.setAlignment(Pos.CENTER);
-
         return box;
     }
 
     private Button makeBtn(String text, String styleClass) {
-        Button b = new Button(text);
-        // để chữ dài kh lam cho btn bị to ra
-        b.getStyleClass().addAll("array-op-button", styleClass);
-        //b.setMaxWidth(Double.MAX_VALUE);
-        b.setWrapText(true);
-        b.setAlignment(Pos.CENTER);
-        return b;
+        Button button = new Button(text);
+        button.getStyleClass().addAll("array-op-button", styleClass);
+        button.setWrapText(true);
+        button.setAlignment(Pos.CENTER);
+        actionButtons.add(button);
+        return button;
     }
 
     private HBox hRow(Button a, Button b) {
         HBox row = new HBox(8, a, b);
-        // HBox.setHgrow(a, Priority.ALWAYS);
-        // HBox.setHgrow(b, Priority.ALWAYS);
-        // để cho các btn bằng nhau không bị co giãn theo chữ
-        a.setPrefWidth(118);
-        b.setPrefWidth(118);
-        a.setMinWidth(118);
-        b.setMinWidth(118);
-        a.setMaxWidth(118);
-        b.setMaxWidth(118);
-
-        a.setPrefHeight(38);
-        b.setPrefHeight(38);
-        a.setMinHeight(38);
-        b.setMinHeight(38);
-        a.setMaxHeight(38);
-        b.setMaxHeight(38);
-
+        a.setPrefSize(118, 38);
+        b.setPrefSize(118, 38);
         return row;
     }
 
     private Region divider() {
-        Region r = new Region();
-        r.getStyleClass().add("divider-line");
-        r.setMaxWidth(Double.MAX_VALUE);
-        return r;
+        Region region = new Region();
+        region.getStyleClass().add("divider-line");
+        region.setMaxWidth(Double.MAX_VALUE);
+        return region;
+    }
+
+    private void setControlsDisabled(boolean disabled) {
+        actionButtons.forEach(button -> button.setDisable(disabled));
+        valueField.setDisable(disabled);
+        indexField.setDisable(disabled);
     }
 
     private void setStatus(String message) {
@@ -513,5 +570,6 @@ public class ArrayVisualizerView extends BorderPane {
     private void addLog(String message) {
         if (logArea == null) return;
         logArea.appendText(message + "\n");
+        logArea.positionCaret(logArea.getText().length());
     }
 }
