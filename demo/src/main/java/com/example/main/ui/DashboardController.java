@@ -56,7 +56,12 @@ public class DashboardController {
 
     @FXML
     public void openArray() {
-        System.out.println("Array");
+        ArrayVisualizerView view = new ArrayVisualizerView();
+        contentPane.getChildren().setAll(view);
+
+        sidebar.setVisible(false);
+        sidebar.setManaged(false);
+        sidebarVisible = false;
     }
 
     @FXML
