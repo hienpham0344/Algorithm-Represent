@@ -234,12 +234,15 @@
 
 
 /* ── BOTTOM PANEL ── */
-
-
-.bottom-panel {
+.bottom-dock {
     -fx-background-color: #0F172A;
     -fx-border-color: #1E293B;
     -fx-border-width: 1 0 0 0;
+}
+
+/* Each side: pseudo-code / activity log */
+.bottom-section {
+    -fx-background-color: #0F172A;
 }
 
 .panel-header-box {
@@ -264,24 +267,37 @@
     -fx-font-family: "Courier New", monospace;
 }
 
-.code-area {
+.code-area,
+.log-area {
     -fx-control-inner-background: #020817;
-    -fx-text-fill: #CBD5E1;
+    -fx-background-color: #020817;
+    -fx-background-radius: 10;
+    -fx-border-color: #334155;
+    -fx-border-width: 1;
+    -fx-border-radius: 10;
     -fx-font-family: "Courier New", monospace;
     -fx-font-size: 12px;
-    -fx-border-color: transparent;
-    -fx-background-color: transparent;
-    -fx-padding: 10;
+    -fx-padding: 15;
+}
+
+.code-area {
+    -fx-text-fill: #CBD5E1;
 }
 
 .log-area {
-    -fx-control-inner-background: #020817;
     -fx-text-fill: #4ADE80;
-    -fx-font-family: "Courier New", monospace;
-    -fx-font-size: 12px;
-    -fx-border-color: transparent;
+}
+
+.code-area .content,
+.log-area .content {
+    -fx-background-color: #020817;
+}
+
+.code-area .scroll-pane,
+.log-area .scroll-pane,
+.code-area .scroll-pane .viewport,
+.log-area .scroll-pane .viewport {
     -fx-background-color: transparent;
-    -fx-padding: 10;
 }
 
 .btn-clear-log {

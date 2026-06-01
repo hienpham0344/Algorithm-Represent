@@ -4,60 +4,47 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane styleClass="queue-root" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.main.ui.QueueController">
+<BorderPane styleClass="q-root" stylesheets="@../styles/queue.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.main.ui.QueueController">
 
-    <!-- ══ LEFT PANEL ══ -->
     <left>
-        <VBox maxWidth="265" minWidth="265" prefHeight="393.0" prefWidth="647.0" spacing="0" styleClass="left-panel">
-
+        <VBox prefWidth="265" spacing="14" styleClass="left-panel">
             <padding>
-                <Insets bottom="22" left="18" right="18" top="22" />
+                <Insets bottom="20" left="16" right="16" top="20" />
             </padding>
 
-            <Label styleClass="ds-title" text="Hàng đợi (Queue - FIFO)" wrapText="true" />
+            <Label styleClass="ds-title" text="QUEUE (FIFO)" />
+            <Label styleClass="ds-desc" text="Hàng đợi hoạt động theo nguyên lý 'Vào trước - Ra trước' (First In, First Out). Phần tử được thêm ở REAR (Cuối) và lấy ra ở FRONT (Đầu)." wrapText="true" />
 
-            <Label styleClass="ds-desc" text="Hoạt động theo nguyên lý 'Vào trước – Ra trước' (First In, First Out). Enqueue thêm vào REAR, Dequeue lấy từ FRONT." wrapText="true">
-                <VBox.margin><Insets top="8" /></VBox.margin>
-            </Label>
+            <Region styleClass="sidebar-divider" />
 
-            <Region maxWidth="Infinity" prefHeight="1" styleClass="divider-line">
-                <VBox.margin><Insets bottom="14" top="14" /></VBox.margin>
-            </Region>
+            <Label styleClass="section-label" text="CÁC THAO TÁC SỬ DỤNG" />
+            <Label styleClass="input-label" text="Giá trị phần tử (Số nguyên):" />
+            <TextField fx:id="inputField" styleClass="input-field" text="10" />
 
-            <Label styleClass="section-label" text="MODULE INFO" />
+            <HBox spacing="8">
+                <Button fx:id="enqueueBtn" maxWidth="9999" prefWidth="0" styleClass="btn-enqueue" text="Enqueue" HBox.hgrow="ALWAYS" />
+                <Button fx:id="dequeueBtn" maxWidth="9999"  prefWidth="0" styleClass="btn-dequeue" text="Dequeue" HBox.hgrow="ALWAYS" />
+            </HBox>
 
-            <GridPane hgap="8" vgap="0">
-                <VBox.margin><Insets bottom="0" top="10" /></VBox.margin>
-                <columnConstraints>
-                    <ColumnConstraints hgrow="ALWAYS" />
-                    <ColumnConstraints hgrow="ALWAYS" />
-                </columnConstraints>
+            <HBox spacing="8">
+                <Button fx:id="peekBtn" maxWidth="9999"  prefWidth="0" styleClass="btn-peek" text="Xem Front" HBox.hgrow="ALWAYS" />
+                <Button fx:id="resetBtn" maxWidth="9999"  prefWidth="0" styleClass="btn-reset" text="Khởi tạo lại" HBox.hgrow="ALWAYS" />
+            </HBox>
 
-                <VBox styleClass="info-card" GridPane.columnIndex="0">
-                    <Label styleClass="info-card-label" text="ENQUEUE" />
-                    <Label styleClass="info-card-value-green" text="O(1)" />
-                </VBox>
+            <VBox spacing="5">
+                <Label styleClass="input-label" text="Tốc độ hiệu ứng:" />
+                <Slider fx:id="speedSlider" max="3.0" maxWidth="9999" min="0.2" showTickMarks="true" showTickLabels="true" majorTickUnit="1.0" blockIncrement="0.1" styleClass="speed-slider" value="1.0" />
+            </VBox>
 
-                <VBox styleClass="info-card" GridPane.columnIndex="1">
-                    <VBox.margin><Insets left="4" /></VBox.margin>
-                    <Label styleClass="info-card-label" text="DEQUEUE" />
-                    <Label styleClass="info-card-value-green" text="O(1)" />
-                </VBox>
-            <rowConstraints>
-               <RowConstraints />
-            </rowConstraints>
-            </GridPane>
-
-            <Region maxWidth="Infinity" prefHeight="1" styleClass="divider-line">
-                <VBox.margin><Insets bottom="14" top="14" /></VBox.margin>
-            </Region>
 
         </VBox>
     </left>
 
-    <!-- CENTER placeholder -->
     <center>
-        <StackPane fx:id="vizPane" styleClass="viz-area" />
+        <StackPane ><!--styleClass="viz-area"-->
+            <HBox fx:id="queueFrame" alignment="CENTER" spacing="12" styleClass="queue-frame" />
+        </StackPane>
     </center>
+
 
 </BorderPane>

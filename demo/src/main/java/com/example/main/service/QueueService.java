@@ -13,23 +13,26 @@ public class QueueService {
 
     public Result enqueue(int value) {
         queue.addLast(value);
-        return new Result(true, "Enqueue " + value + " vào REAR thành công.", value);
+        return new Result(true, "Đã Enqueue " + value + " vào cuối hàng đợi (REAR).", value);
     }
 
     public Result dequeue() {
         if (queue.isEmpty())
-            return new Result(false, "Queue rỗng (Underflow). Không thể Dequeue!", null);
-        int val = queue.removeFirst();
-        return new Result(true, "Dequeue " + val + " từ FRONT thành công.", val);
+            return new Result(false, "Hàng đợi đang rỗng, không thể Dequeue.", null);
+        int val = queue.removeFirst(); // Lấy ra từ đầu hàng (FRONT)
+        return new Result(true, "Đã Dequeue " + val + " ra khỏi đầu hàng đợi (FRONT).", val);
     }
 
     public Result peek() {
         if (queue.isEmpty())
-            return new Result(false, "Queue rỗng. Peek = NULL!", null);
-        return new Result(true, "FRONT hiện tại: " + queue.peekFirst(), queue.peekFirst());
+            return new Result(false, "Hàng đợi đang rỗng, không có phần tử đầu hàng.", null);
+        return new Result(true, "Đầu hàng đợi (peek): " + queue.peekFirst(), queue.peekFirst());
     }
 
-    public void reset() { queue.clear(); }
+    public void reset() {
+        queue.clear();
+    }
+
 
     public List<Integer> toList() {
         return new ArrayList<>(queue);

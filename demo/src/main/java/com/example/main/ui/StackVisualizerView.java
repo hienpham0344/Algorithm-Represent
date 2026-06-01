@@ -279,73 +279,69 @@ public class StackVisualizerView extends BorderPane {
         return row;
     }
     private HBox buildBottomPanel() {
-        Label codeHeader = new Label("PSEUDO-CODE");
-        codeHeader.getStyleClass().add("panel-header-label");
-        Label codeLang = new Label("Java code");
-        codeLang.getStyleClass().add("panel-lang-badge");
-        Region sp1 = new Region();
-        HBox.setHgrow(sp1, Priority.ALWAYS);
-        HBox codeHdr = new HBox(codeHeader, sp1, codeLang);
-        codeHdr.getStyleClass().add("panel-header-box");
-        codeHdr.setAlignment(Pos.CENTER_LEFT);
-
-        codeHdr.setPrefHeight(40);
-        codeHdr.setMinHeight(40);
-        codeHdr.setMaxHeight(40);
-
-        codeArea = new TextArea(CODE_IDLE);
-        codeArea.setEditable(false);
+        HBox codeHeader = panelHeader("<>  PSEUDO-CODE", "Java code");
+        codeArea = new TextArea();
         codeArea.getStyleClass().add("code-area");
+        codeArea.setText("// Chọn 1 hành động để trực quan hóa mã giả");
+        codeArea.setEditable(false);
+        codeArea.setWrapText(false);
         VBox.setVgrow(codeArea, Priority.ALWAYS);
+        VBox.setMargin(codeArea, new Insets(12, 12, 12, 12));
+        VBox codeBox = new VBox(codeHeader, codeArea);
+        codeBox.getStyleClass().add("bottom-section");
+        HBox.setHgrow(codeBox, Priority.ALWAYS);
+        codeBox.setPrefWidth(0);
+        codeBox.setMaxHeight(Double.MAX_VALUE);
 
-        VBox codePanel = new VBox(codeHdr, codeArea);
-        codePanel.getStyleClass().add("bottom-panel");
-        HBox.setHgrow(codePanel, Priority.ALWAYS);
+        Region divider = new Region();
+        divider.getStyleClass().add("bottom-divider");
 
-        Region vdiv = new Region();
-        vdiv.getStyleClass().add("bottom-divider");
-
-        Label logHeader = new Label("ACTIVITY LOG");
-        logHeader.getStyleClass().add("panel-header-label");
-        Button btnClear = new Button("🗑 Clear");
-        btnClear.getStyleClass().add("btn-clear-log");
-        btnClear.setOnAction(e -> {
-            logArea.clear();
-            appendLog("[Hệ Thống]: Nhật ký đã được dọn sạch.");
-        });
-        Region sp2 = new Region();
-        HBox.setHgrow(sp2, Priority.ALWAYS);
-        HBox logHdr = new HBox(logHeader, sp2, btnClear);
-        logHdr.getStyleClass().add("panel-header-box");
-        logHdr.setAlignment(Pos.CENTER_LEFT);
-
-        logHdr.setPrefHeight(40);
-        logHdr.setMinHeight(40);
-        logHdr.setMaxHeight(40);
+        HBox logHeader = panelHeader(">_  ACTIVITY LOG", null);
+        Button clearBtn = new Button("Clear");
+        clearBtn.getStyleClass().add("btn-clear-log");
+        clearBtn.setOnAction(e -> logArea.clear());
+        logHeader.getChildren().add(clearBtn);
 
         logArea = new TextArea();
+        logArea.getStyleClass().add("log-area");
         logArea.setEditable(false);
         logArea.setWrapText(true);
-        logArea.getStyleClass().add("log-area");
         VBox.setVgrow(logArea, Priority.ALWAYS);
+        VBox.setMargin(logArea, new Insets(12, 12, 12, 12));
+        VBox logBox = new VBox(logHeader, logArea);
+        logBox.getStyleClass().add("bottom-section");
+        HBox.setHgrow(logBox, Priority.ALWAYS);
+        logBox.setPrefWidth(0);
+        logBox.setMaxHeight(Double.MAX_VALUE);
 
-        VBox logPanel = new VBox(logHdr, logArea);
-        logPanel.getStyleClass().add("bottom-panel");
-        HBox.setHgrow(logPanel, Priority.ALWAYS);
-
-
-        codePanel.setPrefWidth(0);
-        logPanel.setPrefWidth(0);
-
-        codePanel.setMaxHeight(Double.MAX_VALUE);
-        logPanel.setMaxHeight(Double.MAX_VALUE);
-
-        HBox bottom = new HBox(codePanel, vdiv, logPanel);
+        HBox bottom = new HBox(codeBox, divider, logBox);
+        bottom.getStyleClass().add("bottom-dock");
         bottom.setPrefHeight(210);
-
+        bottom.setMinHeight(180);
         bottom.setFillHeight(true);
-
         return bottom;
+    }
+    private HBox panelHeader(String title, String badgeText) {
+        HBox header = new HBox();
+        header.getStyleClass().add("panel-header-box");
+        header.setAlignment(Pos.CENTER_LEFT);
+        header.setPrefHeight(40);
+        header.setMinHeight(40);
+        header.setMaxHeight(40);
+
+        Label titleLabel = new Label(title);
+        titleLabel.getStyleClass().add("panel-header-label");
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        header.getChildren().addAll(titleLabel, spacer);
+
+        if (badgeText != null) {
+            Label badge = new Label(badgeText);
+            badge.getStyleClass().add("panel-lang-badge");
+            header.getChildren().add(badge);
+        }
+        return header;
     }
 
     private void setStatus(String msg) { setStatus(msg, null); }
