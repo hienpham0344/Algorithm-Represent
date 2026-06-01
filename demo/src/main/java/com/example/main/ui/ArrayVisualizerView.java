@@ -26,6 +26,7 @@ public class ArrayVisualizerView extends BorderPane {
     private Slider speedSlider;
     private Timeline animation;
     private int highlightedIndex = -1;
+    private int foundIndex = -1;
 
     private static final String CODE_IDLE =
             "// Choose an operation to view pseudo-code.\n";
@@ -143,6 +144,7 @@ public class ArrayVisualizerView extends BorderPane {
         valueField.setPromptText("Example: 42");
         valueField.getStyleClass().add("input-field");
         valueField.setMaxWidth(Double.MAX_VALUE);
+        VBox valueBox = new VBox(5, valueLabel, valueField);
 
         Label indexLabel = new Label("Index");
         indexLabel.getStyleClass().add("input-label");
@@ -150,6 +152,10 @@ public class ArrayVisualizerView extends BorderPane {
         indexField.setPromptText("Example: 2");
         indexField.getStyleClass().add("input-field");
         indexField.setMaxWidth(Double.MAX_VALUE);
+        VBox indexBox = new VBox(5, indexLabel, indexField);
+
+        Region operationGap = new Region();
+        operationGap.setPrefHeight(5);
 
         Button btnInsertEnd = makeBtn("Insert End", "btn-array-insert");
         Button btnDeleteEnd = makeBtn("Delete End", "btn-array-delete");
@@ -181,8 +187,8 @@ public class ArrayVisualizerView extends BorderPane {
 
         panel.getChildren().addAll(
                 title, desc, infoRow, divider(),
-                sectionOp, valueLabel, valueField,
-                indexLabel, indexField,
+                sectionOp, valueBox,
+                indexBox, operationGap,
                 hRow(btnInsertEnd, btnDeleteEnd),
                 hRow(btnInsertAt, btnDeleteAt),
                 hRow(btnUpdateAt, btnSearch),
@@ -195,6 +201,7 @@ public class ArrayVisualizerView extends BorderPane {
     private HBox buildMainToolbar() {
         Label speedLabel = new Label("Speed");
         speedLabel.getStyleClass().add("input-label");
+        HBox.setMargin(speedLabel, new Insets(0, 0, 18, 0));
 
         speedSlider = new Slider(0.2, 3.0, 1.0);
         speedSlider.getStyleClass().add("speed-slider");
@@ -212,8 +219,7 @@ public class ArrayVisualizerView extends BorderPane {
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
-
-        HBox toolbar = new HBox(10, spacer, speedLabel, speedSlider);
+        HBox toolbar = new HBox(10, spacer,  speedLabel, speedSlider);
         toolbar.getStyleClass().add("array-toolbar");
         toolbar.setAlignment(Pos.CENTER_RIGHT);
         return toolbar;
@@ -263,8 +269,9 @@ public class ArrayVisualizerView extends BorderPane {
         codeArea.setEditable(false);
         codeArea.setWrapText(false);
         VBox.setVgrow(codeArea, Priority.ALWAYS);
+        VBox.setMargin(codeArea, new Insets(12, 12, 12, 12));
         VBox codeBox = new VBox(codeHeader, codeArea);
-        codeBox.getStyleClass().add("bottom-panel");
+        codeBox.getStyleClass().add("bottom-section");
         HBox.setHgrow(codeBox, Priority.ALWAYS);
         codeBox.setPrefWidth(0);
         codeBox.setMaxHeight(Double.MAX_VALUE);
@@ -283,13 +290,15 @@ public class ArrayVisualizerView extends BorderPane {
         logArea.setEditable(false);
         logArea.setWrapText(true);
         VBox.setVgrow(logArea, Priority.ALWAYS);
+        VBox.setMargin(logArea, new Insets(12, 12, 12, 12));
         VBox logBox = new VBox(logHeader, logArea);
-        logBox.getStyleClass().add("bottom-panel");
+        logBox.getStyleClass().add("bottom-section");
         HBox.setHgrow(logBox, Priority.ALWAYS);
         logBox.setPrefWidth(0);
         logBox.setMaxHeight(Double.MAX_VALUE);
 
         HBox bottom = new HBox(codeBox, divider, logBox);
+        bottom.getStyleClass().add("bottom-dock");
         bottom.setPrefHeight(210);
         bottom.setMinHeight(180);
         bottom.setFillHeight(true);
@@ -326,6 +335,7 @@ public class ArrayVisualizerView extends BorderPane {
         setCode(CODE_INSERT_END);
         stopAnimation();
         setControlsDisabled(true);
+        foundIndex = -1;
         setStatus("Appending value at the end...");
         addLog("[STEP] Appending value at the end...");
 
@@ -344,6 +354,7 @@ public class ArrayVisualizerView extends BorderPane {
 
     private void handleDeleteEnd() {
         setCode(CODE_DELETE_END);
+        foundIndex = -1;
         int lastIndex = service.size() - 1;
         runOperationAnimation("Removing the last value...", lastIndex >= 0 ? List.of(lastIndex) : List.of(), () -> {
             ArrayService.Result result = service.deleteEnd();
@@ -358,6 +369,7 @@ public class ArrayVisualizerView extends BorderPane {
         if (value == null || index == null) return;
 
         setCode(CODE_INSERT_AT);
+        foundIndex = -1;
         if (index < 0 || index > service.size()) {
             afterAction(service.insertAt(index, value));
             return;
@@ -375,6 +387,7 @@ public class ArrayVisualizerView extends BorderPane {
         if (index == null) return;
 
         setCode(CODE_DELETE_AT);
+        foundIndex = -1;
         if (index < 0 || index >= service.size()) {
             afterAction(service.deleteAt(index));
             return;
@@ -393,6 +406,7 @@ public class ArrayVisualizerView extends BorderPane {
         if (value == null || index == null) return;
 
         setCode(CODE_UPDATE_AT);
+        foundIndex = -1;
         if (index < 0 || index >= service.size()) {
             afterAction(service.updateAt(index, value));
             return;
@@ -419,7 +433,8 @@ public class ArrayVisualizerView extends BorderPane {
         int end = targetIndex >= 0 ? targetIndex : service.size() - 1;
         runOperationAnimation("Scanning values from left to right...", indicesAscending(0, end), () -> {
             ArrayService.Result result = service.search(value);
-            highlightedIndex = result.success() && result.index() != null ? result.index() : -1;
+            foundIndex = result.success() && result.index() != null ? result.index() : -1;
+            highlightedIndex = -1;
             afterAction(result);
         });
     }
@@ -428,6 +443,7 @@ public class ArrayVisualizerView extends BorderPane {
         stopAnimation();
         ArrayService.Result result = service.randomize();
         highlightedIndex = -1;
+        foundIndex = -1;
         setCode(CODE_IDLE);
         afterAction(result);
     }
@@ -436,6 +452,7 @@ public class ArrayVisualizerView extends BorderPane {
         stopAnimation();
         ArrayService.Result result = service.reset();
         highlightedIndex = -1;
+        foundIndex = -1;
         valueField.clear();
         indexField.clear();
         setCode(CODE_IDLE);
@@ -445,6 +462,7 @@ public class ArrayVisualizerView extends BorderPane {
     private void runOperationAnimation(String message, List<Integer> indices, Runnable onFinished) {
         stopAnimation();
         setControlsDisabled(true);
+        foundIndex = -1;
         setStatus(message);
         addLog("[STEP] " + message);
 
@@ -546,16 +564,16 @@ public class ArrayVisualizerView extends BorderPane {
         }
 
         for (int i = 0; i < items.size(); i++) {
-            arrayFrame.getChildren().add(buildArrayCell(items.get(i), i, i == highlightedIndex));
+            arrayFrame.getChildren().add(buildArrayCell(items.get(i), i, i == highlightedIndex, i == foundIndex));
         }
     }
 
-    private VBox buildArrayCell(int value, int index, boolean highlighted) {
+    private VBox buildArrayCell(int value, int index, boolean highlighted, boolean found) {
         Label valueLabel = new Label(String.valueOf(value));
         valueLabel.getStyleClass().add("array-cell-value");
 
         StackPane cell = new StackPane(valueLabel);
-        cell.getStyleClass().add(highlighted ? "array-cell-highlight" : "array-cell");
+        cell.getStyleClass().add(found ? "array-cell-found" : highlighted ? "array-cell-highlight" : "array-cell");
         cell.setPrefWidth(58);
         cell.setPrefHeight(52);
 

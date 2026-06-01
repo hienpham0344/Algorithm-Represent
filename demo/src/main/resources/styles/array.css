@@ -84,7 +84,7 @@
 }
 
 .speed-slider {
-    -fx-padding: 5 0 5 0;
+    -fx-padding: 0 0 2 0;
 }
 
 .speed-slider .track {
@@ -245,7 +245,8 @@
 }
 
 .array-cell,
-.array-cell-highlight {
+.array-cell-highlight,
+.array-cell-found {
     -fx-border-width: 2;
     -fx-border-radius: 10;
     -fx-background-radius: 10;
@@ -260,6 +261,12 @@
     -fx-background-color: rgba(79, 70, 229, 0.75);
     -fx-border-color: #A5B4FC;
     -fx-effect: dropshadow(gaussian, rgba(129,140,248,0.65), 16, 0, 0, 0);
+}
+
+.array-cell-found {
+    -fx-background-color: rgba(245, 158, 11, 0.85);
+    -fx-border-color: #FBBF24;
+    -fx-effect: dropshadow(gaussian, rgba(251,191,36,0.6), 16, 0, 0, 0);
 }
 
 .array-cell-value {
@@ -281,10 +288,15 @@
 }
 
 /* Bottom dock */
-.bottom-panel {
+.bottom-dock {
     -fx-background-color: #0F172A;
     -fx-border-color: #1E293B;
     -fx-border-width: 1 0 0 0;
+}
+
+/* Each side: pseudo-code / activity log */
+.bottom-section {
+    -fx-background-color: #0F172A;
 }
 
 .panel-header-box {
@@ -312,11 +324,14 @@
 .code-area,
 .log-area {
     -fx-control-inner-background: #020817;
-    -fx-border-color: transparent;
-    -fx-background-color: transparent;
+    -fx-background-color: #020817;
+    -fx-background-radius: 10;
+    -fx-border-color: #334155;
+    -fx-border-width: 1;
+    -fx-border-radius: 10;
     -fx-font-family: "Courier New", monospace;
     -fx-font-size: 12px;
-    -fx-padding: 10;
+    -fx-padding: 15;
 }
 
 .code-area {
@@ -325,6 +340,18 @@
 
 .log-area {
     -fx-text-fill: #4ADE80;
+}
+
+.code-area .content,
+.log-area .content {
+    -fx-background-color: #020817;
+}
+
+.code-area .scroll-pane,
+.log-area .scroll-pane,
+.code-area .scroll-pane .viewport,
+.log-area .scroll-pane .viewport {
+    -fx-background-color: transparent;
 }
 
 .btn-clear-log {
