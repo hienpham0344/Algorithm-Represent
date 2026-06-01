@@ -1,22 +1,12 @@
 package com.example.main.ui;
 
 import com.example.main.service.ArrayService;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
+import javafx.animation.*;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
 import javafx.util.Duration;
 
 import java.util.ArrayList;
@@ -33,6 +23,7 @@ public class ArrayVisualizerView extends BorderPane {
     private Label statusText;
     private TextArea codeArea;
     private TextArea logArea;
+    private Slider speedSlider;
     private Timeline animation;
     private int highlightedIndex = -1;
 
@@ -91,7 +82,6 @@ public class ArrayVisualizerView extends BorderPane {
                     "}\n";
 
     public ArrayVisualizerView() {
-        getStylesheets().add(getClass().getResource("/styles/stack.css").toExternalForm());
         getStylesheets().add(getClass().getResource("/styles/array.css").toExternalForm());
         getStyleClass().add("array-root");
 
@@ -106,6 +96,7 @@ public class ArrayVisualizerView extends BorderPane {
 
         BorderPane mainContent = new BorderPane();
         mainContent.getStyleClass().add("array-main-content");
+        mainContent.setTop(buildMainToolbar());
         mainContent.setCenter(buildVizArea());
         mainContent.setBottom(buildBottomPanel());
 
@@ -201,6 +192,33 @@ public class ArrayVisualizerView extends BorderPane {
         return panel;
     }
 
+    private HBox buildMainToolbar() {
+        Label speedLabel = new Label("Speed");
+        speedLabel.getStyleClass().add("input-label");
+
+        speedSlider = new Slider(0.2, 3.0, 1.0);
+        speedSlider.getStyleClass().add("speed-slider");
+        speedSlider.setShowTickMarks(true);
+        speedSlider.setShowTickLabels(true);
+        speedSlider.setMajorTickUnit(1.0);
+        speedSlider.setBlockIncrement(0.1);
+        speedSlider.setPrefWidth(210);
+
+        speedSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if (animation != null && animation.getStatus() == Animation.Status.RUNNING) {
+                animation.setRate(newValue.doubleValue());
+            }
+        });
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        HBox toolbar = new HBox(10, spacer, speedLabel, speedSlider);
+        toolbar.getStyleClass().add("array-toolbar");
+        toolbar.setAlignment(Pos.CENTER_RIGHT);
+        return toolbar;
+    }
+
     private HBox makeInfoCard(String label, String value) {
         Label labelText = new Label(label);
         labelText.getStyleClass().add("array-info-label");
@@ -255,7 +273,7 @@ public class ArrayVisualizerView extends BorderPane {
         divider.getStyleClass().add("bottom-divider");
 
         HBox logHeader = panelHeader(">_  ACTIVITY LOG", null);
-        Button clearBtn = new Button("🗑 Clear");
+        Button clearBtn = new Button("Clear");
         clearBtn.getStyleClass().add("btn-clear-log");
         clearBtn.setOnAction(e -> logArea.clear());
         logHeader.getChildren().add(clearBtn);
@@ -306,11 +324,22 @@ public class ArrayVisualizerView extends BorderPane {
         if (value == null) return;
 
         setCode(CODE_INSERT_END);
-        runOperationAnimation("Appending value at the end...", List.of(service.size()), () -> {
-            ArrayService.Result result = service.insertEnd(value);
-            highlightedIndex = result.index() == null ? -1 : result.index();
+        stopAnimation();
+        setControlsDisabled(true);
+        setStatus("Appending value at the end...");
+        addLog("[STEP] Appending value at the end...");
+
+        ArrayService.Result result = service.insertEnd(value);
+        highlightedIndex = result.index() == null ? -1 : result.index();
+        redrawArray();
+
+        animation = new Timeline(new KeyFrame(Duration.millis(320), e -> {
+            stopAnimation();
             afterAction(result);
-        });
+            setControlsDisabled(false);
+        }));
+        animation.setRate(speedSlider.getValue());
+        animation.play();
     }
 
     private void handleDeleteEnd() {
@@ -381,6 +410,11 @@ public class ArrayVisualizerView extends BorderPane {
         if (value == null) return;
 
         setCode(CODE_SEARCH);
+        if (service.isEmpty()) {
+            afterAction(service.search(value));
+            return;
+        }
+
         int targetIndex = service.indexOf(value);
         int end = targetIndex >= 0 ? targetIndex : service.size() - 1;
         runOperationAnimation("Scanning values from left to right...", indicesAscending(0, end), () -> {
@@ -433,6 +467,7 @@ public class ArrayVisualizerView extends BorderPane {
             redrawArray();
         }));
         animation.setCycleCount(Timeline.INDEFINITE);
+        animation.setRate(speedSlider.getValue());
         animation.play();
     }
 
@@ -505,7 +540,7 @@ public class ArrayVisualizerView extends BorderPane {
         List<Integer> items = service.toList();
         if (items.isEmpty()) {
             Label empty = new Label("Array is empty");
-            empty.getStyleClass().add("stack-empty-label");
+            empty.getStyleClass().add("array-empty-label");
             arrayFrame.getChildren().add(empty);
             return;
         }
