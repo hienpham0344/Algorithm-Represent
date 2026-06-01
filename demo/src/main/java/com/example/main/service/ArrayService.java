@@ -17,66 +17,65 @@ public class ArrayService {
 
     public Result insertEnd(int value) {
         array.add(value);
-        return new Result(true, "Đã thêm " + value + " vào cuối mảng.", value, array.size() - 1);
+        return new Result(true, "Inserted " + value + " at the end of the array.", value, array.size() - 1);
     }
 
     public Result deleteEnd() {
         if (array.isEmpty()) {
-            return new Result(false, "Mảng đang rỗng, không thể xóa cuối.", null, null);
+            return new Result(false, "The array is empty. Delete End cannot run.", null, null);
         }
 
         int index = array.size() - 1;
         int removedValue = array.remove(index);
-        return new Result(true, "Đã xóa phần tử cuối: " + removedValue + ".", removedValue, index);
+        return new Result(true, "Removed last value " + removedValue + ".", removedValue, index);
     }
 
     public Result insertAt(int index, int value) {
         if (index < 0 || index > array.size()) {
-            return new Result(false, "Index không hợp lệ. Index insert phải nằm trong đoạn [0, " + array.size() + "].", value, index);
+            return new Result(false, "Invalid index. Insert index must be in [0, " + array.size() + "].", value, index);
         }
 
         array.add(index, value);
-        return new Result(true, "Đã chèn " + value + " vào vị trí index " + index + ".", value, index);
+        return new Result(true, "Inserted " + value + " at index " + index + ".", value, index);
     }
 
     public Result deleteAt(int index) {
         if (array.isEmpty()) {
-            return new Result(false, "Mảng đang rỗng, không thể xóa.", null, index);
+            return new Result(false, "The array is empty. Delete at Index cannot run.", null, index);
         }
 
         if (index < 0 || index >= array.size()) {
-            return new Result(false, "Index không hợp lệ. Index delete phải nằm trong đoạn [0, " + (array.size() - 1) + "].", null, index);
+            return new Result(false, "Invalid index. Delete index must be in [0, " + (array.size() - 1) + "].", null, index);
         }
 
         int removedValue = array.remove(index);
-        return new Result(true, "Đã xóa phần tử " + removedValue + " tại index " + index + ".", removedValue, index);
+        return new Result(true, "Removed value " + removedValue + " at index " + index + ".", removedValue, index);
     }
 
     public Result updateAt(int index, int value) {
         if (array.isEmpty()) {
-            return new Result(false, "Mảng đang rỗng, không thể cập nhật.", value, index);
+            return new Result(false, "The array is empty. Update cannot run.", value, index);
         }
 
         if (index < 0 || index >= array.size()) {
-            return new Result(false, "Index không hợp lệ. Index update phải nằm trong đoạn [0, " + (array.size() - 1) + "].", value, index);
+            return new Result(false, "Invalid index. Update index must be in [0, " + (array.size() - 1) + "].", value, index);
         }
 
         int oldValue = array.set(index, value);
-        return new Result(true, "Đã cập nhật index " + index + " từ " + oldValue + " thành " + value + ".", value, index);
+        return new Result(true, "Updated index " + index + " from " + oldValue + " to " + value + ".", value, index);
     }
 
     public Result search(int value) {
         if (array.isEmpty()) {
-            return new Result(false, "Mảng đang rỗng, không thể tìm kiếm.", value, null);
+            return new Result(false, "The array is empty. Search cannot run.", value, null);
         }
 
         int index = array.indexOf(value);
-
         if (index == -1) {
-            return new Result(false, "Không tìm thấy giá trị " + value + " trong mảng.", value, null);
+            return new Result(false, "Value " + value + " was not found in the array.", value, null);
         }
 
-        return new Result(true, "Tìm thấy giá trị " + value + " tại index " + index + ".", value, index);
+        return new Result(true, "Found value " + value + " at index " + index + ".", value, index);
     }
 
     public Result randomize() {
@@ -85,7 +84,7 @@ public class ArrayService {
         for (int i = 0; i < size; i++) {
             array.add(random.nextInt(90) + 10);
         }
-        return new Result(true, "Đã tạo mảng ngẫu nhiên gồm " + size + " phần tử.", null, null);
+        return new Result(true, "Generated a random array with " + size + " values.", null, null);
     }
 
     public Result reset() {
@@ -97,11 +96,15 @@ public class ArrayService {
         array.add(23);
         array.add(19);
         array.add(56);
-        return new Result(true, "Đã khởi tạo lại mảng mẫu.", null, null);
+        return new Result(true, "Reset to the sample array.", null, null);
     }
 
     public List<Integer> toList() {
         return new ArrayList<>(array);
+    }
+
+    public int indexOf(int value) {
+        return array.indexOf(value);
     }
 
     public boolean isEmpty() {
