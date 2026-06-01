@@ -86,7 +86,12 @@ public class ArrayVisualizerView extends BorderPane {
 
         setLeft(buildLeftPanel());
         setCenter(buildVizArea());
-        setBottom(buildBottomPanel());
+
+        //để cho bottom panel không kéo dài qua left panel
+        BorderPane mainContent = new BorderPane();
+        mainContent.setCenter(buildVizArea());
+        mainContent.setBottom(buildBottomPanel());
+        //setBottom(buildBottomPanel());
 
         redrawArray();
         setStatus("[Hệ Thống]: Đã tải xong mảng mô phỏng.");
@@ -450,15 +455,33 @@ public class ArrayVisualizerView extends BorderPane {
 
     private Button makeBtn(String text, String styleClass) {
         Button b = new Button(text);
-        b.getStyleClass().add(styleClass);
-        b.setMaxWidth(Double.MAX_VALUE);
+        // để chữ dài kh lam cho btn bị to ra
+        b.getStyleClass().addAll("array-op-button", styleClass);
+        //b.setMaxWidth(Double.MAX_VALUE);
+        b.setWrapText(true);
+        b.setAlignment(Pos.CENTER);
         return b;
     }
 
     private HBox hRow(Button a, Button b) {
         HBox row = new HBox(8, a, b);
-        HBox.setHgrow(a, Priority.ALWAYS);
-        HBox.setHgrow(b, Priority.ALWAYS);
+        // HBox.setHgrow(a, Priority.ALWAYS);
+        // HBox.setHgrow(b, Priority.ALWAYS);
+        // để cho các btn bằng nhau không bị co giãn theo chữ
+        a.setPrefWidth(118);
+        b.setPrefWidth(118);
+        a.setMinWidth(118);
+        b.setMinWidth(118);
+        a.setMaxWidth(118);
+        b.setMaxWidth(118);
+
+        a.setPrefHeight(38);
+        b.setPrefHeight(38);
+        a.setMinHeight(38);
+        b.setMinHeight(38);
+        a.setMaxHeight(38);
+        b.setMaxHeight(38);
+
         return row;
     }
 

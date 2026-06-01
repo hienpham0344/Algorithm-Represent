@@ -28,6 +28,21 @@
 
 /* ── ARRAY BUTTONS ── */
 
+.array-op-button {
+    -fx-pref-width: 118;
+    -fx-min-width: 118;
+    -fx-max-width: 118;
+
+    -fx-pref-height: 38;
+    -fx-min-height: 38;
+    -fx-max-height: 38;
+
+    -fx-font-size: 11.5px;
+    -fx-font-weight: bold;
+    -fx-alignment: center;
+    -fx-text-alignment: center;
+}
+
 .btn-array-insert {
     -fx-background-color: #4F46E5;
     -fx-text-fill: white;
