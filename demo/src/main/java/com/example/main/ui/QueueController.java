@@ -58,6 +58,202 @@ public class QueueController implements Initializable {
                 currentAnimation.setRate(newVal.doubleValue());
             }
         });
+        // init data
 
+
+        service.enqueue(15);
+        service.enqueue(30);
+        service.enqueue(45);
+        redrawQueue(AnimType.NONE, -1);
+
+        appendLog("[Hệ Thống]: Đã tải xong ngăn xếp mô phỏng.");
+        appendLog("[Hệ Thống]: Sẵn sàng hoạt động.");
+
+
+
+    }
+        @FXML
+    private void handleEnqueue() {
+        if (isSimulating) return;
+        String txt = inputField.getText().trim();
+        if (txt.isEmpty()) return;
+
+        try {
+            int val = Integer.parseInt(txt);
+            if (service.size() >= 7) {
+                appendLog("✖ [Lỗi]: Bộ mô phỏng hàng đợi đầy phần tử đồ họa (Tối đa 7).");
+                setStatus("Hàng đợi đầy đồ họa.", false);
+                return;
+            }
+
+            isSimulating = true;
+            codeArea.setText(CODE_ENQUEUE);
+            appendLog("⚡ [Đang xử lý]: Đang tiến hành Enqueue giá trị " + val + " vào cuối hàng (REAR)...");
+            setStatus("Đang thực hiện Enqueue...");
+
+            service.enqueue(val);
+            redrawQueue(AnimType.ENQUEUE, service.size() - 1);
+
+            PauseTransition pause = new PauseTransition(Duration.millis(1200));
+            pause.setOnFinished(e -> {
+                appendLog("✔ [Thành công]: Đã thêm phần tử " + val + " vào REAR.");
+                setStatus("Enqueue(" + val + ") thành công.", true);
+                isSimulating = false;
+            });
+            pause.play();
+
+        } catch (NumberFormatException ex) {
+            appendLog("✖ [Lỗi]: Giá trị nhập vào phải là số nguyên!");
+            setStatus("Lỗi nhập liệu.", false);
+        }
+    }
+
+    @FXML
+    private void handleDequeue() {
+        if (isSimulating) return;
+        if (service.isEmpty()) {
+            appendLog("✖ [Lỗi]: Hàng đợi trống. Không thể Dequeue!");
+            setStatus("Hàng đợi rỗng.", false);
+            return;
+        }
+
+        isSimulating = true;
+        codeArea.setText(CODE_DEQUEUE);
+        int frontVal = service.toList().get(0);
+        appendLog("⚡ [Đang xử lý]: Đang rút phần tử " + frontVal + " ra khỏi đầu hàng (FRONT)...");
+        setStatus("Đang thực hiện Dequeue...");
+
+        VBox frontNode = (VBox) queueFrame.getChildren().get(0);
+
+        // Chạy hiệu ứng biến mất
+        ScaleTransition st = new ScaleTransition(Duration.millis(450), frontNode);
+        st.setToX(0); st.setToY(0);
+        FadeTransition ft = new FadeTransition(Duration.millis(450), frontNode);
+        ft.setToValue(0);
+        ParallelTransition pt = new ParallelTransition(st, ft);
+
+        pt.setOnFinished(e -> {
+            service.dequeue();
+            redrawQueue(AnimType.NONE, -1);
+            appendLog("✔ [Thành công]: Đã rút thành công " + frontVal + " ra khỏi FRONT.");
+            setStatus("Dequeue thành công.", true);
+            isSimulating = false;
+        });
+
+        currentAnimation = pt;
+        pt.setRate(speedSlider.getValue());
+        pt.play();
+    }
+
+    @FXML
+    private void handlePeek() {
+        if (isSimulating) return;
+        if (service.isEmpty()) {
+            appendLog("✖ [Lỗi]: Hàng đợi rỗng. Không thể Peek!");
+            setStatus("Hàng đợi rỗng.", false);
+            return;
+        }
+
+        isSimulating = true;
+        codeArea.setText(CODE_PEEK);
+        int frontVal = service.toList().get(0);
+        appendLog("⚡ [Đang xử lý]: Đang đọc giá trị phần tử FRONT...");
+        setStatus("Kiểm tra giá trị FRONT...");
+
+        redrawQueue(AnimType.PEEK, 0);
+
+        PauseTransition pause = new PauseTransition(Duration.millis(1500));
+        pause.setOnFinished(e -> {
+            appendLog("✔ [Thành công]: Giá trị ở FRONT hiện tại là: " + frontVal);
+            setStatus("Front Value: " + frontVal, true);
+            isSimulating = false;
+        });
+        pause.play();
+    }
+
+    @FXML
+    private void handleReset() {
+        if (isSimulating) return;
+        service.reset();
+        service.enqueue(15);
+        service.enqueue(30);
+        service.enqueue(45);
+
+        codeArea.setText(CODE_IDLE);
+        logArea.clear();
+        appendLog("[Hệ Thống]: Đã nạp lại trạng thái mô phỏng Hàng Đợi mặc định.");
+        appendLog("[Hệ Thống]: Khởi tạo 3 phần tử ban đầu: 15 (FRONT) → 30 → 45 (REAR).");
+        setStatus("Hệ thống đã sẵn sàng.", true);
+
+        redrawQueue(AnimType.NONE, -1);
+    }
+
+    @FXML
+    private void handleClearLog() {
+        logArea.clear();
+        appendLog("[Hệ Thống]: Nhật ký đã được dọn sạch.");
+    }
+
+    private void redrawQueue(AnimType type, int animIdx) {
+        queueFrame.getChildren().clear();
+        List<Integer> items = service.toList();
+
+        if (items.isEmpty()) {
+            Label empty = new Label("QUEUE RỖNG (EMPTY)");
+            empty.getStyleClass().add("queue-empty-label");
+
+            // Khi rỗng, chiếc máng ngang có kích thước cố định ngắn
+            queueFrame.setPrefWidth(160);
+            queueFrame.setMinWidth(160);
+            queueFrame.setMaxWidth(160);
+            return;
+        }
+
+
+        double calculatedWidth = (items.size() * 75) + ((items.size() - 1) * 12) + 40;
+
+        queueFrame.setPrefWidth(calculatedWidth);
+        queueFrame.setMinWidth(calculatedWidth);
+        queueFrame.setMaxWidth(calculatedWidth);
+
+        for (int i = 0; i < items.size(); i++) {
+            boolean isFront = (i == 0);
+            boolean isRear  = (i == items.size() - 1);
+            VBox cellNode = buildCellNode(items.get(i), isFront, isRear);
+            queueFrame.getChildren().add(cellNode);
+
+        }
+    }
+
+    private VBox buildCellNode(int value, boolean isFront, boolean isRear) {
+        VBox cell = new VBox(4);
+        cell.setAlignment(Pos.CENTER);
+
+        String tagText = "";
+        if (isFront && isRear) tagText = "FRONT / REAR";
+        else if (isFront)      tagText = "FRONT (ĐẦU)";
+        else if (isRear)       tagText = "REAR (CUỐI)";
+
+        Label topLabel = new Label(tagText);
+        topLabel.getStyleClass().add(isFront ? "queue-tag-front" : (isRear ? "queue-tag-rear" : "queue-tag-mid"));
+
+        StackPane cellBox = new StackPane(new Label(String.valueOf(value)));
+        cellBox.getStyleClass().add("queue-cell-box");
+        if (isFront) cellBox.getStyleClass().add("queue-cell-front-border");
+
+        cell.getChildren().addAll(topLabel, cellBox);
+        return cell;
+    }
+
+    private void appendLog(String msg) { logArea.appendText(msg + "\n"); }
+
+    private void setStatus(String text) {
+        statusText.setText(text);
+        statusText.setStyle("-fx-text-fill: #94A3B8;");
+    }
+
+    private void setStatus(String text, boolean success) {
+        statusText.setText(text);
+        statusText.setStyle("-fx-text-fill: " + (success ? "#34D399;" : "#F87171;"));
     }
 }

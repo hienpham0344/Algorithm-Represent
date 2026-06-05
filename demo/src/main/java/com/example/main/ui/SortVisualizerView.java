@@ -41,7 +41,6 @@ import java.util.Set;
 
 public class SortVisualizerView extends VBox {
 
-    // ── Algorithm display names ──────────────────────────────────────────
     private static final Map<String, String> ALGORITHM_NAMES = Map.of(
             "selection", "Selection Sort",
             "bubble",    "Bubble Sort",
@@ -51,13 +50,13 @@ public class SortVisualizerView extends VBox {
             "merge",     "Merge Sort"
     );
 
-    // ── Bar colours ──────────────────────────────────────────────────────
-    private static final Color COL_DEFAULT = Color.web("#3b82f6");
+    // ── Bar colours
+    private static final Color COL_DEFAULT = Color.web("#ffff00");
     private static final Color COL_COMPARE = Color.web("#f59e0b");
     private static final Color COL_SWAP    = Color.web("#ef4444");
     private static final Color COL_SORTED  = Color.web("#10b981");
 
-    // ── State ────────────────────────────────────────────────────────────
+    // ── State
     private final Map<String, SortStrategy> strategies = SortingRegistry.createStrategies();
     private final Random random = new Random();
 
@@ -94,7 +93,7 @@ public class SortVisualizerView extends VBox {
     private boolean    paused;
     private final Set<Integer> sortedIndices = new LinkedHashSet<>();
 
-    // ====================================================================
+
     public SortVisualizerView() {
         getStyleClass().add("app-root");
         setPadding(new Insets(20, 22, 20, 22));
@@ -124,7 +123,7 @@ public class SortVisualizerView extends VBox {
         updateButtons(false);
     }
 
-    // ── ROW 1 ─────────────────────────────────────────────────────────────
+    // ── ROW 1
     private HBox buildRow1() {
         // Algorithm picker
         algorithmBox.getItems().addAll(strategies.keySet());
@@ -183,7 +182,7 @@ public class SortVisualizerView extends VBox {
         return row;
     }
 
-    // ── ROW 2 ─────────────────────────────────────────────────────────────
+    // ── ROW 2
     private HBox buildRow2() {
         // Buttons grid (2 rows × 3 cols, matching original layout)
         GridPane grid = new GridPane();
@@ -203,7 +202,7 @@ public class SortVisualizerView extends VBox {
         grid.add(resetButton,  0, 1);
         grid.add(giamDanBtn,   1, 1);
         grid.add(deleteButton, 2, 1);
-        // Make all buttons fill width
+
         for (javafx.scene.Node n : grid.getChildren()) {
             if (n instanceof Button b) {
                 b.setMaxWidth(Double.MAX_VALUE);
@@ -246,7 +245,7 @@ public class SortVisualizerView extends VBox {
         return row;
     }
 
-    // ── ROW 3 ─────────────────────────────────────────────────────────────
+    // ── ROW 3
     private HBox buildRow3() {
         // Chart (left, grows)
         chartPane.setSpacing(8);
@@ -269,7 +268,7 @@ public class SortVisualizerView extends VBox {
         statusLabel.getStyleClass().add("status-text");
         chartCard.getChildren().add(statusLabel);
 
-        // Code panel (right, fixed width)
+        // Code panel
         ScrollPane codeScroll = new ScrollPane(codePane);
         codeScroll.setFitToWidth(false);
         codeScroll.setFitToHeight(true);
@@ -295,7 +294,6 @@ public class SortVisualizerView extends VBox {
         return row;
     }
 
-    // ── Helpers ──────────────────────────────────────────────────────────
     private VBox labeledCard(String title, javafx.scene.Node content) {
         Label lbl = new Label(title);
         lbl.getStyleClass().add("card-title");
@@ -311,7 +309,6 @@ public class SortVisualizerView extends VBox {
         createButton.getStyleClass().add("btn-create");
     }
 
-    // ── Events ───────────────────────────────────────────────────────────
     private void bindEvents() {
         sizeSlider.valueProperty().addListener((o, ov, nv) ->
                 sizeRangeLabel.setText("2 -> " + nv.intValue()));
@@ -334,7 +331,6 @@ public class SortVisualizerView extends VBox {
         stopButton.setOnAction(e -> togglePause());
     }
 
-    // ── Array operations ─────────────────────────────────────────────────
     private boolean isManual() { return "Manual Entry".equals(dataSourceBox.getValue()); }
 
     private void createArray() {
@@ -353,7 +349,7 @@ public class SortVisualizerView extends VBox {
         originalArray = array.clone();
         currentArray  = array.clone();
         steps = List.of();
-        statusLabel.setText("rray is ready — click Sort to start.");
+        statusLabel.setText("Array is ready — click Sort to start.");
         refreshChart(currentArray, -1, -1, null);
         renderCode();
         updateButtons(false);
@@ -460,7 +456,6 @@ public class SortVisualizerView extends VBox {
         stopButton.setText("Stop");
     }
 
-    // ── Parsing / utils ───────────────────────────────────────────────────
     private int[] parseManualInput() {
         String text = manualInput.getText();
         if (text == null || text.isBlank()) return new int[0];
@@ -489,7 +484,6 @@ public class SortVisualizerView extends VBox {
         return 45;
     }
 
-    // ── Chart ─────────────────────────────────────────────────────────────
     private void refreshChart(int[] values, int fi, int si, String stepType) {
         chartPane.getChildren().clear();
         if (values.length == 0) {
@@ -538,7 +532,7 @@ public class SortVisualizerView extends VBox {
         return COL_DEFAULT;
     }
 
-    // ── Code panel ────────────────────────────────────────────────────────
+    // ── Code panel
     private void renderCode() {
         codePane.getChildren().clear();
         String code = CodeSnippets.JAVA_CODE.getOrDefault(algorithmBox.getValue(), "// Không có code");
@@ -578,7 +572,7 @@ public class SortVisualizerView extends VBox {
         };
     }
 
-    // ── Button state ──────────────────────────────────────────────────────
+    // ── Button state
     private void updateButtons(boolean running) {
         boolean hasData = currentArray.length > 0;
         sortButton.setDisable(!hasData || running);

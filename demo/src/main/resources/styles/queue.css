@@ -177,47 +177,58 @@
 }
 
 .panel-header-box {
-    -fx-background-color: #0A1020;
-    -fx-border-color: #1E293B;
-    -fx-border-width: 0 0 1 0;
-    -fx-padding: 8 14 8 14;
+     -fx-background-color: #0A1020;
+        -fx-border-color: #1E293B;
+        -fx-border-width: 0 0 1 0;
+        -fx-padding: 8 14 8 14;
 }
 
 .panel-header-label {
-    -fx-font-size: 12px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #94A3B8;
+    -fx-font-size: 11px;
+        -fx-font-weight: bold;
+        -fx-text-fill: #94A3B8;
 }
 
 .panel-lang-badge {
-    -fx-font-size: 10px;
-    -fx-text-fill: #38BDF8;
-    -fx-background-color: rgba(56, 189, 248, 0.1);
-    -fx-background-radius: 4;
-    -fx-padding: 2 7 2 7;
-    -fx-font-family: "Courier New", monospace;
+    -fx-font-size: 9px;
+        -fx-text-fill: #64748B;
+        -fx-background-color: #1E293B;
+        -fx-background-radius: 4;
+        -fx-padding: 2 7 2 7;
+        -fx-font-family: "Courier New", monospace;
 }
 
-.code-area {
+.code-area,
+.log-area {
     -fx-control-inner-background: #020817;
-    -fx-text-fill: #CBD5E1;
+    -fx-background-color: #020817;
+    -fx-background-radius: 10;
+    -fx-border-color: #334155;
+    -fx-border-width: 1;
+    -fx-border-radius: 10;
     -fx-font-family: "Courier New", monospace;
-    -fx-font-size: 13px;
-    -fx-border-color: transparent;
-    -fx-background-color: transparent;
-    -fx-padding: 10;
+    -fx-font-size: 12px;
+    -fx-padding: 15;
+}
+.code-area {
+    -fx-text-fill: #CBD5E1;
 }
 
 .log-area {
-    -fx-control-inner-background: #020817;
-    -fx-text-fill: #38BDF8;
-    -fx-font-family: "Courier New", monospace;
-    -fx-font-size: 13px;
-    -fx-border-color: transparent;
-    -fx-background-color: transparent;
-    -fx-padding: 10;
+    -fx-text-fill: #4ADE80;
 }
 
+.code-area .content,
+.log-area .content {
+    -fx-background-color: #020817;
+}
+
+.code-area .scroll-pane,
+.log-area .scroll-pane,
+.code-area .scroll-pane .viewport,
+.log-area .scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
 .btn-clear-log {
     -fx-background-color: transparent;
     -fx-text-fill: #64748B;
