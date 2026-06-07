@@ -35,12 +35,16 @@
 
 .input-field {
     -fx-background-color: #1E293B;
-    -fx-text-fill: #FFFFFF;
-    -fx-border-color: #334155;
-    -fx-border-radius: 6;
-    -fx-background-radius: 6;
-    -fx-padding: 8;
-    -fx-font-size: 13px;
+        -fx-text-fill: #F1F5F9;
+        -fx-border-color: #334155;
+        -fx-border-radius: 8;
+        -fx-background-radius: 8;
+        -fx-font-size: 13px;
+        -fx-padding: 8 12 8 12;
+        -fx-prompt-text-fill: #475569;
+}
+.input-field:focused {
+    -fx-border-color: #6366F1;
 }
 
 .sidebar-divider {

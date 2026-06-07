@@ -13,13 +13,14 @@
             </padding>
 
             <Label styleClass="ds-title" text="QUEUE (FIFO)" />
-            <Label styleClass="ds-desc" text="Hàng đợi hoạt động theo nguyên lý 'Vào trước - Ra trước' (First In, First Out). Phần tử được thêm ở REAR (Cuối) và lấy ra ở FRONT (Đầu)." wrapText="true" />
+            <Label styleClass="ds-desc" text="A queue operates on the 'First In, First Out' (FIFO) principle. Elements are added at the REAR and removed from the FRONT." wrapText="true" />
 
             <Region styleClass="sidebar-divider" />
 
-            <Label styleClass="section-label" text="CÁC THAO TÁC SỬ DỤNG" />
-            <Label styleClass="input-label" text="Giá trị phần tử (Số nguyên):" />
-            <TextField fx:id="inputField" styleClass="input-field" text="10" />
+            <Label styleClass="section-label" text="OPERATIONS" />
+            <Label styleClass="input-label" text="Element Value:" />
+            <TextField fx:id="inputField" styleClass="input-field"  promptText="Example: 42"/>
+
 
             <HBox spacing="8">
                 <Button fx:id="enqueueBtn" maxWidth="9999" onAction="#handleEnqueue" prefWidth="0" styleClass="btn-enqueue" text="Enqueue" HBox.hgrow="ALWAYS" />
@@ -27,18 +28,18 @@
             </HBox>
 
             <HBox spacing="8">
-                <Button fx:id="peekBtn" maxWidth="9999" onAction="#handlePeek" prefWidth="0" styleClass="btn-peek" text="Xem Front" HBox.hgrow="ALWAYS" />
-                <Button fx:id="resetBtn" maxWidth="9999" onAction="#handleReset" prefWidth="0" styleClass="btn-reset" text="Khởi tạo lại" HBox.hgrow="ALWAYS" />
+                <Button fx:id="peekBtn" maxWidth="9999" onAction="#handlePeek" prefWidth="0" styleClass="btn-peek" text="Front" HBox.hgrow="ALWAYS" />
+                <Button fx:id="resetBtn" maxWidth="9999" onAction="#handleReset" prefWidth="0" styleClass="btn-reset" text="Reset" HBox.hgrow="ALWAYS" />
             </HBox>
 
             <VBox spacing="5">
-                <Label styleClass="input-label" text="Tốc độ hiệu ứng:" />
+                <Label styleClass="input-label" text="⏱ Speed:" />
                 <Slider fx:id="speedSlider" blockIncrement="0.1" majorTickUnit="1.0" max="3.0" maxWidth="9999" min="0.2" showTickLabels="true" showTickMarks="true" styleClass="speed-slider" value="1.0" />
             </VBox>
                         <Region styleClass="sidebar-divider" />
 
                         <VBox spacing="6" styleClass="status-box">
-                            <Label styleClass="status-header" text="ℹ  TRẠNG THÁI MÔ PHỎNG" />
+                            <Label styleClass="status-header" text="ℹ  SIMULATION STATUS" />
                             <Label fx:id="statusText" styleClass="status-text" text="Hệ thống đã sẵn sàng. Hãy chọn một thao tác." />
                         <padding>
                            <Insets bottom="12.0" left="14.0" right="14.0" top="12.0" />
@@ -57,11 +58,11 @@
             <HBox fillHeight="true" prefHeight="210">
                 <VBox maxHeight="9999" prefWidth="0" styleClass="bottom-panel" HBox.hgrow="ALWAYS">
                     <HBox alignment="CENTER_LEFT" maxHeight="40" minHeight="40" prefHeight="40" styleClass="panel-header-box">
-                        <Label styleClass="panel-header-label" text="Pseudo-code" />
+                        <Label styleClass="panel-header-label" text="&lt;&gt; PSEUDO-CODE" />
                         <Region HBox.hgrow="ALWAYS" />
                         <Label styleClass="panel-lang-badge" text="Java code" />
                     </HBox>
-                    <TextArea fx:id="codeArea" editable="false" styleClass="code-area" VBox.vgrow="ALWAYS">
+                    <TextArea fx:id="codeArea" editable="false" styleClass="code-area" VBox.vgrow="ALWAYS" text="// Chọn 1 hành động để trực quan hóa mã giả" >
                <VBox.margin>
                   <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
                </VBox.margin></TextArea>
@@ -71,9 +72,9 @@
 
                 <VBox maxHeight="9999" prefWidth="0" styleClass="bottom-panel" HBox.hgrow="ALWAYS">
                     <HBox alignment="CENTER_LEFT" maxHeight="40" minHeight="40" prefHeight="40" styleClass="panel-header-box">
-                        <Label styleClass="panel-header-label" text=" Nhật ký từng bước" />
+                        <Label styleClass="panel-header-label" text="&gt;_  ACTIVITY LOG" />
                         <Region HBox.hgrow="ALWAYS" />
-                        <Button onAction="#handleClearLog" styleClass="btn-clear-log" text="🗑 Xóa" />
+                        <Button onAction="#handleClearLog" styleClass="btn-clear-log" text="Clear" />
                     </HBox>
                     <TextArea fx:id="logArea" editable="false" styleClass="log-area" wrapText="true" VBox.vgrow="ALWAYS">
                <VBox.margin>

@@ -80,15 +80,15 @@ public class QueueController implements Initializable {
 
         try {
             int val = Integer.parseInt(txt);
-            if (service.size() >= 7) {
-                appendLog("✖ [Lỗi]: Bộ mô phỏng hàng đợi đầy phần tử đồ họa (Tối đa 7).");
-                setStatus("Hàng đợi đầy đồ họa.", false);
+            if (service.size() >= 10) {
+                appendLog("✖ [Lỗi]: Chiều dài hàng đợi giới hạn 10 phần tử trong demo.");
+                setStatus("Queue đã đầy (giới hạn demo: 10 phần tử).", false);
                 return;
             }
 
             isSimulating = true;
             codeArea.setText(CODE_ENQUEUE);
-            appendLog("⚡ [Đang xử lý]: Đang tiến hành Enqueue giá trị " + val + " vào cuối hàng (REAR)...");
+            appendLog("⚡ [Đang xử lý]: Đang Enqueue " + val + " vào cuối hàng đợi (REAR)...");
             setStatus("Đang thực hiện Enqueue...");
 
             service.enqueue(val);
@@ -103,8 +103,8 @@ public class QueueController implements Initializable {
             pause.play();
 
         } catch (NumberFormatException ex) {
-            appendLog("✖ [Lỗi]: Giá trị nhập vào phải là số nguyên!");
-            setStatus("Lỗi nhập liệu.", false);
+
+            setStatus("⚠ Giá trị không hợp lệ. Hãy nhập số nguyên.", false);
         }
     }
 
@@ -112,7 +112,7 @@ public class QueueController implements Initializable {
     private void handleDequeue() {
         if (isSimulating) return;
         if (service.isEmpty()) {
-            appendLog("✖ [Lỗi]: Hàng đợi trống. Không thể Dequeue!");
+            appendLog("✖ [Lỗi]: Hàng đợi trống (Queue Empty). Không thể Dequeue!");
             setStatus("Hàng đợi rỗng.", false);
             return;
         }
@@ -125,7 +125,7 @@ public class QueueController implements Initializable {
 
         VBox frontNode = (VBox) queueFrame.getChildren().get(0);
 
-        // Chạy hiệu ứng biến mất
+
         ScaleTransition st = new ScaleTransition(Duration.millis(450), frontNode);
         st.setToX(0); st.setToY(0);
         FadeTransition ft = new FadeTransition(Duration.millis(450), frontNode);
@@ -149,7 +149,7 @@ public class QueueController implements Initializable {
     private void handlePeek() {
         if (isSimulating) return;
         if (service.isEmpty()) {
-            appendLog("✖ [Lỗi]: Hàng đợi rỗng. Không thể Peek!");
+            appendLog("✖ [Lỗi]: Hàng đợi rỗng (Queue Empty). Không thể Peek!");
             setStatus("Hàng đợi rỗng.", false);
             return;
         }
