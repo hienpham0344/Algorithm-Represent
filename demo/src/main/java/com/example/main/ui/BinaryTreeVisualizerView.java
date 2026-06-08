@@ -137,14 +137,23 @@ public class BinaryTreeVisualizerView extends BorderPane {
         topBar.setPadding(new Insets(16, 24, 0, 0));
 
         vizPane = new Pane();
-        VBox.setVgrow(vizPane, Priority.ALWAYS);
+        vizPane.setMinSize(3000, 1500);
+        vizPane.setPrefSize(3000, 1500);
+        vizPane.setStyle("-fx-background-color: #0f172a;");
 
-        VBox canvasContainer = new VBox(topBar, vizPane);
+        ScrollPane scrollPane = new ScrollPane(vizPane);
+        scrollPane.setPannable(true);
+        javafx.application.Platform.runLater(() -> scrollPane.setHvalue(0.5));
+        VBox.setVgrow(scrollPane, Priority.ALWAYS);
+
+        VBox canvasContainer = new VBox(topBar, scrollPane);
         canvasContainer.getStyleClass().add("viz-area");
         VBox.setVgrow(canvasContainer, Priority.ALWAYS);
 
         HBox bottomPanels = new HBox();
-        bottomPanels.setPrefHeight(200);
+        bottomPanels.setMinHeight(220);
+        bottomPanels.setMaxHeight(220);
+        bottomPanels.setPrefHeight(220);
 
         VBox pseudoBox = new VBox();
         pseudoBox.getStyleClass().add("bottom-panel");
@@ -302,7 +311,7 @@ public class BinaryTreeVisualizerView extends BorderPane {
         vizPane.getChildren().clear();
         BinaryTreeService.Node root = service.getRoot();
         if (root != null) {
-            drawNode(root, 500, 40, 200);
+            drawNode(root, 1500, 40, 800);
         }
     }
 
