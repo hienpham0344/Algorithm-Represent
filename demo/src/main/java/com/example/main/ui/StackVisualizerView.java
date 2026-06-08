@@ -103,10 +103,10 @@ public class StackVisualizerView extends BorderPane {
         inputField.getStyleClass().add("input-field");
         inputField.setMaxWidth(Double.MAX_VALUE);
 
-        Button btnPush  = makeBtn("↴  Push", "btn-push");
-        Button btnPop   = makeBtn("↷  Pop",   "btn-pop");
-        Button btnPeek  = makeBtn("⚇  Peek","btn-peek");
-        Button btnReset = makeBtn("⟳  Reset",   "btn-reset");
+        Button btnPush  = makeBtn("Push", "btn-push");
+        Button btnPop   = makeBtn("Pop",   "btn-pop");
+        Button btnPeek  = makeBtn("Peek","btn-peek");
+        Button btnReset = makeBtn("Reset",   "btn-reset");
 
         btnPush.setOnAction(e  -> handlePush());
         btnPop.setOnAction(e   -> handlePop());
@@ -438,7 +438,7 @@ public class StackVisualizerView extends BorderPane {
     private void handlePop() {
         if (isSimulating) return;
         if (service.isEmpty()) {
-            appendLog("✖ [Lỗi]: Ngăn xếp rỗng (Stack Underflow). Không thể Pop!");
+            appendLog("✖ [Lỗi]: Ngăn xếp rỗng (Stack Empty). Không thể Pop!");
             setStatus("Ngăn xếp rỗng, không thể Pop.", false);
             return;
         }
