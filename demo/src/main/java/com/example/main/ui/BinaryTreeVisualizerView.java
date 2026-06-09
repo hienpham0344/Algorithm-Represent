@@ -21,8 +21,11 @@ public class BinaryTreeVisualizerView extends BorderPane {
     private TextArea pseudoCodeArea;
     private TextArea activityLogArea;
     private Label statusText;
-    private Button btnInsert, btnSearch, btnDelete, btnReset;
+
+    private Button btnInsert, btnSearch, btnDelete, btnReset, btnTraverse;
+    private ComboBox<String> traversalBox;
     private Slider speedSlider;
+
     private int currentSearchValue = -1;
     private int foundValue = -1;
 
@@ -52,27 +55,42 @@ public class BinaryTreeVisualizerView extends BorderPane {
 
         Label title = new Label("Binary Search Tree");
         title.getStyleClass().add("ds-title");
-        Label desc = new Label("Left child < Parent < Right child. Efficient search, insert, and delete. Average case O(log N).");
+        Label desc = new Label("Trái < Cha < Phải. Hỗ trợ Tìm kiếm, Thêm, Xóa và Duyệt toàn bộ cây.");
         desc.getStyleClass().add("ds-desc");
         desc.setWrapText(true);
 
-        Label lblOps = new Label("☷ OPERATIONS");
+        Label lblOps = new Label("☷ THAO TÁC NÚT (CẦN NHẬP SỐ)");
         lblOps.getStyleClass().add("section-label");
 
         inputField = new TextField();
-        inputField.setPromptText("e.g. 55");
+        inputField.setPromptText("Nhập một số (VD: 55)...");
         inputField.getStyleClass().add("input-field");
 
-        btnInsert = createButton("+ Insert Node", "btn-purple");
+        btnInsert = createButton("+ Thêm nút (Insert)", "btn-purple");
         btnInsert.setOnAction(e -> executeOp("INSERT"));
 
-        btnSearch = createButton("⌕ Search Node", "btn-green");
+        btnSearch = createButton("⌕ Tìm 1 nút (Search)", "btn-green");
         btnSearch.setOnAction(e -> executeOp("SEARCH"));
 
-        btnDelete = createButton("🗑 Delete Node", "btn-red");
+        btnDelete = createButton("🗑 Xóa nút (Delete)", "btn-red");
         btnDelete.setOnAction(e -> executeOp("DELETE"));
 
-        btnReset = createButton("⟳ Reset", "btn-gray");
+        VBox opsBox = new VBox(8, inputField, btnInsert, btnSearch, btnDelete);
+
+        Label lblTraverse = new Label("☍ DUYỆT CÂY (TRAVERSAL)");
+        lblTraverse.getStyleClass().add("section-label");
+
+        traversalBox = new ComboBox<>();
+        traversalBox.getItems().addAll("Pre-order (NLR)", "In-order (LNR)", "Post-order (LRN)");
+        traversalBox.getSelectionModel().select(0);
+        traversalBox.setMaxWidth(Double.MAX_VALUE);
+
+        btnTraverse = createButton("▶ Duyệt", "btn-purple");
+        btnTraverse.setOnAction(e -> executeTraversal());
+
+        VBox traverseBox = new VBox(8, traversalBox, btnTraverse);
+
+        btnReset = createButton("⟳ Xóa làm lại (Reset)", "btn-gray");
         btnReset.setOnAction(e -> {
             service.clear();
             foundValue = -1;
@@ -82,24 +100,21 @@ public class BinaryTreeVisualizerView extends BorderPane {
             redrawTree();
         });
 
-        GridPane btnGrid = new GridPane();
-        btnGrid.setHgap(10); btnGrid.setVgap(10);
-        btnGrid.add(btnInsert, 0, 0); btnGrid.add(btnSearch, 1, 0);
-        btnGrid.add(btnDelete, 0, 1); btnGrid.add(btnReset, 1, 1);
-
-        ColumnConstraints cc = new ColumnConstraints();
-        cc.setPercentWidth(50);
-        btnGrid.getColumnConstraints().addAll(cc, cc);
-
-        Label lblStatus = new Label("∿ SIMULATION STATUS");
+        Label lblStatus = new Label("∿ TRẠNG THÁI (STATUS)");
         lblStatus.getStyleClass().add("section-label");
 
-        statusText = new Label("Ready to start simulation.");
+        statusText = new Label("Sẵn sàng hoạt động.");
         statusText.setStyle("-fx-text-fill: #a78bfa; -fx-font-family: 'Courier New';");
         VBox statusBox = new VBox(statusText);
         statusBox.setStyle("-fx-background-color: #1e1b4b; -fx-background-radius: 8; -fx-padding: 10;");
 
-        panel.getChildren().addAll(title, desc, lblOps, inputField, btnGrid, lblStatus, statusBox);
+        panel.getChildren().addAll(
+                title, desc,
+                lblOps, opsBox,
+                lblTraverse, traverseBox,
+                btnReset,
+                lblStatus, statusBox
+        );
         return panel;
     }
 
@@ -122,14 +137,23 @@ public class BinaryTreeVisualizerView extends BorderPane {
         topBar.setPadding(new Insets(16, 24, 0, 0));
 
         vizPane = new Pane();
-        VBox.setVgrow(vizPane, Priority.ALWAYS);
+        vizPane.setMinSize(3000, 1500);
+        vizPane.setPrefSize(3000, 1500);
+        vizPane.setStyle("-fx-background-color: #0f172a;");
 
-        VBox canvasContainer = new VBox(topBar, vizPane);
+        ScrollPane scrollPane = new ScrollPane(vizPane);
+        scrollPane.setPannable(true);
+        javafx.application.Platform.runLater(() -> scrollPane.setHvalue(0.5));
+        VBox.setVgrow(scrollPane, Priority.ALWAYS);
+
+        VBox canvasContainer = new VBox(topBar, scrollPane);
         canvasContainer.getStyleClass().add("viz-area");
         VBox.setVgrow(canvasContainer, Priority.ALWAYS);
 
         HBox bottomPanels = new HBox();
-        bottomPanels.setPrefHeight(200);
+        bottomPanels.setMinHeight(220);
+        bottomPanels.setMaxHeight(220);
+        bottomPanels.setPrefHeight(220);
 
         VBox pseudoBox = new VBox();
         pseudoBox.getStyleClass().add("bottom-panel");
@@ -207,6 +231,43 @@ public class BinaryTreeVisualizerView extends BorderPane {
         }
     }
 
+    private void executeTraversal() {
+        String selection = traversalBox.getValue();
+        String type = "NLR";
+        if (selection.contains("LNR")) type = "LNR";
+        else if (selection.contains("LRN")) type = "LRN";
+
+        foundValue = -1;
+        currentSearchValue = -1;
+        redrawTree();
+
+        String pseudoCode = "";
+        if (type.equals("NLR")) {
+            pseudoCode = "function preOrder(node):\n  if node == null return\n  visit(node)\n  preOrder(node.left)\n  preOrder(node.right)";
+        } else if (type.equals("LNR")) {
+            pseudoCode = "function inOrder(node):\n  if node == null return\n  inOrder(node.left)\n  visit(node)\n  inOrder(node.right)";
+        } else if (type.equals("LRN")) {
+            pseudoCode = "function postOrder(node):\n  if node == null return\n  postOrder(node.left)\n  postOrder(node.right)\n  visit(node)";
+        }
+        setPseudoCode(pseudoCode);
+
+        BinaryTreeService.SearchResult res = service.traverse(type);
+        if (!res.success()) {
+            statusText.setText(res.message());
+            logActivity("[Traverse]: " + res.message());
+            return;
+        }
+
+        statusText.setText("Đang duyệt: " + type + "...");
+        logActivity("[Traverse]: Bắt đầu duyệt " + type + ".");
+
+        animatePath(res.path(), () -> {
+            statusText.setText("Duyệt xong!");
+            logActivity(res.message() + "\n>> Kết quả: " + res.path().toString());
+            redrawTree();
+        });
+    }
+
     private void animatePath(List<Integer> path, Runnable onComplete) {
         setControlsDisabled(true);
 
@@ -221,7 +282,7 @@ public class BinaryTreeVisualizerView extends BorderPane {
             KeyFrame kf = new KeyFrame(Duration.millis(i * delayMs), e -> {
                 currentSearchValue = val;
                 redrawTree();
-                logActivity("[Traverse]: Đang duyệt qua nút " + val + "...");
+                logActivity("[Traverse]: Đang thăm/duyệt qua nút " + val + "...");
             });
             timeline.getKeyFrames().add(kf);
         }
@@ -242,13 +303,15 @@ public class BinaryTreeVisualizerView extends BorderPane {
         btnDelete.setDisable(disabled);
         btnReset.setDisable(disabled);
         inputField.setDisable(disabled);
+        btnTraverse.setDisable(disabled);
+        traversalBox.setDisable(disabled);
     }
 
     private void redrawTree() {
         vizPane.getChildren().clear();
         BinaryTreeService.Node root = service.getRoot();
         if (root != null) {
-            drawNode(root, 500, 40, 200);
+            drawNode(root, 1500, 40, 800);
         }
     }
 
