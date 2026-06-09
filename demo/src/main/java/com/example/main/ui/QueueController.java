@@ -19,6 +19,7 @@ public class QueueController implements Initializable {
     @FXML private HBox queueFrame;
     @FXML private TextArea codeArea;
     @FXML private TextArea logArea;
+    @FXML private TextArea explanationArea;
     @FXML private Label statusText;
     @FXML private Slider speedSlider;
 
@@ -66,6 +67,12 @@ public class QueueController implements Initializable {
         service.enqueue(45);
         redrawQueue(AnimType.NONE, -1);
 
+        explanationArea.setText(
+                "• Hàng đợi (Queue) được khởi tạo mặc định với 3 phần tử: 15, 30, 45.\n" +
+                        "• Theo nguyên lý FIFO (Vào trước, Ra trước), phần tử 15 vào đầu tiên nên nằm ở vị trí FRONT (Sẽ được lấy ra trước).\n" +
+                        "• Phần tử 45 vào sau cùng tạm thời đứng xếp hàng ở vị trí REAR."
+        );
+
         appendLog("[Hệ Thống]: Đã tải xong ngăn xếp mô phỏng.");
         appendLog("[Hệ Thống]: Sẵn sàng hoạt động.");
 
@@ -73,40 +80,91 @@ public class QueueController implements Initializable {
 
     }
         @FXML
-    private void handleEnqueue() {
-        if (isSimulating) return;
-        String txt = inputField.getText().trim();
-        if (txt.isEmpty()) return;
+        private void handleEnqueue() {
+            if (isSimulating) return;
+            String txt = inputField.getText().trim();
+            if (txt.isEmpty()) return;
 
-        try {
-            int val = Integer.parseInt(txt);
-            if (service.size() >= 10) {
-                appendLog("✖ [Lỗi]: Chiều dài hàng đợi giới hạn 10 phần tử trong demo.");
-                setStatus("Queue đã đầy (giới hạn demo: 10 phần tử).", false);
-                return;
+            // Tách chuỗi dựa vào dấu phẩy
+            String[] tokens = txt.split(",");
+
+            // Tạo một luồng thực thi tuần tự các hiệu ứng chèn phần tử
+            SequentialTransition sequentialTransition = new SequentialTransition();
+
+            // Biến tạm để lưu danh sách các số hợp lệ đã parse thành công
+            java.util.List<Integer> validValues = new java.util.ArrayList<>();
+
+            // 1. Kiểm tra tính hợp lệ của toàn bộ chuỗi trước khi chạy mô phỏng
+            for (String token : tokens) {
+                String trimmedToken = token.trim();
+                if (trimmedToken.isEmpty()) continue; // Bỏ qua khoảng trắng thừa giữa các dấu phẩy
+                try {
+                    int val = Integer.parseInt(trimmedToken);
+                    validValues.add(val);
+                } catch (NumberFormatException ex) {
+                    setStatus("⚠ Dãy nhập vào chứa giá trị không hợp lệ: '" + trimmedToken + "'", false);
+                    return;
+                }
             }
+
+            if (validValues.isEmpty()) return;
 
             isSimulating = true;
             codeArea.setText(CODE_ENQUEUE);
-            appendLog("⚡ [Đang xử lý]: Đang Enqueue " + val + " vào cuối hàng đợi (REAR)...");
-            setStatus("Đang thực hiện Enqueue...");
+            inputField.clear(); // Xóa khung nhập sau khi đã nhận dữ liệu thành công
 
-            service.enqueue(val);
-            redrawQueue(AnimType.ENQUEUE, service.size() - 1);
+            // 2. Tạo chuỗi hiệu ứng đổ tuần tự từng số vào hàng đợi
+            for (int i = 0; i < validValues.size(); i++) {
+                final int val = validValues.get(i);
+                final boolean isLast = (i == validValues.size() - 1);
 
-            PauseTransition pause = new PauseTransition(Duration.millis(1200));
-            pause.setOnFinished(e -> {
-                appendLog("✔ [Thành công]: Đã thêm phần tử " + val + " vào REAR.");
-                setStatus("Enqueue(" + val + ") thành công.", true);
-                isSimulating = false;
-            });
-            pause.play();
+                // Đoạn phim tĩnh (PauseTransition) đóng vai trò kích hoạt logic cho từng phần tử
+                PauseTransition step = new PauseTransition(Duration.millis(1400));
 
-        } catch (NumberFormatException ex) {
+                step.setOnFinished(e -> {
+                    // Kiểm tra xem hàng đợi tại thời điểm chèn này đã bị đầy hay chưa
+                    if (service.size() >= 10) {
+                        appendLog("✖ [Lỗi]: Không thể chèn " + val + ". Hàng đợi đã đầy (Tối đa 10 phần tử).");
+                        setStatus("Queue đầy. Dừng chèn các phần tử còn lại.", false);
 
-            setStatus("⚠ Giá trị không hợp lệ. Hãy nhập số nguyên.", false);
+                        // Nếu gặp lỗi đầy hàng đợi, hủy bỏ toàn bộ các bước chèn phía sau ngay lập tức
+                        sequentialTransition.stop();
+                        isSimulating = false;
+                        return;
+                    }
+
+                    // Cập nhật lời giải thích tương ứng với phần tử đang được xử lý
+                    explanationArea.setText(
+                            "• Thao tác Enqueue đang xử lý giá trị: " + val + "\n" +
+                                    "• Bước 1: Kiểm tra trạng thái isFull() (Hiện tại size = " + service.size() + ").\n" +
+                                    "• Bước 2: Tịnh tiến chỉ mục REAR lên vị trí mới để chuẩn bị đón nhận phần tử.\n" +
+                                    "• Bước 3: Đưa giá trị " + val + " vào cuối hàng đợi.\n" +
+                                    "• Bước 4: Tăng kích thước (size++) của Hàng đợi lên thêm 1."
+                    );
+
+                    appendLog("⚡ [Đang xử lý]: Đang Enqueue " + val + " vào cuối hàng đợi (REAR)...");
+                    setStatus("Đang Enqueue phần tử " + val + "...");
+
+                    // Đưa dữ liệu vào service và vẽ lại giao diện với chỉ mục hoạt họa mới nhất
+                    service.enqueue(val);
+                    redrawQueue(AnimType.ENQUEUE, service.size() - 1);
+
+                    appendLog("✔ [Thành công]: Đã thêm phần tử " + val + " vào REAR.");
+                    setStatus("Enqueue(" + val + ") thành công.", true);
+
+                    // Nếu đây là phần tử cuối cùng trong dãy, chính thức mở khóa mô phỏng
+                    if (isLast) {
+                        isSimulating = false;
+                    }
+                });
+
+                sequentialTransition.getChildren().add(step);
+            }
+
+            // Bắt đầu chạy chuỗi hiệu ứng chèn hàng loạt phần tử
+            sequentialTransition.setRate(speedSlider.getValue());
+            sequentialTransition.play();
         }
-    }
 
     @FXML
     private void handleDequeue() {
@@ -120,6 +178,14 @@ public class QueueController implements Initializable {
         isSimulating = true;
         codeArea.setText(CODE_DEQUEUE);
         int frontVal = service.toList().get(0);
+
+        explanationArea.setText(
+                "• Bước 1: Kiểm tra xem Hàng đợi có bị rỗng hay không (isEmpty()).\n" +
+                        "• Bước 2: Định vị và lấy ra dữ liệu tại vị trí đầu hàng FRONT (Hiện tại là giá trị: " + frontVal + ").\n" +
+                        "• Bước 3: Di chuyển con trỏ FRONT sang vị trí tiếp theo bằng mảng vòng: front = (front + 1) % capacity.\n" +
+                        "• Bước 4: Giảm kích thước tổng thể (size--) của Hàng đợi đi 1 đơn vị."
+        );
+
         appendLog("⚡ [Đang xử lý]: Đang rút phần tử " + frontVal + " ra khỏi đầu hàng (FRONT)...");
         setStatus("Đang thực hiện Dequeue...");
 
@@ -157,6 +223,13 @@ public class QueueController implements Initializable {
         isSimulating = true;
         codeArea.setText(CODE_PEEK);
         int frontVal = service.toList().get(0);
+
+        explanationArea.setText(
+                "• Lệnh Peek() (hoặc Front()) giúp xem trước thông tin của phần tử đang chuẩn bị xuất xưởng ở đầu hàng.\n" +
+                        "• Hệ thống truy cập trực tiếp vào chỉ mục của con trỏ FRONT và trích xuất giá trị: " + frontVal + ".\n" +
+                        "• Hành động này hoàn toàn KHÔNG xóa phần tử, vị trí FRONT và REAR được bảo toàn nguyên vẹn."
+        );
+
         appendLog("⚡ [Đang xử lý]: Đang đọc giá trị phần tử FRONT...");
         setStatus("Kiểm tra giá trị FRONT...");
 
@@ -180,6 +253,13 @@ public class QueueController implements Initializable {
         service.enqueue(45);
 
         codeArea.setText(CODE_IDLE);
+
+        explanationArea.setText(
+                "• Toàn bộ cấu trúc cũ đã bị hủy bỏ để nạp lại trạng thái mô phỏng Hàng đợi mặc định.\n" +
+                        "• Hệ thống tự động xếp lại 3 phần tử ban đầu: 15 (FRONT) → 30 → 45 (REAR).\n" +
+                        "• Hàng đợi đã sẵn sàng tiếp nhận các phần tử mới đi vào từ REAR."
+        );
+
         logArea.clear();
         appendLog("[Hệ Thống]: Đã nạp lại trạng thái mô phỏng Hàng Đợi mặc định.");
         appendLog("[Hệ Thống]: Khởi tạo 3 phần tử ban đầu: 15 (FRONT) → 30 → 45 (REAR).");
