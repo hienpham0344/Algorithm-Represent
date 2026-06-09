@@ -25,6 +25,8 @@ public class StackVisualizerView extends BorderPane {
 
     private Slider    speedSlider;
     private Animation currentAnimation;
+    private SequentialTransition batchTransition;
+    private Button               btnPause;
 //Dữ liệu mã giả tương ứng của các buttons để nạp vào codeArea(mã giả)
     private static final String CODE_IDLE =
             "// Chọn một hành động để trực quan hóa mã giả\n";
@@ -124,6 +126,30 @@ public class StackVisualizerView extends BorderPane {
         HBox row1 = hRow(btnPush, btnPop);
         HBox row2 = hRow(btnPeek, btnReset);
 
+        btnPause = makeBtn("Pause", "btn-pause");
+        btnPause.setMaxWidth(Double.MAX_VALUE);
+        HBox.setHgrow(btnPause, Priority.ALWAYS);
+
+        HBox pauseRow = new HBox(btnPause);
+        pauseRow.setAlignment(Pos.CENTER);
+
+        btnPause.setOnAction(e -> {
+            if (batchTransition != null && isSimulating) {
+                if (batchTransition.getStatus() == Animation.Status.RUNNING) {
+                    batchTransition.pause();
+                    btnPause.setText("Resume");
+                    btnPause.setStyle("-fx-background-color: #EAB308; -fx-text-fill: #FFFFFF;");
+
+                    setStatus("⏸ Đã tạm dừng mô phỏng.");
+                } else if (batchTransition.getStatus() == Animation.Status.PAUSED) {
+                    batchTransition.play();
+                    btnPause.setText("Pause");
+                    btnPause.setStyle("");
+                    setStatus("▶ Đang tiếp tục mô phỏng loạt số...");
+                }
+            }
+        });
+
         Label speedLabel = new Label("⏱ Speed:");
         speedLabel.getStyleClass().add("input-label");
 
@@ -157,7 +183,7 @@ public class StackVisualizerView extends BorderPane {
         panel.getChildren().addAll(
                 title, desc, divider(),
                 sectionOp, inputLabel, inputField,
-                row1, row2,speedBox, divider(), statusBox
+                row1, row2,pauseRow,speedBox, divider(), statusBox
         );
         return panel;
     }
@@ -447,7 +473,7 @@ public class StackVisualizerView extends BorderPane {
         String[] tokens = raw.split(",");
 
         // Tạo một luồng thực thi tuần tự các hiệu ứng chèn phần tử
-        SequentialTransition sequentialTransition = new SequentialTransition();
+        batchTransition = new SequentialTransition();
 
         // Biến tạm để lưu danh sách các số hợp lệ đã parse thành công
         List<Integer> validValues = new ArrayList<>();
@@ -455,7 +481,7 @@ public class StackVisualizerView extends BorderPane {
         // 1. Kiểm tra tính hợp lệ của toàn bộ chuỗi trước khi chạy mô phỏng
         for (String token : tokens) {
             String trimmedToken = token.trim();
-            if (trimmedToken.isEmpty()) continue; // Bỏ qua khoảng trắng thừa giữa các dấu phẩy
+            if (trimmedToken.isEmpty()) continue;
             try {
                 int val = Integer.parseInt(trimmedToken);
                 validValues.add(val);
@@ -480,13 +506,13 @@ public class StackVisualizerView extends BorderPane {
             PauseTransition step = new PauseTransition(Duration.millis(1400));
 
             step.setOnFinished(e -> {
-                // Kiểm tra xem Ngăn xếp tại thời điểm chèn này đã bị đầy hay chưa (giới hạn 8 phần tử)
+                // Kiểm tra xem Ngăn xếp tại thời điểm chèn này đã bị đầy hay chưa
                 if (service.size() >= 8) {
                     appendLog("✖ [Lỗi]: Không thể đẩy " + val + ". Stack đã đầy (Tối đa 8 phần tử).");
                     setStatus("Stack đầy. Dừng đẩy các phần tử còn lại.", false);
 
                     // Nếu gặp lỗi đầy bộ nhớ, hủy bỏ toàn bộ các bước chèn phía sau ngay lập tức
-                    sequentialTransition.stop();
+                    batchTransition.stop();
                     isSimulating = false;
                     return;
                 }
@@ -513,15 +539,17 @@ public class StackVisualizerView extends BorderPane {
                 // Nếu đây là phần tử cuối cùng trong dãy, chính thức mở khóa mô phỏng
                 if (isLast) {
                     isSimulating = false;
+                    btnPause.setText("Pause");
+                    btnPause.setStyle("");
                 }
             });
 
-            sequentialTransition.getChildren().add(step);
+            batchTransition.getChildren().add(step);
         }
 
         // Bắt đầu chạy chuỗi hiệu ứng chèn hàng loạt phần tử vào Stack
-        sequentialTransition.setRate(speedSlider.getValue());
-        sequentialTransition.play();
+        batchTransition.setRate(speedSlider.getValue());
+        batchTransition.play();
     }
 
     private void handlePop() {

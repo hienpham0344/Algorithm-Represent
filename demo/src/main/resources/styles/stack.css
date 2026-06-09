@@ -76,7 +76,7 @@
 .btn-push:pressed  { -fx-background-color: #3730A3; }
 
 .btn-pop {
-    -fx-background-color: #DC2626;
+    -fx-background-color: #EA580C;
     -fx-text-fill: white;
     -fx-font-size: 14px;
     -fx-font-weight: bold;
@@ -86,8 +86,8 @@
         -fx-font-family: roboto;
 
 }
-.btn-pop:hover    { -fx-background-color: #EF4444; }
-.btn-pop:pressed  { -fx-background-color: #991B1B; }
+.btn-pop:hover    { -fx-background-color: #F97316; }
+.btn-pop:pressed  { -fx-background-color: #C2410C; }
 
 .btn-peek {
     -fx-background-color: #059669;
@@ -117,7 +117,24 @@
 .btn-reset:hover   { -fx-background-color: #475569; }
 .btn-reset:pressed { -fx-background-color: #1E293B; }
 
+.btn-pause {
+    -fx-background-color: #DC2626;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+    -fx-padding: 9 0 9 0;
+    -fx-font-family: roboto;
+}
 
+.btn-pause:hover {
+    -fx-background-color: #EF4444;;
+}
+.btn-pause:pressed {
+    -fx-background-color: #991B1B;;
+
+}
 /* ── STATUS BOX ── */
 
 

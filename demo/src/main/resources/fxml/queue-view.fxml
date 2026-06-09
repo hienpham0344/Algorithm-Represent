@@ -32,6 +32,10 @@
                 <Button fx:id="resetBtn" maxWidth="9999" onAction="#handleReset" prefWidth="0" styleClass="btn-reset" text="Reset" HBox.hgrow="ALWAYS" />
             </HBox>
 
+            <HBox alignment="CENTER">
+                <Button fx:id="pauseBtn" maxWidth="9999" onAction="#handlePause" styleClass="btn-pause" text="Pause" HBox.hgrow="ALWAYS" />
+            </HBox>
+
             <VBox spacing="5">
                 <Label styleClass="input-label" text="⏱ Speed:" />
                 <Slider fx:id="speedSlider" blockIncrement="0.1" majorTickUnit="1.0" max="3.0" maxWidth="9999" min="0.2" showTickLabels="true" showTickMarks="true" styleClass="speed-slider" value="1.0" />

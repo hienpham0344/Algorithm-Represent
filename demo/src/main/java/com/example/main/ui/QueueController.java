@@ -22,6 +22,8 @@ public class QueueController implements Initializable {
     @FXML private TextArea explanationArea;
     @FXML private Label statusText;
     @FXML private Slider speedSlider;
+    @FXML private Button pauseBtn;
+    private SequentialTransition batchTransition;
 
     private final QueueService service = new QueueService();
     private boolean isSimulating = false;
@@ -89,8 +91,7 @@ public class QueueController implements Initializable {
             String[] tokens = txt.split(",");
 
             // Tạo một luồng thực thi tuần tự các hiệu ứng chèn phần tử
-            SequentialTransition sequentialTransition = new SequentialTransition();
-
+            batchTransition = new SequentialTransition();
             // Biến tạm để lưu danh sách các số hợp lệ đã parse thành công
             java.util.List<Integer> validValues = new java.util.ArrayList<>();
 
@@ -118,7 +119,6 @@ public class QueueController implements Initializable {
                 final int val = validValues.get(i);
                 final boolean isLast = (i == validValues.size() - 1);
 
-                // Đoạn phim tĩnh (PauseTransition) đóng vai trò kích hoạt logic cho từng phần tử
                 PauseTransition step = new PauseTransition(Duration.millis(1400));
 
                 step.setOnFinished(e -> {
@@ -128,7 +128,7 @@ public class QueueController implements Initializable {
                         setStatus("Queue đầy. Dừng chèn các phần tử còn lại.", false);
 
                         // Nếu gặp lỗi đầy hàng đợi, hủy bỏ toàn bộ các bước chèn phía sau ngay lập tức
-                        sequentialTransition.stop();
+                        batchTransition.stop();
                         isSimulating = false;
                         return;
                     }
@@ -155,15 +155,16 @@ public class QueueController implements Initializable {
                     // Nếu đây là phần tử cuối cùng trong dãy, chính thức mở khóa mô phỏng
                     if (isLast) {
                         isSimulating = false;
+                        pauseBtn.setText("Pause");
+                        pauseBtn.setStyle("");
                     }
                 });
 
-                sequentialTransition.getChildren().add(step);
-            }
+                batchTransition.getChildren().add(step);            }
 
             // Bắt đầu chạy chuỗi hiệu ứng chèn hàng loạt phần tử
-            sequentialTransition.setRate(speedSlider.getValue());
-            sequentialTransition.play();
+            batchTransition.setRate(speedSlider.getValue());
+            batchTransition.play();
         }
 
     @FXML
@@ -267,7 +268,22 @@ public class QueueController implements Initializable {
 
         redrawQueue(AnimType.NONE, -1);
     }
-
+    @FXML
+    private void handlePause() {
+        if (batchTransition != null && isSimulating) {
+            if (batchTransition.getStatus() == Animation.Status.RUNNING) {
+                batchTransition.pause();
+                pauseBtn.setText("Resume");
+                pauseBtn.setStyle("-fx-background-color: #EAB308; -fx-text-fill: #FFFFFF;");
+                setStatus("⏸ Đã tạm dừng mô phỏng chuỗi Queue.");
+            } else if (batchTransition.getStatus() == Animation.Status.PAUSED) {
+                batchTransition.play();
+                pauseBtn.setText("Pause");
+                pauseBtn.setStyle("");
+                setStatus("▶ Tiếp tục nạp các phần tử Queue còn lại...");
+            }
+        }
+    }
     @FXML
     private void handleClearLog() {
         logArea.clear();

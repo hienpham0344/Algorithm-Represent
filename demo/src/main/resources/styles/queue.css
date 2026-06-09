@@ -53,7 +53,7 @@
     -fx-max-height: 1;
 }
 
-.btn-enqueue, .btn-dequeue, .btn-peek, .btn-reset {
+.btn-enqueue, .btn-dequeue, .btn-peek, .btn-reset, .btn-pause {
     -fx-text-fill: white;
     -fx-font-weight: bold;
     -fx-padding: 10;
@@ -62,17 +62,30 @@
     -fx-font-size: 13px;
 }
 
-.btn-enqueue { -fx-background-color: #2563EB; }
-.btn-enqueue:hover { -fx-background-color: #1D4ED8; }
+.btn-enqueue { -fx-background-color:#4F46E5; }
+.btn-push:hover    { -fx-background-color: #6366F1; }
+.btn-push:pressed  { -fx-background-color: #3730A3; }
 
-.btn-dequeue { -fx-background-color: #DC2626; }
-.btn-dequeue:hover { -fx-background-color: #B91C1C; }
+.btn-dequeue {  -fx-background-color: #EA580C; }
+.btn-pop:hover    { -fx-background-color: #F97316; }
+.btn-pop:pressed  { -fx-background-color: #C2410C; }
 
-.btn-peek { -fx-background-color: #0D9488; }
-.btn-peek:hover { -fx-background-color: #0F766E; }
+.btn-peek { -fx-background-color: #059669; }
+.btn-peek:hover    { -fx-background-color: #10B981; }
+.btn-peek:pressed  { -fx-background-color: #065F46; }
 
-.btn-reset { -fx-background-color: #4B5563; }
-.btn-reset:hover { -fx-background-color: #374151; }
+.btn-reset { -fx-background-color: #334155; }
+.btn-reset:hover   { -fx-background-color: #475569; }
+.btn-reset:pressed { -fx-background-color: #1E293B; }
+
+.btn-pause{-fx-background-color: #DC2626; }
+.btn-pause:hover {
+    -fx-background-color: #EF4444;;
+}
+.btn-pause:pressed {
+    -fx-background-color: #991B1B;;
+
+}
 
 /* ── SLIDER TỐC ĐỘ ── */
 .speed-slider { -fx-padding: 5 0 5 0; }
