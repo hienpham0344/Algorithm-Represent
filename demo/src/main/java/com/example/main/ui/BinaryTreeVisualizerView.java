@@ -19,12 +19,13 @@ public class BinaryTreeVisualizerView extends BorderPane {
     private TextField inputField;
     private Pane vizPane;
     private TextArea pseudoCodeArea;
+    private TextArea explanationArea;
     private TextArea activityLogArea;
     private Label statusText;
 
     private Button btnInsert, btnSearch, btnDelete, btnReset, btnTraverse;
     private ComboBox<String> traversalBox;
-    private Slider speedSlider;
+    private Slider speedSlider = new Slider(0.5, 3.0, 1.5);
 
     private int currentSearchValue = -1;
     private int foundValue = -1;
@@ -45,6 +46,12 @@ public class BinaryTreeVisualizerView extends BorderPane {
         service.insert(60);
         service.insert(80);
         redrawTree();
+
+        explanationArea.setText(
+                "• Cây nhị phân tìm kiếm (BST) đã được nạp trạng thái mặc định.\n" +
+                        "• Cây tuân thủ quy tắc: Nhánh trái < Nút cha < Nhánh phải.\n" +
+                        "• Chọn một thao tác trên thanh công cụ bên trái để bắt đầu mô phỏng."
+        );
     }
 
     private VBox buildLeftPanel() {
@@ -90,6 +97,17 @@ public class BinaryTreeVisualizerView extends BorderPane {
 
         VBox traverseBox = new VBox(8, traversalBox, btnTraverse);
 
+        Label lblSpeed = new Label("⏱ TỐC ĐỘ (SPEED)");
+        lblSpeed.getStyleClass().add("section-label");
+
+        speedSlider.setBlockIncrement(0.5);
+        speedSlider.setMajorTickUnit(0.5);
+        speedSlider.setShowTickMarks(true);
+        speedSlider.setShowTickLabels(true);
+
+        VBox speedBox = new VBox(speedSlider);
+        speedBox.setStyle("-fx-background-color: #1e1b4b; -fx-background-radius: 8; -fx-padding: 10 10 0 10;");
+
         btnReset = createButton("⟳ Xóa làm lại (Reset)", "btn-gray");
         btnReset.setOnAction(e -> {
             service.clear();
@@ -97,6 +115,11 @@ public class BinaryTreeVisualizerView extends BorderPane {
             currentSearchValue = -1;
             logActivity("Đã xóa toàn bộ cây (Reset).");
             setPseudoCode("function reset():\n  tree.root = null");
+            explanationArea.setText(
+                    "• Toàn bộ cấu trúc cây cũ đã bị hủy bỏ.\n" +
+                            "• Cây hiện tại đang rỗng (Root = Null).\n" +
+                            "• Bạn có thể bắt đầu Thêm (Insert) các phần tử mới để xây dựng lại cây."
+            );
             redrawTree();
         });
 
@@ -112,6 +135,7 @@ public class BinaryTreeVisualizerView extends BorderPane {
                 title, desc,
                 lblOps, opsBox,
                 lblTraverse, traverseBox,
+                lblSpeed, speedBox,
                 btnReset,
                 lblStatus, statusBox
         );
@@ -126,16 +150,6 @@ public class BinaryTreeVisualizerView extends BorderPane {
     }
 
     private VBox buildCenterArea() {
-        speedSlider = new Slider(0.5, 3.0, 1.5);
-        speedSlider.setPrefWidth(120);
-
-        Label speedLabel = new Label("⏱ Speed:");
-        speedLabel.setStyle("-fx-text-fill: #94A3B8; -fx-font-size: 12px; -fx-font-weight: bold;");
-
-        HBox topBar = new HBox(8, speedLabel, speedSlider);
-        topBar.setAlignment(Pos.CENTER_RIGHT);
-        topBar.setPadding(new Insets(16, 24, 0, 0));
-
         vizPane = new Pane();
         vizPane.setMinSize(3000, 1500);
         vizPane.setPrefSize(3000, 1500);
@@ -143,22 +157,24 @@ public class BinaryTreeVisualizerView extends BorderPane {
 
         ScrollPane scrollPane = new ScrollPane(vizPane);
         scrollPane.setPannable(true);
+        scrollPane.setStyle("-fx-background: #0f172a; -fx-background-color: #0f172a; -fx-padding: 0; -fx-border-width: 0;");
         javafx.application.Platform.runLater(() -> scrollPane.setHvalue(0.5));
         VBox.setVgrow(scrollPane, Priority.ALWAYS);
 
-        VBox canvasContainer = new VBox(topBar, scrollPane);
+        VBox canvasContainer = new VBox(scrollPane);
         canvasContainer.getStyleClass().add("viz-area");
         VBox.setVgrow(canvasContainer, Priority.ALWAYS);
 
-        HBox bottomPanels = new HBox();
+        HBox bottomPanels = new HBox(12);
         bottomPanels.setMinHeight(220);
         bottomPanels.setMaxHeight(220);
         bottomPanels.setPrefHeight(220);
+        bottomPanels.setPadding(new Insets(12, 0, 0, 0));
 
         VBox pseudoBox = new VBox();
         pseudoBox.getStyleClass().add("bottom-panel");
         HBox.setHgrow(pseudoBox, Priority.ALWAYS);
-        Label lblPseudo = new Label("< > PSEUDO-CODE");
+        Label lblPseudo = new Label("< > MÃ GIẢ (PSEUDO-CODE)");
         lblPseudo.getStyleClass().add("panel-header");
         pseudoCodeArea = new TextArea();
         pseudoCodeArea.getStyleClass().add("code-area");
@@ -166,10 +182,22 @@ public class BinaryTreeVisualizerView extends BorderPane {
         VBox.setVgrow(pseudoCodeArea, Priority.ALWAYS);
         pseudoBox.getChildren().addAll(lblPseudo, pseudoCodeArea);
 
+        VBox explBox = new VBox();
+        explBox.getStyleClass().add("bottom-panel");
+        HBox.setHgrow(explBox, Priority.ALWAYS);
+        Label lblExpl = new Label("💡 GIẢI THÍCH (EXPLANATION)");
+        lblExpl.getStyleClass().add("panel-header");
+        explanationArea = new TextArea();
+        explanationArea.getStyleClass().add("log-area");
+        explanationArea.setEditable(false);
+        explanationArea.setWrapText(true);
+        VBox.setVgrow(explanationArea, Priority.ALWAYS);
+        explBox.getChildren().addAll(lblExpl, explanationArea);
+
         VBox logBox = new VBox();
         logBox.getStyleClass().add("bottom-panel");
         HBox.setHgrow(logBox, Priority.ALWAYS);
-        Label lblLog = new Label(">_ ACTIVITY LOG");
+        Label lblLog = new Label(">_ NHẬT KÝ (ACTIVITY LOG)");
         lblLog.getStyleClass().add("panel-header");
         activityLogArea = new TextArea();
         activityLogArea.getStyleClass().add("log-area");
@@ -177,7 +205,7 @@ public class BinaryTreeVisualizerView extends BorderPane {
         VBox.setVgrow(activityLogArea, Priority.ALWAYS);
         logBox.getChildren().addAll(lblLog, activityLogArea);
 
-        bottomPanels.getChildren().addAll(pseudoBox, logBox);
+        bottomPanels.getChildren().addAll(pseudoBox, explBox, logBox);
 
         return new VBox(canvasContainer, bottomPanels);
     }
@@ -192,6 +220,14 @@ public class BinaryTreeVisualizerView extends BorderPane {
 
             if (type.equals("SEARCH")) {
                 setPseudoCode("function search(node, key):\n  if node is null or node.key == key\n    return node\n  if key < node.key\n    return search(node.left, key)\n  return search(node.right, key)");
+                explanationArea.setText(
+                        "• Thao tác TÌM KIẾM (Search):\n" +
+                                "• Bước 1: Bắt đầu từ gốc (Root).\n" +
+                                "• Bước 2: So sánh giá trị cần tìm (" + val + ") với nút hiện tại.\n" +
+                                "• Bước 3: Nếu bằng thì dừng lại. Nếu nhỏ hơn thì rẽ qua trái, lớn hơn thì rẽ qua phải.\n" +
+                                "• Bước 4: Lặp lại quá trình cho đến khi tìm thấy nút hoặc gặp vị trí rỗng (Null)."
+                );
+
                 BinaryTreeService.SearchResult res = service.search(val);
 
                 animatePath(res.path(), () -> {
@@ -203,6 +239,13 @@ public class BinaryTreeVisualizerView extends BorderPane {
 
             } else if (type.equals("INSERT")) {
                 setPseudoCode("function insert(node, key):\n  if node is null return new Node(key)\n  if key < node.key\n    node.left = insert(node.left, key)\n  else\n    node.right = insert(node.right, key)\n  return node");
+                explanationArea.setText(
+                        "• Thao tác THÊM NÚT (Insert):\n" +
+                                "• Bước 1: Khởi hành từ gốc. Thuật toán hoạt động tương tự như Tìm kiếm.\n" +
+                                "• Bước 2: Đi theo quy luật Trái < Cha < Phải để dò đường đi xuống dưới.\n" +
+                                "• Bước 3: Ngay khi gặp một vị trí trống (Null), tạo một nút chứa số " + val + " tại vị trí đó và liên kết với cha."
+                );
+
                 BinaryTreeService.SearchResult searchRes = service.search(val);
 
                 animatePath(searchRes.path(), () -> {
@@ -214,6 +257,14 @@ public class BinaryTreeVisualizerView extends BorderPane {
 
             } else if (type.equals("DELETE")) {
                 setPseudoCode("function delete(node, key):\n  if node is null return null\n  if key < node.key node.left = delete(node.left, key)\n  else if key > node.key node.right = delete(node.right, key)\n  else:\n    if left is null return right\n    if right is null return left\n    node.key = min(node.right)\n    node.right = delete(node.right, node.key)\n  return node");
+                explanationArea.setText(
+                        "• Thao tác XÓA NÚT (Delete):\n" +
+                                "• Bước 1: Dò tìm vị trí của nút " + val + " cần xóa.\n" +
+                                "• Bước 2: Nếu là nút lá (0 con), xóa trực tiếp.\n" +
+                                "• Bước 3: Nếu có 1 con, kéo đứa con đó lên thay thế vị trí nút bị xóa.\n" +
+                                "• Bước 4: Nếu có 2 con, tìm nút Nhỏ Nhất của nhánh Bên Phải để đưa lên thế chỗ, sau đó xóa nút thế chỗ ở dưới cùng."
+                );
+
                 BinaryTreeService.SearchResult searchRes = service.search(val);
 
                 animatePath(searchRes.path(), () -> {
@@ -250,6 +301,13 @@ public class BinaryTreeVisualizerView extends BorderPane {
             pseudoCode = "function postOrder(node):\n  if node == null return\n  postOrder(node.left)\n  postOrder(node.right)\n  visit(node)";
         }
         setPseudoCode(pseudoCode);
+
+        explanationArea.setText(
+                "• Thao tác DUYỆT CÂY (" + type + "):\n" +
+                        "• Thuật toán đệ quy sẽ đi qua tất cả các nút trên cây theo thứ tự chỉ định.\n" +
+                        "• Các nút đang được quét sẽ hiển thị màu sáng (Highlight).\n" +
+                        "• Mảng kết quả sau khi duyệt xong sẽ được in ra tại bảng Nhật ký (Log) bên cạnh."
+        );
 
         BinaryTreeService.SearchResult res = service.traverse(type);
         if (!res.success()) {
