@@ -1,10 +1,12 @@
 package com.example.main.ui;
 
 import com.example.main.dto.Step;
+import com.example.main.dto.StepAction;
 import com.example.main.service.SortStrategy;
 import com.example.main.service.SortingRegistry;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -66,10 +68,15 @@ public class SortVisualizerView extends VBox {
     private final ComboBox<String> dataSourceBox = new ComboBox<>();
     private final Slider  sizeSlider   = new Slider(2, 15, 8);
     private final Label   sizeRangeLabel = new Label("2 -> 15");
-    private final Slider  speedSlider  = new Slider(0.5, 3.0, 1.0);
+    private final Slider  speedSlider =
+            new Slider(SortSpeed.MIN_RATE, SortSpeed.MAX_RATE, SortSpeed.DEFAULT_RATE);
+    private final Label   speedValueLabel = new Label(SortSpeed.label(SortSpeed.DEFAULT_RATE));
     private final TextArea manualInput = new TextArea("42, 17, 88, 6, 31, 59, 12, 75");
     private final Label   swapValueLabel = new Label("0");
     private final Label   statusLabel  = new Label("Creating an array to get started.");
+    private final Label   explanationTitle = new Label("Giải thích thuật toán");
+    private final Label   explanationText = new Label();
+    private final Label   lessonFacts = new Label();
 
     // Buttons
     private final Button sortButton   = new Button("Sort");
@@ -82,7 +89,9 @@ public class SortVisualizerView extends VBox {
 
     // Panels
     private final HBox  chartPane = new HBox();
+    private final ScrollPane chartScroll = new ScrollPane(chartPane);
     private final VBox  codePane  = new VBox(2);
+    private final ScrollPane codeScroll = new ScrollPane(codePane);
 
     // Runtime state
     private Timeline   timeline;
@@ -119,8 +128,9 @@ public class SortVisualizerView extends VBox {
         // Wire up
         applyButtonStyles();
         bindEvents();
-        renderCode();
-        refreshChart(currentArray, -1, -1, null);
+        updateLesson();
+        renderCode(null);
+        refreshChart(currentArray, null);
         updateButtons(false);
     }
 
@@ -225,8 +235,22 @@ public class SortVisualizerView extends VBox {
         // Speed card
         speedSlider.setMajorTickUnit(0.5);
         speedSlider.setMinorTickCount(0);
+        speedSlider.setBlockIncrement(0.5);
+        speedSlider.setSnapToTicks(true);
+        speedSlider.setShowTickMarks(true);
+        speedSlider.setShowTickLabels(true);
         speedSlider.setMaxWidth(Double.MAX_VALUE);
-        VBox speedCard = labeledCard("Sorting Speed", speedSlider);
+        speedValueLabel.getStyleClass().add("speed-value");
+        Label speedTitle = new Label("Sorting Speed");
+        speedTitle.getStyleClass().add("card-title");
+        Region speedSpacer = new Region();
+        HBox.setHgrow(speedSpacer, Priority.ALWAYS);
+        HBox speedHeader = new HBox(speedTitle, speedSpacer, speedValueLabel);
+        speedHeader.setAlignment(Pos.CENTER_LEFT);
+
+        VBox speedCard = new VBox(10, speedHeader, speedSlider);
+        speedCard.getStyleClass().add("card");
+        speedCard.setPadding(new Insets(14, 16, 14, 16));
         speedCard.setPrefWidth(260);
         speedCard.setMinWidth(200);
         HBox.setHgrow(speedCard, Priority.SOMETIMES);
@@ -253,16 +277,32 @@ public class SortVisualizerView extends VBox {
         chartPane.setAlignment(Pos.BOTTOM_CENTER);
         chartPane.setFillHeight(true);
         chartPane.getStyleClass().add("chart-pane");
-        chartPane.setMinHeight(380);
+        chartPane.setMinHeight(280);
         chartPane.setMaxWidth(Double.MAX_VALUE);
+
+        chartScroll.setFitToWidth(true);
+        chartScroll.setFitToHeight(true);
+        chartScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        chartScroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        chartScroll.setPannable(true);
+        chartScroll.setMinHeight(315);
+        chartScroll.getStyleClass().add("chart-scroll");
 
         Label sortLabel = new Label("Sort");
         sortLabel.getStyleClass().add("section-title");
 
-        VBox chartCard = new VBox(10, sortLabel, chartPane);
+        explanationTitle.getStyleClass().add("explanation-title");
+        explanationText.getStyleClass().add("explanation-text");
+        explanationText.setWrapText(true);
+        lessonFacts.getStyleClass().add("lesson-facts");
+        lessonFacts.setWrapText(true);
+        VBox explanationCard = new VBox(6, explanationTitle, explanationText, lessonFacts);
+        explanationCard.getStyleClass().add("explanation-card");
+
+        VBox chartCard = new VBox(10, sortLabel, chartScroll, explanationCard);
         chartCard.getStyleClass().add("card");
         chartCard.setPadding(new Insets(16));
-        VBox.setVgrow(chartPane, Priority.ALWAYS);
+        VBox.setVgrow(chartScroll, Priority.ALWAYS);
         HBox.setHgrow(chartCard, Priority.ALWAYS);
 
         // Status bar inside chart card
@@ -270,9 +310,8 @@ public class SortVisualizerView extends VBox {
         chartCard.getChildren().add(statusLabel);
 
         // Code panel (right, fixed width)
-        ScrollPane codeScroll = new ScrollPane(codePane);
         codeScroll.setFitToWidth(false);
-        codeScroll.setFitToHeight(true);
+        codeScroll.setFitToHeight(false);
         codeScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         codeScroll.getStyleClass().add("code-scroll");
         VBox.setVgrow(codeScroll, Priority.ALWAYS);
@@ -283,9 +322,9 @@ public class SortVisualizerView extends VBox {
         VBox codeCard = new VBox(10, codeLabel, codeScroll);
         codeCard.getStyleClass().add("card");
         codeCard.setPadding(new Insets(16));
-        codeCard.setPrefWidth(360);
-        codeCard.setMinWidth(300);
-        codeCard.setMaxWidth(400);
+        codeCard.setPrefWidth(SortLayout.CODE_PANEL_PREF_WIDTH);
+        codeCard.setMinWidth(SortLayout.CODE_PANEL_MIN_WIDTH);
+        codeCard.setMaxWidth(SortLayout.CODE_PANEL_MAX_WIDTH);
         VBox.setVgrow(codeScroll, Priority.ALWAYS);
 
         HBox row = new HBox(12, chartCard, codeCard);
@@ -316,6 +355,14 @@ public class SortVisualizerView extends VBox {
         sizeSlider.valueProperty().addListener((o, ov, nv) ->
                 sizeRangeLabel.setText("2 -> " + nv.intValue()));
 
+        speedSlider.valueProperty().addListener((o, ov, nv) -> {
+            double rate = SortSpeed.timelineRate(nv.doubleValue());
+            speedValueLabel.setText(SortSpeed.label(rate));
+            if (timeline != null) {
+                timeline.setRate(rate);
+            }
+        });
+
         dataSourceBox.valueProperty().addListener((o, ov, nv) -> {
             boolean manual = "Manual Entry".equals(nv);
             manualInput.setVisible(manual);
@@ -323,7 +370,10 @@ public class SortVisualizerView extends VBox {
             sizeSlider.setDisable(manual);
         });
 
-        algorithmBox.valueProperty().addListener((o, ov, nv) -> renderCode());
+        algorithmBox.valueProperty().addListener((o, ov, nv) -> {
+            updateLesson();
+            renderCode(null);
+        });
 
         createButton.setOnAction(e -> createArray());
         deleteButton.setOnAction(e -> deleteArray());
@@ -347,15 +397,17 @@ public class SortVisualizerView extends VBox {
         if (array.length == 0) {
             statusLabel.setText("Empty or invalid data.");
             currentArray = originalArray = new int[0];
-            refreshChart(currentArray, -1, -1, null);
+            refreshChart(currentArray, null);
+            updateLesson();
             return;
         }
         originalArray = array.clone();
         currentArray  = array.clone();
         steps = List.of();
-        statusLabel.setText("rray is ready — click Sort to start.");
-        refreshChart(currentArray, -1, -1, null);
-        renderCode();
+        statusLabel.setText("Array is ready - click Sort to start.");
+        refreshChart(currentArray, null);
+        updateLesson();
+        renderCode(null);
         updateButtons(false);
     }
 
@@ -376,7 +428,7 @@ public class SortVisualizerView extends VBox {
         steps = strategy.sort(source, ascending);
         if (steps.isEmpty()) {
             statusLabel.setText("Failed to create animation step.");
-            refreshChart(currentArray, -1, -1, null);
+            refreshChart(currentArray, null);
             return;
         }
         paused = false;
@@ -387,31 +439,38 @@ public class SortVisualizerView extends VBox {
 
     private void playTimeline() {
         updateButtons(true);
-        timeline = new Timeline(new KeyFrame(Duration.millis(getDelayMillis()), e -> advanceStep()));
+        timeline = new Timeline(new KeyFrame(
+                Duration.millis(SortSpeed.BASE_STEP_MILLIS),
+                e -> advanceStep()
+        ));
         timeline.setCycleCount(Timeline.INDEFINITE);
+        timeline.setRate(SortSpeed.timelineRate(speedSlider.getValue()));
         timeline.play();
     }
 
     private void advanceStep() {
         if (stepIndex >= steps.size()) { finishAnimation(); return; }
         Step step = steps.get(stepIndex++);
-        currentArray = step.array.clone();
-        if ("swap".equals(step.type)) {
+        currentArray = step.array();
+        if (step.countsAsSwap()) {
             swapCount++;
             swapValueLabel.setText(Integer.toString(swapCount));
-        } else if ("sorted".equals(step.type)) {
-            sortedIndices.add(step.i);
-            sortedIndices.add(step.j);
         }
-        refreshChart(currentArray, step.i, step.j, step.type);
-        renderCode();
+        sortedIndices.clear();
+        sortedIndices.addAll(step.sortedIndices());
+        refreshChart(currentArray, step);
+        showStepExplanation(step);
+        renderCode(step.codeLineId());
     }
 
     private void finishAnimation() {
         stopAnimation();
         for (int i = 0; i < currentArray.length; i++) sortedIndices.add(i);
-        refreshChart(currentArray, -1, -1, null);
-        statusLabel.setText("✓ Completed — " + swapCount + " swaps.");
+        refreshChart(currentArray, null);
+        explanationTitle.setText("Hoàn tất");
+        explanationText.setText("Mảng đã được sắp xếp. Tổng số lần đổi chỗ thực: " + swapCount + ".");
+        lessonFacts.setText("Đã thực hiện " + steps.size() + " bước mô phỏng.");
+        statusLabel.setText("Completed - " + swapCount + " swaps.");
         updateButtons(false);
     }
 
@@ -436,8 +495,9 @@ public class SortVisualizerView extends VBox {
         sortedIndices.clear();
         steps = List.of(); stepIndex = 0; swapCount = 0;
         swapValueLabel.setText("0");
-        refreshChart(currentArray, -1, -1, null);
-        renderCode();
+        refreshChart(currentArray, null);
+        updateLesson();
+        renderCode(null);
         statusLabel.setText(currentArray.length == 0 ? "Nothing to reset." : "Array reset.");
         updateButtons(false);
     }
@@ -448,8 +508,9 @@ public class SortVisualizerView extends VBox {
         steps = List.of(); sortedIndices.clear();
         stepIndex = 0; swapCount = 0;
         swapValueLabel.setText("0");
-        refreshChart(currentArray, -1, -1, null);
-        renderCode();
+        refreshChart(currentArray, null);
+        updateLesson();
+        renderCode(null);
         statusLabel.setText("Array deleted.");
         updateButtons(false);
     }
@@ -479,28 +540,23 @@ public class SortVisualizerView extends VBox {
         return a;
     }
 
-    private double getDelayMillis() {
-        double s = speedSlider.getValue();
-        if (s <= 0.5) return 1200;
-        if (s <= 1.0) return 700;
-        if (s <= 1.5) return 400;
-        if (s <= 2.0) return 220;
-        if (s <= 2.5) return 120;
-        return 45;
-    }
-
     // ── Chart ─────────────────────────────────────────────────────────────
-    private void refreshChart(int[] values, int fi, int si, String stepType) {
+    private void refreshChart(int[] values, Step step) {
         chartPane.getChildren().clear();
         if (values.length == 0) {
-            Label empty = new Label("No data available — Click \"Create Array\"");
+            chartPane.setMinWidth(0);
+            chartPane.setPrefWidth(Region.USE_COMPUTED_SIZE);
+            Label empty = new Label("No data available - Click \"Create Array\"");
             empty.getStyleClass().add("empty-state");
             chartPane.getChildren().add(empty);
             return;
         }
         int max = Arrays.stream(values).max().orElse(1);
-        double barW = values.length > 12 ? 26 : values.length > 8 ? 34 : 44;
-        double gap  = values.length > 12 ?  5 : values.length > 8 ?  7 :  9;
+        double barW = SortLayout.barWidth(values.length);
+        double gap = SortLayout.barGap(values.length);
+        double contentWidth = SortLayout.chartContentWidth(values.length);
+        chartPane.setMinWidth(contentWidth);
+        chartPane.setPrefWidth(contentWidth);
         chartPane.setSpacing(gap);
 
         for (int i = 0; i < values.length; i++) {
@@ -510,11 +566,22 @@ public class SortVisualizerView extends VBox {
             barBox.setPrefWidth(barW);
             barBox.setMinWidth(barW);
 
+            Label markerLabel = new Label(step == null ? "" : SortPresentation.markerText(step, i));
+            markerLabel.getStyleClass().add("bar-marker");
+            markerLabel.setMinHeight(18);
+
+            boolean showSwap = step != null && SortPresentation.showSwapBadge(step, i);
+            Label swapBadge = new Label(showSwap ? "SWAP" : "");
+            if (showSwap) {
+                swapBadge.getStyleClass().add("swap-badge");
+            }
+            swapBadge.setMinHeight(18);
+
             Text valLabel = new Text(Integer.toString(values[i]));
             valLabel.getStyleClass().add("bar-value");
 
-            double h = Math.max(18, (values[i] * 340.0) / max);
-            Color  c = resolveColor(i, fi, si, stepType);
+            double h = Math.max(18, (values[i] * 230.0) / max);
+            Color  c = resolveColor(i, step);
 
             Rectangle bar = new Rectangle(barW * 0.68, h);
             bar.setArcWidth(7);
@@ -526,26 +593,28 @@ public class SortVisualizerView extends VBox {
             Label idxLabel = new Label(Integer.toString(i));
             idxLabel.getStyleClass().add("bar-index");
 
-            barBox.getChildren().addAll(valLabel, bar, idxLabel);
+            barBox.getChildren().addAll(markerLabel, swapBadge, valLabel, bar, idxLabel);
             chartPane.getChildren().add(barBox);
         }
     }
 
-    private Color resolveColor(int idx, int fi, int si, String type) {
-        if (sortedIndices.contains(idx))                          return COL_SORTED;
-        if ("swap".equals(type)    && (idx == fi || idx == si))   return COL_SWAP;
-        if ("compare".equals(type) && (idx == fi || idx == si))   return COL_COMPARE;
+    private Color resolveColor(int idx, Step step) {
+        if (step != null && step.affectedIndices().contains(idx)) {
+            if (step.action() == StepAction.SWAP) return COL_SWAP;
+            if (step.action() == StepAction.CONDITION || step.action() == StepAction.WRITE) return COL_COMPARE;
+        }
+        if (sortedIndices.contains(idx)) return COL_SORTED;
         return COL_DEFAULT;
     }
 
     // ── Code panel ────────────────────────────────────────────────────────
-    private void renderCode() {
+    private void renderCode(String activeLineId) {
         codePane.getChildren().clear();
-        String code = CodeSnippets.JAVA_CODE.getOrDefault(algorithmBox.getValue(), "// Không có code");
-        int activeLine = resolveActiveLine();
-        String[] lines = code.split("\\R");
-        for (int i = 0; i < lines.length; i++) {
-            Label line = new Label(String.format("%2d  %s", i + 1, lines[i]));
+        List<CodeLine> lines = CodeSnippets.get(algorithmBox.getValue()).lines();
+        int activeLine = CodeSnippets.lineIndex(algorithmBox.getValue(), activeLineId);
+        for (int i = 0; i < lines.size(); i++) {
+            CodeLine codeLine = lines.get(i);
+            Label line = new Label(String.format("%2d  %s", i + 1, codeLine.text()));
             line.getStyleClass().add("code-line");
             line.setWrapText(false);
             line.setMinWidth(Region.USE_PREF_SIZE);
@@ -553,29 +622,32 @@ public class SortVisualizerView extends VBox {
             if (i == activeLine) line.getStyleClass().add("code-line-active");
             codePane.getChildren().add(line);
         }
+        if (activeLine >= 0 && lines.size() > 1) {
+            double position = (double) activeLine / (lines.size() - 1);
+            Platform.runLater(() -> codeScroll.setVvalue(position));
+        }
     }
 
-    private int resolveActiveLine() {
-        if (stepIndex == 0 || stepIndex > steps.size()) return -1;
-        Step step = steps.get(stepIndex - 1);
-        return switch (algorithmBox.getValue()) {
-            case "bubble"    -> mapStep(step, 3, 5, 1);
-            case "selection" -> mapStep(step, 4, 9, 2);
-            case "insertion" -> mapStep(step, 4, 6, 1);
-            case "heap"      -> mapStep(step, 1, 6, 5);
-            case "quick"     -> mapStep(step, 2, 3, 1);
-            case "merge"     -> mapStep(step, 4, 8, 1);
-            default -> -1;
-        };
+    private void updateLesson() {
+        AlgorithmLesson lesson = AlgorithmLessons.get(algorithmBox.getValue());
+        explanationTitle.setText("Cách hoạt động");
+        explanationText.setText(lesson.overview());
+        lessonFacts.setText("Thời gian: " + lesson.timeComplexity()
+                + "   |   Bộ nhớ: " + lesson.spaceComplexity()
+                + "   |   " + lesson.stability());
     }
 
-    private int mapStep(Step step, int cmp, int swp, int srt) {
-        return switch (step.type) {
-            case "compare" -> cmp;
-            case "swap"    -> swp;
-            case "sorted"  -> srt;
-            default -> -1;
-        };
+    private void showStepExplanation(Step step) {
+        explanationTitle.setText(switch (step.action()) {
+            case CONDITION -> "Kiểm tra điều kiện";
+            case VARIABLE_UPDATE -> "Cập nhật biến";
+            case SWAP -> step.countsAsSwap() ? "Đổi chỗ" : "Đặt phần tử";
+            case WRITE -> "Ghi giá trị";
+            case MARK_SORTED -> "Cố định vị trí";
+            case COMPLETE -> "Hoàn tất";
+        });
+        explanationText.setText(step.explanation());
+        lessonFacts.setText("Bước " + stepIndex + " / " + steps.size());
     }
 
     // ── Button state ──────────────────────────────────────────────────────

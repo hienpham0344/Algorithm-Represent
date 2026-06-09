@@ -41,12 +41,13 @@ public class DashboardController {
     public void openSortingVisualizer() {
 
         SortVisualizerView visualizer = new SortVisualizerView();
+        SortViewContainer container = new SortViewContainer(visualizer);
 
-        visualizer.getStylesheets().add(
+        container.getStylesheets().add(
                 getClass().getResource("/styles/sort.css").toExternalForm()
         );
 
-        contentPane.getChildren().setAll(visualizer);
+        contentPane.getChildren().setAll(container);
 
         // tự đóng sidebar sau khi chọn
         sidebar.setVisible(false);
