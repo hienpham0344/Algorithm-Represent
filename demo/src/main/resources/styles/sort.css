@@ -348,7 +348,7 @@
 }
 .code-line-active {
     -fx-background-color: rgba(167,139,250,0.22);
-    -fx-text-fill: #ddd6fe;
+    -fx-text-fill: #ffff00;
     -fx-font-weight: 700;
     -fx-padding: 2 10 2 8;
     -fx-border-color: transparent transparent transparent #a78bfa;

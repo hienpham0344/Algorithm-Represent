@@ -8,6 +8,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.util.Duration;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class StackVisualizerView extends BorderPane {
@@ -19,11 +20,14 @@ public class StackVisualizerView extends BorderPane {
     private TextArea  logArea;
     private TextArea  codeArea;
     private Label     statusText;
+    private TextArea  explanationArea;
     private boolean   isSimulating = false;
 
     private Slider    speedSlider;
     private Animation currentAnimation;
-//Dữ liệu mã giả ứng của các buttons để nạp vào codeArea(mã giả)
+    private SequentialTransition batchTransition;
+    private Button               btnPause;
+//Dữ liệu mã giả tương ứng của các buttons để nạp vào codeArea(mã giả)
     private static final String CODE_IDLE =
             "// Chọn một hành động để trực quan hóa mã giả\n";
 
@@ -69,6 +73,12 @@ public class StackVisualizerView extends BorderPane {
         service.push(45);
         redrawStack(AnimType.NONE, -1);
 
+        explanationArea.setText(
+                "• Ngăn xếp (Stack) được khởi tạo mặc định với 3 phần tử: 15, 30, 45.\n" +
+                        "• Theo nguyên lý LIFO, phần tử 45 được đưa vào cuối cùng nên nó nằm ở trên cùng (Đỉnh Ngăn xếp).\n" +
+                        "• Con trỏ TOP hiện tại đang chỉ thẳng vào phần tử số 45 này."
+        );
+
         appendLog("[Hệ Thống]: Đã tải xong ngăn xếp mô phỏng.");
         appendLog("[Hệ Thống]: Sẵn sàng hoạt động.");
     }
@@ -92,7 +102,7 @@ public class StackVisualizerView extends BorderPane {
         desc.getStyleClass().add("ds-desc");
         desc.setWrapText(true);
 
-        Label sectionOp = new Label("OPRATIONS");
+        Label sectionOp = new Label("OPERATIONS");
         sectionOp.getStyleClass().add("section-label");
 
         Label inputLabel = new Label("Element Value:");
@@ -103,10 +113,10 @@ public class StackVisualizerView extends BorderPane {
         inputField.getStyleClass().add("input-field");
         inputField.setMaxWidth(Double.MAX_VALUE);
 
-        Button btnPush  = makeBtn("↴  Push", "btn-push");
-        Button btnPop   = makeBtn("↷  Pop",   "btn-pop");
-        Button btnPeek  = makeBtn("⚇  Peek","btn-peek");
-        Button btnReset = makeBtn("⟳  Reset",   "btn-reset");
+        Button btnPush  = makeBtn("Push", "btn-push");
+        Button btnPop   = makeBtn("Pop",   "btn-pop");
+        Button btnPeek  = makeBtn("Peek","btn-peek");
+        Button btnReset = makeBtn("Reset",   "btn-reset");
 
         btnPush.setOnAction(e  -> handlePush());
         btnPop.setOnAction(e   -> handlePop());
@@ -115,6 +125,30 @@ public class StackVisualizerView extends BorderPane {
 
         HBox row1 = hRow(btnPush, btnPop);
         HBox row2 = hRow(btnPeek, btnReset);
+
+        btnPause = makeBtn("Pause", "btn-pause");
+        btnPause.setMaxWidth(Double.MAX_VALUE);
+        HBox.setHgrow(btnPause, Priority.ALWAYS);
+
+        HBox pauseRow = new HBox(btnPause);
+        pauseRow.setAlignment(Pos.CENTER);
+
+        btnPause.setOnAction(e -> {
+            if (batchTransition != null && isSimulating) {
+                if (batchTransition.getStatus() == Animation.Status.RUNNING) {
+                    batchTransition.pause();
+                    btnPause.setText("Resume");
+                    btnPause.setStyle("-fx-background-color: #EAB308; -fx-text-fill: #FFFFFF;");
+
+                    setStatus("⏸ Đã tạm dừng mô phỏng.");
+                } else if (batchTransition.getStatus() == Animation.Status.PAUSED) {
+                    batchTransition.play();
+                    btnPause.setText("Pause");
+                    btnPause.setStyle("");
+                    setStatus("▶ Đang tiếp tục mô phỏng loạt số...");
+                }
+            }
+        });
 
         Label speedLabel = new Label("⏱ Speed:");
         speedLabel.getStyleClass().add("input-label");
@@ -149,7 +183,7 @@ public class StackVisualizerView extends BorderPane {
         panel.getChildren().addAll(
                 title, desc, divider(),
                 sectionOp, inputLabel, inputField,
-                row1, row2,speedBox, divider(), statusBox
+                row1, row2,pauseRow,speedBox, divider(), statusBox
         );
         return panel;
     }
@@ -279,6 +313,7 @@ public class StackVisualizerView extends BorderPane {
         return row;
     }
     private HBox buildBottomPanel() {
+        // 1. Khối Mã Giả (Pseudo-code)
         HBox codeHeader = panelHeader("<>  PSEUDO-CODE", "Java code");
         codeArea = new TextArea();
         codeArea.getStyleClass().add("code-area");
@@ -296,6 +331,7 @@ public class StackVisualizerView extends BorderPane {
         Region divider = new Region();
         divider.getStyleClass().add("bottom-divider");
 
+        // 2. Khối Nhật Ký (Activity Log)
         HBox logHeader = panelHeader(">_  ACTIVITY LOG", null);
         Button clearBtn = new Button("Clear");
         clearBtn.getStyleClass().add("btn-clear-log");
@@ -314,7 +350,26 @@ public class StackVisualizerView extends BorderPane {
         logBox.setPrefWidth(0);
         logBox.setMaxHeight(Double.MAX_VALUE);
 
-        HBox bottom = new HBox(codeBox, divider, logBox);
+        Region divider2 = new Region();
+        divider2.getStyleClass().add("bottom-divider");
+
+        // 3.Khối Giải thích
+        HBox expHeader = panelHeader("?  EXPLANATION", "Hướng dẫn");
+        explanationArea = new TextArea();
+        explanationArea.getStyleClass().add("explanation-area");
+        explanationArea.setEditable(false);
+        explanationArea.setWrapText(true);
+        VBox.setVgrow(explanationArea, Priority.ALWAYS);
+        VBox.setMargin(explanationArea, new Insets(12, 12, 12, 12));
+        VBox expBox = new VBox(expHeader, explanationArea);
+        expBox.getStyleClass().add("bottom-section");
+        HBox.setHgrow(expBox, Priority.ALWAYS);
+        expBox.setPrefWidth(0);
+        expBox.setMaxHeight(Double.MAX_VALUE);
+
+
+
+        HBox bottom = new HBox(codeBox, divider, expBox, divider2, logBox);
         bottom.getStyleClass().add("bottom-dock");
         bottom.setPrefHeight(210);
         bottom.setMinHeight(180);
@@ -410,41 +465,109 @@ public class StackVisualizerView extends BorderPane {
         if (isSimulating) return;
         String raw = inputField.getText().trim();
         if (raw.isEmpty()) {
-            setStatus("⚠ Vui lòng nhập một số nguyên hợp lệ!", false);
+            setStatus("⚠ Vui lòng nhập một số nguyên hoặc một dãy số hợp lệ!", false);
             return;
         }
-        try {
-            int val = Integer.parseInt(raw);
-            if (service.size() >= 8) {
-                appendLog("✖ [Lỗi]: Chiều cao ngăn xếp giới hạn 8 phần tử trong demo.");
-                setStatus("Stack đã đầy (giới hạn demo: 8 phần tử).", false);
+
+        // Tách chuỗi dựa vào dấu phẩy
+        String[] tokens = raw.split(",");
+
+        // Tạo một luồng thực thi tuần tự các hiệu ứng chèn phần tử
+        batchTransition = new SequentialTransition();
+
+        // Biến tạm để lưu danh sách các số hợp lệ đã parse thành công
+        List<Integer> validValues = new ArrayList<>();
+
+        // 1. Kiểm tra tính hợp lệ của toàn bộ chuỗi trước khi chạy mô phỏng
+        for (String token : tokens) {
+            String trimmedToken = token.trim();
+            if (trimmedToken.isEmpty()) continue;
+            try {
+                int val = Integer.parseInt(trimmedToken);
+                validValues.add(val);
+            } catch (NumberFormatException ex) {
+                setStatus("⚠ Dãy nhập vào chứa giá trị không hợp lệ: '" + trimmedToken + "'", false);
                 return;
             }
-            isSimulating = true;
-            codeArea.setText(CODE_PUSH);
-            appendLog("⚡ [Đang xử lý]: Đang Push(" + val + ") vào đỉnh Ngăn xếp...");
-            setStatus("Đang chuẩn bị chèn vào...");
-            service.push(val);
-            redrawStack(AnimType.PUSH, 0);
-            appendLog("✔ [Thành công]: Push " + val + " lên đỉnh Ngăn xếp thành công.");
-            setStatus("Đã Push thành công.", true);
-            inputField.clear();
-            isSimulating = false;
-        } catch (NumberFormatException ex) {
-            setStatus("⚠ Giá trị không hợp lệ. Hãy nhập số nguyên.", false);
         }
+
+        if (validValues.isEmpty()) return;
+
+        isSimulating = true;
+        codeArea.setText(CODE_PUSH);
+        inputField.clear(); // Xóa khung nhập sau khi đã nhận dữ liệu thành công
+
+        // 2. Tạo chuỗi hiệu ứng đổ tuần tự từng số vào Ngăn xếp (Stack)
+        for (int i = 0; i < validValues.size(); i++) {
+            final int val = validValues.get(i);
+            final boolean isLast = (i == validValues.size() - 1);
+
+            // Đoạn phim tĩnh (PauseTransition) đóng vai trò kích hoạt logic cho từng phần tử
+            PauseTransition step = new PauseTransition(Duration.millis(1400));
+
+            step.setOnFinished(e -> {
+                // Kiểm tra xem Ngăn xếp tại thời điểm chèn này đã bị đầy hay chưa
+                if (service.size() >= 8) {
+                    appendLog("✖ [Lỗi]: Không thể đẩy " + val + ". Stack đã đầy (Tối đa 8 phần tử).");
+                    setStatus("Stack đầy. Dừng đẩy các phần tử còn lại.", false);
+
+                    // Nếu gặp lỗi đầy bộ nhớ, hủy bỏ toàn bộ các bước chèn phía sau ngay lập tức
+                    batchTransition.stop();
+                    isSimulating = false;
+                    return;
+                }
+
+                // Cập nhật lời giải thích tương ứng với phần tử đang được xử lý
+                explanationArea.setText(
+                        "• Thao tác Push đang xử lý giá trị: " + val + "\n" +
+                                "• Bước 1: Kiểm tra giới hạn bộ nhớ (Hiện tại size = " + service.size() + ").\n" +
+                                "• Bước 2: Cấp phát ô nhớ mới để lưu giá trị " + val + ".\n" +
+                                "• Bước 3: Đẩy phần tử vào đỉnh. Theo nguyên lý LIFO, phần tử mới sẽ nằm trên cùng và che khuất phần tử cũ.\n" +
+                                "• Bước 4: Con trỏ TOP được cập nhật bám sát lên để quản lý giá trị " + val + " vừa thêm."
+                );
+
+                appendLog("⚡ [Đang xử lý]: Đang Push(" + val + ") vào đỉnh Ngăn xếp...");
+                setStatus("Đang Push phần tử " + val + "...");
+
+                // Đưa dữ liệu vào service và vẽ lại giao diện với chỉ mục hoạt họa mới nhất
+                service.push(val);
+                redrawStack(AnimType.PUSH, 0);
+
+                appendLog("✔ [Thành công]: Push " + val + " lên đỉnh Ngăn xếp thành công.");
+                setStatus("Đã Push thành công phần tử " + val + ".", true);
+
+                // Nếu đây là phần tử cuối cùng trong dãy, chính thức mở khóa mô phỏng
+                if (isLast) {
+                    isSimulating = false;
+                    btnPause.setText("Pause");
+                    btnPause.setStyle("");
+                }
+            });
+
+            batchTransition.getChildren().add(step);
+        }
+
+        // Bắt đầu chạy chuỗi hiệu ứng chèn hàng loạt phần tử vào Stack
+        batchTransition.setRate(speedSlider.getValue());
+        batchTransition.play();
     }
 
     private void handlePop() {
         if (isSimulating) return;
         if (service.isEmpty()) {
-            appendLog("✖ [Lỗi]: Ngăn xếp rỗng (Stack Underflow). Không thể Pop!");
+            appendLog("✖ [Lỗi]: Ngăn xếp rỗng (Stack Empty). Không thể Pop!");
             setStatus("Ngăn xếp rỗng, không thể Pop.", false);
             return;
         }
         isSimulating = true;
         codeArea.setText(CODE_POP);
         int topVal = service.toList().get(0);
+        explanationArea.setText(
+                "• Bước 1: Kiểm tra xem Ngăn xếp có trống không. Nếu trống sẽ báo lỗi Underflow.\n" +
+                        "• Bước 2: Định vị phần tử đang nằm ở đỉnh trên cùng (Giá trị hiện tại là: " + topVal + ").\n" +
+                        "• Bước 3: Thực hiện nhấc phần tử " + topVal + " ra khỏi Ngăn xếp và giải phóng ô nhớ này.\n" +
+                        "• Bước 4: Tự động dịch chuyển hạ con trỏ TOP xuống phần tử liền kề phía dưới."
+        );
         appendLog("⚡ [Đang xử lý]: Đang Pop(" + topVal + ") ra khỏi Ngăn xếp...");
         setStatus("Đang trích xuất dữ liệu từ đỉnh (POP)...");
 
@@ -478,6 +601,11 @@ public class StackVisualizerView extends BorderPane {
         isSimulating = true;
         codeArea.setText(CODE_PEEK);
         int peeked = service.toList().get(0);
+        explanationArea.setText(
+                "• Điểm khác biệt: Lệnh Peek() chỉ kiểm tra (đọc trộm) giá trị đỉnh mà hoàn toàn không làm thay đổi cấu trúc dữ liệu.\n" +
+                        "• Hệ thống lần theo vị trí con trỏ TOP để lấy ra giá trị tại ô trên cùng (Đang hiển thị số: " + peeked + ").\n" +
+                        "• Phần tử " + peeked + " vẫn nằm nguyên vẹn trên Ngăn xếp, con trỏ TOP giữ nguyên vị trí."
+        );
         appendLog("⚡ [Đang xử lý]: Đang đọc giá trị đỉnh...");
         setStatus("Kiểm tra giá trị đỉnh ngăn xếp...");
         redrawStack(AnimType.PEEK, 0);
@@ -497,6 +625,11 @@ public class StackVisualizerView extends BorderPane {
         service.push(30);
         service.push(45);
         codeArea.setText(CODE_IDLE);
+        explanationArea.setText(
+                "• Hệ thống thực hiện dọn sạch bộ nhớ và nạp lại trạng thái ban đầu.\n" +
+                        "• Ba phần tử mặc định (15, 30, 45) được đưa vào khung chứa.\n" +
+                        "• Con trỏ TOP quay trở lại quản lý phần tử số 45 nằm ở đỉnh."
+        );
         redrawStack(AnimType.NONE, -1);
         appendLog("[Nhật ký]: Đã làm mới Ngăn xếp về trạng thái mặc định.");
         setStatus("Đã khởi tạo lại.", true);

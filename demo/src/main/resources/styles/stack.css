@@ -76,7 +76,7 @@
 .btn-push:pressed  { -fx-background-color: #3730A3; }
 
 .btn-pop {
-    -fx-background-color: #DC2626;
+    -fx-background-color: #EA580C;
     -fx-text-fill: white;
     -fx-font-size: 14px;
     -fx-font-weight: bold;
@@ -86,8 +86,8 @@
         -fx-font-family: roboto;
 
 }
-.btn-pop:hover    { -fx-background-color: #EF4444; }
-.btn-pop:pressed  { -fx-background-color: #991B1B; }
+.btn-pop:hover    { -fx-background-color: #F97316; }
+.btn-pop:pressed  { -fx-background-color: #C2410C; }
 
 .btn-peek {
     -fx-background-color: #059669;
@@ -117,7 +117,24 @@
 .btn-reset:hover   { -fx-background-color: #475569; }
 .btn-reset:pressed { -fx-background-color: #1E293B; }
 
+.btn-pause {
+    -fx-background-color: #DC2626;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+    -fx-padding: 9 0 9 0;
+    -fx-font-family: roboto;
+}
 
+.btn-pause:hover {
+    -fx-background-color: #EF4444;;
+}
+.btn-pause:pressed {
+    -fx-background-color: #991B1B;;
+
+}
 /* ── STATUS BOX ── */
 
 
@@ -141,7 +158,7 @@
     -fx-font-size: 12px;
     -fx-text-fill: #C7D2FE;
     -fx-wrap-text: true;
-    -fx-font-family: "Courier New", monospace;
+    -fx-font-family: "Roboto", sans serif;
 }
 
 .divider-line {
@@ -240,7 +257,6 @@
     -fx-border-width: 1 0 0 0;
 }
 
-/* Each side: pseudo-code / activity log */
 .bottom-section {
     -fx-background-color: #0F172A;
 }
@@ -268,14 +284,15 @@
 }
 
 .code-area,
-.log-area {
+.log-area,
+.explanation-area {
     -fx-control-inner-background: #020817;
     -fx-background-color: #020817;
     -fx-background-radius: 10;
     -fx-border-color: #334155;
     -fx-border-width: 1;
     -fx-border-radius: 10;
-    -fx-font-family: "Courier New", monospace;
+    -fx-font-family: "Roboto", sans serif;
     -fx-font-size: 12px;
     -fx-padding: 15;
 }
@@ -287,16 +304,22 @@
 .log-area {
     -fx-text-fill: #4ADE80;
 }
+.explanation-area {
+    -fx-text-fill: #E2E8F0;
+}
 
 .code-area .content,
-.log-area .content {
+.log-area .content,
+.explanation-area .content {
     -fx-background-color: #020817;
 }
 
 .code-area .scroll-pane,
 .log-area .scroll-pane,
+.explanation-area .scroll-pane,
 .code-area .scroll-pane .viewport,
-.log-area .scroll-pane .viewport {
+.log-area .scroll-pane .viewport,
+.explanation-area .scroll-pane .viewport {
     -fx-background-color: transparent;
 }
 

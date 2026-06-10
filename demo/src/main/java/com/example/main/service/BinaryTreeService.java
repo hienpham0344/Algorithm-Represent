@@ -102,6 +102,48 @@ public class BinaryTreeService {
         return value < current.value ? contains(current.left, value) : contains(current.right, value);
     }
 
+    public SearchResult traverse(String type) {
+        List<Integer> path = new ArrayList<>();
+        if (root == null) {
+            return new SearchResult(false, "Cây đang rỗng, không thể duyệt.", path);
+        }
+
+        switch (type) {
+            case "NLR":
+                preOrderRec(root, path);
+                return new SearchResult(true, "Duyệt tiền thứ tự (NLR / Pre-order) hoàn tất.", path);
+            case "LNR":
+                inOrderRec(root, path);
+                return new SearchResult(true, "Duyệt trung thứ tự (LNR / In-order) hoàn tất.", path);
+            case "LRN":
+                postOrderRec(root, path);
+                return new SearchResult(true, "Duyệt hậu thứ tự (LRN / Post-order) hoàn tất.", path);
+            default:
+                return new SearchResult(false, "Kiểu duyệt không hợp lệ.", path);
+        }
+    }
+
+    private void preOrderRec(Node node, List<Integer> path) {
+        if (node == null) return;
+        path.add(node.value);
+        preOrderRec(node.left, path);
+        preOrderRec(node.right, path);
+    }
+
+    private void inOrderRec(Node node, List<Integer> path) {
+        if (node == null) return;
+        inOrderRec(node.left, path);
+        path.add(node.value);
+        inOrderRec(node.right, path);
+    }
+
+    private void postOrderRec(Node node, List<Integer> path) {
+        if (node == null) return;
+        postOrderRec(node.left, path);
+        postOrderRec(node.right, path);
+        path.add(node.value);
+    }
+
     public Node getRoot() {
         return root;
     }
