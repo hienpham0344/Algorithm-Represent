@@ -60,6 +60,9 @@ public class QueueController implements Initializable {
             if (currentAnimation != null && currentAnimation.getStatus() == Animation.Status.RUNNING) {
                 currentAnimation.setRate(newVal.doubleValue());
             }
+            if (batchTransition != null && batchTransition.getStatus() != Animation.Status.STOPPED) {
+                batchTransition.setRate(newVal.doubleValue());
+            }
         });
         // init data
 

@@ -35,7 +35,8 @@ public class BinaryTreeVisualizerView extends BorderPane {
         getStyleClass().add("tree-root");
 
         setLeft(buildLeftPanel());
-        setCenter(buildCenterArea());
+        setCenter(buildCanvasArea());
+        setBottom(buildBottomPanels());
 
         logActivity("[System]: Binary Search Tree initialized. Ready.");
         service.insert(50);
@@ -73,16 +74,44 @@ public class BinaryTreeVisualizerView extends BorderPane {
         inputField.setPromptText("Nhập một số (VD: 55)...");
         inputField.getStyleClass().add("input-field");
 
-        btnInsert = createButton("+ Thêm nút (Insert)", "btn-purple");
+        btnInsert = createButton("Insert", "btn-purple");
         btnInsert.setOnAction(e -> executeOp("INSERT"));
 
-        btnSearch = createButton("⌕ Tìm 1 nút (Search)", "btn-green");
-        btnSearch.setOnAction(e -> executeOp("SEARCH"));
-
-        btnDelete = createButton("🗑 Xóa nút (Delete)", "btn-red");
+        btnDelete = createButton("Delete", "btn-red");
         btnDelete.setOnAction(e -> executeOp("DELETE"));
 
-        VBox opsBox = new VBox(8, inputField, btnInsert, btnSearch, btnDelete);
+        btnSearch = createButton("Search", "btn-green");
+        btnSearch.setOnAction(e -> executeOp("SEARCH"));
+
+        btnReset = createButton("Reset", "btn-gray");
+        btnReset.setOnAction(e -> {
+            service.clear();
+            foundValue = -1;
+            currentSearchValue = -1;
+            logActivity("Đã xóa toàn bộ cây (Reset).");
+            setPseudoCode("function reset():\n  tree.root = null");
+            explanationArea.setText(
+                    "• Toàn bộ cấu trúc cây cũ đã bị hủy bỏ.\n" +
+                            "• Cây hiện tại đang rỗng (Root = Null).\n" +
+                            "• Bạn có thể bắt đầu Thêm (Insert) các phần tử mới để xây dựng lại cây."
+            );
+            redrawTree();
+        });
+
+        GridPane btnGrid = new GridPane();
+        btnGrid.setHgap(10);
+        btnGrid.setVgap(10);
+
+        ColumnConstraints cc = new ColumnConstraints();
+        cc.setPercentWidth(50);
+        btnGrid.getColumnConstraints().addAll(cc, cc);
+
+        btnGrid.add(btnInsert, 0, 0);
+        btnGrid.add(btnDelete, 1, 0);
+        btnGrid.add(btnSearch, 0, 1);
+        btnGrid.add(btnReset, 1, 1);
+
+        VBox opsBox = new VBox(12, inputField, btnGrid);
 
         Label lblTraverse = new Label("☍ DUYỆT CÂY (TRAVERSAL)");
         lblTraverse.getStyleClass().add("section-label");
@@ -108,21 +137,6 @@ public class BinaryTreeVisualizerView extends BorderPane {
         VBox speedBox = new VBox(speedSlider);
         speedBox.setStyle("-fx-background-color: #1e1b4b; -fx-background-radius: 8; -fx-padding: 10 10 0 10;");
 
-        btnReset = createButton("⟳ Xóa làm lại (Reset)", "btn-gray");
-        btnReset.setOnAction(e -> {
-            service.clear();
-            foundValue = -1;
-            currentSearchValue = -1;
-            logActivity("Đã xóa toàn bộ cây (Reset).");
-            setPseudoCode("function reset():\n  tree.root = null");
-            explanationArea.setText(
-                    "• Toàn bộ cấu trúc cây cũ đã bị hủy bỏ.\n" +
-                            "• Cây hiện tại đang rỗng (Root = Null).\n" +
-                            "• Bạn có thể bắt đầu Thêm (Insert) các phần tử mới để xây dựng lại cây."
-            );
-            redrawTree();
-        });
-
         Label lblStatus = new Label("∿ TRẠNG THÁI (STATUS)");
         lblStatus.getStyleClass().add("section-label");
 
@@ -136,7 +150,6 @@ public class BinaryTreeVisualizerView extends BorderPane {
                 lblOps, opsBox,
                 lblTraverse, traverseBox,
                 lblSpeed, speedBox,
-                btnReset,
                 lblStatus, statusBox
         );
         return panel;
@@ -149,10 +162,10 @@ public class BinaryTreeVisualizerView extends BorderPane {
         return btn;
     }
 
-    private VBox buildCenterArea() {
+    private VBox buildCanvasArea() {
         vizPane = new Pane();
-        vizPane.setMinSize(3000, 1500);
-        vizPane.setPrefSize(3000, 1500);
+        vizPane.setMinSize(2000, 1000);
+        vizPane.setPrefSize(2000, 1000);
         vizPane.setStyle("-fx-background-color: #0f172a;");
 
         ScrollPane scrollPane = new ScrollPane(vizPane);
@@ -165,11 +178,16 @@ public class BinaryTreeVisualizerView extends BorderPane {
         canvasContainer.getStyleClass().add("viz-area");
         VBox.setVgrow(canvasContainer, Priority.ALWAYS);
 
+        return canvasContainer;
+    }
+
+    private HBox buildBottomPanels() {
         HBox bottomPanels = new HBox(12);
         bottomPanels.setMinHeight(220);
         bottomPanels.setMaxHeight(220);
         bottomPanels.setPrefHeight(220);
-        bottomPanels.setPadding(new Insets(12, 0, 0, 0));
+        bottomPanels.setPadding(new Insets(12, 12, 12, 12));
+        bottomPanels.setStyle("-fx-background-color: #0b1120; -fx-border-color: #1e293b; -fx-border-width: 1 0 0 0;");
 
         VBox pseudoBox = new VBox();
         pseudoBox.getStyleClass().add("bottom-panel");
@@ -206,8 +224,7 @@ public class BinaryTreeVisualizerView extends BorderPane {
         logBox.getChildren().addAll(lblLog, activityLogArea);
 
         bottomPanels.getChildren().addAll(pseudoBox, explBox, logBox);
-
-        return new VBox(canvasContainer, bottomPanels);
+        return bottomPanels;
     }
 
     private void executeOp(String type) {
@@ -369,7 +386,7 @@ public class BinaryTreeVisualizerView extends BorderPane {
         vizPane.getChildren().clear();
         BinaryTreeService.Node root = service.getRoot();
         if (root != null) {
-            drawNode(root, 1500, 40, 800);
+            drawNode(root, 1000, 40, 200);
         }
     }
 
