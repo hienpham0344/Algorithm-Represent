@@ -17,6 +17,7 @@ public class StackVisualizerView extends BorderPane {
 
     private TextField inputField;
     private VBox      stackFrame;
+    private ScrollPane scrollPane;
     private TextArea  logArea;
     private TextArea  codeArea;
     private Label     statusText;
@@ -165,6 +166,11 @@ public class StackVisualizerView extends BorderPane {
             if (currentAnimation != null && currentAnimation.getStatus() == Animation.Status.RUNNING) {
                 currentAnimation.setRate(newValue.doubleValue());
             }
+            if (batchTransition != null && batchTransition.getStatus() != Animation.Status.STOPPED) {
+                batchTransition.setRate(newValue.doubleValue());
+            }
+
+
         });
         VBox speedBox = new VBox(5, speedLabel, speedSlider);
 
@@ -219,9 +225,29 @@ public class StackVisualizerView extends BorderPane {
         stackFrame.setAlignment(Pos.CENTER);
         stackFrame.getStyleClass().add("stack-frame");
 
-        StackPane wrapper = new StackPane(stackFrame);
+        StackPane frameWrapper = new StackPane(stackFrame);
+        frameWrapper.setAlignment(Pos.CENTER);
+
+
+        VBox centerWrapper = new VBox(frameWrapper);
+        centerWrapper.setAlignment(Pos.CENTER);
+        centerWrapper.setPadding(new Insets(20, 0, 20, 0)); // Tạo khoảng đệm trên/dưới thoáng đãng
+
+        scrollPane = new ScrollPane(centerWrapper);
+
+        scrollPane.setFitToWidth(true);
+        scrollPane.setFitToHeight(true);
+
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollPane.getStyleClass().add("viz-scroll-pane");
+
+        StackPane wrapper = new StackPane(scrollPane);
         wrapper.setAlignment(Pos.CENTER);
         wrapper.getStyleClass().add("viz-area");
+        wrapper.setMinHeight(200);
+
+        VBox.setVgrow(wrapper, Priority.ALWAYS);
         return wrapper;
     }
 
@@ -283,31 +309,32 @@ public class StackVisualizerView extends BorderPane {
         grid.setAlignment(Pos.CENTER); // Căn giữa toàn bộ lưới này vào chính giữa màn hình
         grid.setHgap(10);              // Khoảng cách giữa các cột (thay cho khoảng cách HBox cũ)
 
-        // Định nghĩa kích thước cố định cho 3 cột
-        ColumnConstraints colLeft = new ColumnConstraints(80);
-        ColumnConstraints colCenter = new ColumnConstraints(190);
-        ColumnConstraints colRight = new ColumnConstraints(80);
+        ColumnConstraints colLeft = new ColumnConstraints();
+        colLeft.setPercentWidth(25); // Chiếm 25% độ rộng hàng cho vùng căn lề trái
 
+        ColumnConstraints colCenter = new ColumnConstraints(190); // Ô dữ liệu giữ nguyên 190px chuẩn
+
+        ColumnConstraints colRight = new ColumnConstraints();
+        colRight.setPercentWidth(25); // Chiếm 25% độ rộng hàng cho vùng chứa chữ TOP bên phải
 
         grid.getColumnConstraints().addAll(colLeft, colCenter, colRight);
 
-
         grid.add(cell, 1, 0);
         GridPane.setHalignment(cell, javafx.geometry.HPos.CENTER);
-
 
         if (isTop) {
             Label badge = new Label("TOP");
             badge.getStyleClass().add("stack-top-badge");
 
             grid.add(badge, 2, 0);
-            GridPane.setHalignment(badge, javafx.geometry.HPos.LEFT); // Căn lề trái trong cột của nó
+            GridPane.setHalignment(badge, javafx.geometry.HPos.LEFT);
             GridPane.setValignment(badge, javafx.geometry.VPos.CENTER);
         }
 
-
         HBox row = new HBox(grid);
         row.setAlignment(Pos.CENTER);
+
+        HBox.setHgrow(grid, Priority.ALWAYS);
         row.setMaxWidth(Double.MAX_VALUE);
 
         return row;
@@ -336,6 +363,7 @@ public class StackVisualizerView extends BorderPane {
         Button clearBtn = new Button("Clear");
         clearBtn.getStyleClass().add("btn-clear-log");
         clearBtn.setOnAction(e -> logArea.clear());
+        HBox.setMargin(clearBtn, new Insets(0, 14, 0, 0));
         logHeader.getChildren().add(clearBtn);
 
         logArea = new TextArea();
@@ -372,7 +400,8 @@ public class StackVisualizerView extends BorderPane {
         HBox bottom = new HBox(codeBox, divider, expBox, divider2, logBox);
         bottom.getStyleClass().add("bottom-dock");
         bottom.setPrefHeight(210);
-        bottom.setMinHeight(180);
+        bottom.setMinHeight(160);
+        bottom.setMaxHeight(260);
         bottom.setFillHeight(true);
         return bottom;
     }
@@ -507,8 +536,8 @@ public class StackVisualizerView extends BorderPane {
 
             step.setOnFinished(e -> {
                 // Kiểm tra xem Ngăn xếp tại thời điểm chèn này đã bị đầy hay chưa
-                if (service.size() >= 8) {
-                    appendLog("✖ [Lỗi]: Không thể đẩy " + val + ". Stack đã đầy (Tối đa 8 phần tử).");
+                if (service.size() >= 20) {
+                    appendLog("✖ [Lỗi]: Không thể đẩy " + val + ". Stack đã đầy (Tối đa 20 phần tử).");
                     setStatus("Stack đầy. Dừng đẩy các phần tử còn lại.", false);
 
                     // Nếu gặp lỗi đầy bộ nhớ, hủy bỏ toàn bộ các bước chèn phía sau ngay lập tức
@@ -532,6 +561,7 @@ public class StackVisualizerView extends BorderPane {
                 // Đưa dữ liệu vào service và vẽ lại giao diện với chỉ mục hoạt họa mới nhất
                 service.push(val);
                 redrawStack(AnimType.PUSH, 0);
+
 
                 appendLog("✔ [Thành công]: Push " + val + " lên đỉnh Ngăn xếp thành công.");
                 setStatus("Đã Push thành công phần tử " + val + ".", true);
