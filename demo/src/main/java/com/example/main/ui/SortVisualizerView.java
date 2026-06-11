@@ -60,10 +60,10 @@ public class SortVisualizerView extends VBox {
     );
 
     // ── Bar colours ──────────────────────────────────────────────────────
-    private static final Color COL_DEFAULT = Color.web("#3b82f6");
-    private static final Color COL_COMPARE = Color.web("#f59e0b");
-    private static final Color COL_SWAP    = Color.web("#ef4444");
-    private static final Color COL_SORTED  = Color.web("#10b981");
+    private static final Color COL_DEFAULT = Color.web(SortTheme.DEFAULT_BAR);
+    private static final Color COL_COMPARE = Color.web(SortTheme.COMPARE_BAR);
+    private static final Color COL_SWAP    = Color.web(SortTheme.SWAP_BAR);
+    private static final Color COL_SORTED  = Color.web(SortTheme.SORTED_BAR);
 
     // ── State ────────────────────────────────────────────────────────────
     private final Map<String, SortStrategy> strategies = SortingRegistry.createStrategies();
@@ -365,10 +365,14 @@ public class SortVisualizerView extends VBox {
     }
 
     private void applyButtonStyles() {
-        sortButton.getStyleClass().add("btn-sort");
-        tangDanBtn.getStyleClass().add("btn-sort");
-        createButton.getStyleClass().add("btn-create");
-        importButton.getStyleClass().add("btn-import");
+        sortButton.getStyleClass().add(SortTheme.PRIMARY_BUTTON);
+        tangDanBtn.getStyleClass().add(SortTheme.PRIMARY_BUTTON);
+        giamDanBtn.getStyleClass().add(SortTheme.PRIMARY_BUTTON);
+        createButton.getStyleClass().add(SortTheme.SUCCESS_BUTTON);
+        importButton.getStyleClass().add(SortTheme.INFO_BUTTON);
+        stopButton.getStyleClass().add(SortTheme.DANGER_BUTTON);
+        deleteButton.getStyleClass().add(SortTheme.DANGER_BUTTON);
+        resetButton.getStyleClass().add(SortTheme.SECONDARY_BUTTON);
     }
 
     // ── Events ───────────────────────────────────────────────────────────
