@@ -4,99 +4,143 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane styleClass="q-root" stylesheets="@../styles/queue.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.main.ui.QueueController">
+<BorderPane styleClass="queue-root" stylesheets="@../styles/queue.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.main.ui.QueueController">
 
     <left>
-        <VBox prefWidth="265" spacing="14" styleClass="left-panel">
-            <padding>
-                <Insets bottom="20" left="16" right="16" top="20" />
-            </padding>
+        <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" maxWidth="280" minWidth="280" prefWidth="280" styleClass="left-scroll-pane" vbarPolicy="AS_NEEDED">
+            <content>
+                <VBox maxWidth="260" minWidth="260" prefWidth="260" spacing="14" styleClass="left-panel">
+                    <padding>
+                        <Insets bottom="20" left="16" right="16" top="20" />
+                    </padding>
 
-            <Label styleClass="ds-title" text="QUEUE (FIFO)" />
-            <Label styleClass="ds-desc" text="A queue operates on the 'First In, First Out' (FIFO) principle. Elements are added at the REAR and removed from the FRONT." wrapText="true" />
+                    <Label styleClass="ds-title" text="QUEUE (FIFO)" />
+                    <Label styleClass="ds-desc" text="A queue operates on the 'First In, First Out' (FIFO) principle. Elements are added at the REAR and removed from the FRONT." wrapText="true" />
 
-            <Region styleClass="sidebar-divider" />
+                    <Region styleClass="sidebar-divider" />
 
-            <Label styleClass="section-label" text="OPERATIONS" />
-            <Label styleClass="input-label" text="Element Value:" />
-            <TextField fx:id="inputField" styleClass="input-field"  promptText="Example: 42"/>
+                    <Label styleClass="section-label" text="OPERATIONS" />
+                    <Label styleClass="input-label" text="Element Value:" />
+                    <TextField fx:id="inputField" maxWidth="1.7976931348623157E308" promptText="Example: 42" styleClass="input-field" />
 
+                    <HBox spacing="8">
+                        <Button fx:id="enqueueBtn" maxWidth="1.7976931348623157E308" onAction="#handleEnqueue" prefWidth="120" styleClass="btn-enqueue" text="Enqueue" HBox.hgrow="ALWAYS" />
+                        <Button fx:id="dequeueBtn" maxWidth="1.7976931348623157E308" onAction="#handleDequeue" prefWidth="120" styleClass="btn-dequeue" text="Dequeue" HBox.hgrow="ALWAYS" />
+                    </HBox>
 
-            <HBox spacing="8">
-                <Button fx:id="enqueueBtn" maxWidth="9999" onAction="#handleEnqueue" prefWidth="0" styleClass="btn-enqueue" text="Enqueue" HBox.hgrow="ALWAYS" />
-                <Button fx:id="dequeueBtn" maxWidth="9999" onAction="#handleDequeue" prefWidth="0" styleClass="btn-dequeue" text="Dequeue" HBox.hgrow="ALWAYS" />
-            </HBox>
+                    <HBox spacing="8">
+                        <Button fx:id="peekBtn" maxWidth="1.7976931348623157E308" onAction="#handlePeek" prefWidth="120" styleClass="btn-peek" text="Peek" HBox.hgrow="ALWAYS" />
+                        <Button fx:id="resetBtn" maxWidth="1.7976931348623157E308" onAction="#handleReset" prefWidth="120" styleClass="btn-reset" text="Reset" HBox.hgrow="ALWAYS" />
+                    </HBox>
 
-            <HBox spacing="8">
-                <Button fx:id="peekBtn" maxWidth="9999" onAction="#handlePeek" prefWidth="0" styleClass="btn-peek" text="Front" HBox.hgrow="ALWAYS" />
-                <Button fx:id="resetBtn" maxWidth="9999" onAction="#handleReset" prefWidth="0" styleClass="btn-reset" text="Reset" HBox.hgrow="ALWAYS" />
-            </HBox>
+                    <HBox alignment="CENTER">
+                        <Button fx:id="pauseBtn" maxWidth="1.7976931348623157E308" styleClass="btn-pause" text="Pause" HBox.hgrow="ALWAYS" />
+                    </HBox>
 
-            <HBox alignment="CENTER">
-                <Button fx:id="pauseBtn" maxWidth="9999" onAction="#handlePause" styleClass="btn-pause" text="Pause" HBox.hgrow="ALWAYS" />
-            </HBox>
+                    <Label styleClass="input-label" text="⏱ Speed:" />
+                    <Slider fx:id="speedSlider" blockIncrement="0.1" maxWidth="1.7976931348623157E308" majorTickUnit="1.0" max="3.0" min="0.2" showTickLabels="true" showTickMarks="true" styleClass="speed-slider" value="1.0" />
 
-            <VBox spacing="5">
-                <Label styleClass="input-label" text="⏱ Speed:" />
-                <Slider fx:id="speedSlider" blockIncrement="0.1" majorTickUnit="1.0" max="3.0" maxWidth="9999" min="0.2" showTickLabels="true" showTickMarks="true" styleClass="speed-slider" value="1.0" />
-            </VBox>
-                        <Region styleClass="sidebar-divider" />
+                    <Region styleClass="sidebar-divider" />
 
-                        <VBox spacing="6" styleClass="status-box">
-                            <Label styleClass="status-header" text="ℹ  SIMULATION STATUS" />
-                            <Label fx:id="statusText" styleClass="status-text" text="Hệ thống đã sẵn sàng. Hãy chọn một thao tác." />
+                    <VBox spacing="6" styleClass="status-box" VBox.vgrow="ALWAYS">
                         <padding>
-                           <Insets bottom="12.0" left="14.0" right="14.0" top="12.0" />
+                            <Insets bottom="12.0" left="14.0" right="14.0" top="12.0" />
                         </padding>
-                        </VBox>
-
-        </VBox>
+                        <Label styleClass="status-header" text="ℹ  SIMULATION STATUS" />
+                        <Label fx:id="statusText" styleClass="status-text" text="Hệ thống đã sẵn sàng. Hãy chọn một thao tác." wrapText="true" />
+                    </VBox>
+                </VBox>
+            </content>
+        </ScrollPane>
     </left>
 
     <center>
-        <StackPane styleClass="viz-area">
-            <HBox fx:id="queueFrame" alignment="CENTER" spacing="12" styleClass="queue-frame" />
+        <StackPane styleClass="viz-area" BorderPane.alignment="CENTER">
+            <children>
+                <ScrollPane fx:id="vizScrollPane"
+                            fitToHeight="true"
+                            fitToWidth="true"
+                            hbarPolicy="AS_NEEDED"
+                            vbarPolicy="NEVER"
+                            styleClass="viz-scroll-pane">
+                    <content>
+                        <HBox alignment="CENTER" maxWidth="1.7976931348623157E308">
+                            <children>
+                                <HBox fx:id="queueFrame" alignment="CENTER" spacing="12" styleClass="queue-frame">
+                                    <padding>
+                                        <Insets left="30.0" right="30.0" />
+                                    </padding>
+                                </HBox>
+                            </children>
+                            <padding>
+                                <Insets bottom="10.0" top="10.0" />
+                            </padding>
+                        </HBox>
+                    </content>
+                </ScrollPane>
+            </children>
         </StackPane>
     </center>
+
     <bottom>
-        <HBox fillHeight="true" prefHeight="210">
-            <VBox maxHeight="9999" prefWidth="0" styleClass="bottom-panel" HBox.hgrow="ALWAYS">
-                <HBox alignment="CENTER_LEFT" maxHeight="40" minHeight="40" prefHeight="40" styleClass="panel-header-box">
-                    <Label styleClass="panel-header-label" text="&lt;&gt; PSEUDO-CODE" />
-                    <Region HBox.hgrow="ALWAYS" />
-                    <Label styleClass="panel-lang-badge" text="Java code" />
-                </HBox>
-                <TextArea fx:id="codeArea" editable="false" styleClass="code-area" VBox.vgrow="ALWAYS" text="// Chọn 1 hành động để trực quan hóa mã giả" >
-                    <VBox.margin><Insets bottom="12.0" left="12.0" right="12.0" top="12.0" /></VBox.margin>
-                </TextArea>
-            </VBox>
+        <HBox fillHeight="true"
+              prefHeight="210.0"
+              minHeight="180.0"
+              maxHeight="260.0"
+              styleClass="bottom-dock"
+              BorderPane.alignment="CENTER">
+            <children>
+                <VBox styleClass="bottom-panel" HBox.hgrow="ALWAYS">
+                    <children>
+                        <HBox alignment="CENTER_LEFT" maxHeight="40" minHeight="40" prefHeight="40" styleClass="panel-header-box">
+                            <children>
+                                <Label styleClass="panel-header-label" text="&lt;&gt;  PSEUDO-CODE" />
+                                <Region HBox.hgrow="ALWAYS" />
+                                <Label styleClass="panel-lang-badge" text="Java code" />
+                            </children>
+                        </HBox>
+                        <TextArea fx:id="codeArea" editable="false" minHeight="100.0" styleClass="code-area" wrapText="false" VBox.vgrow="ALWAYS">
+                            <VBox.margin><Insets bottom="12.0" left="12.0" right="12.0" top="12.0" /></VBox.margin>
+                        </TextArea>
+                    </children>
+                </VBox>
 
-            <Region maxWidth="1" minWidth="1" prefWidth="1" styleClass="bottom-divider" />
+                <Region maxWidth="1" minWidth="1" prefWidth="1" styleClass="bottom-divider" />
 
-            <VBox maxHeight="9999" prefWidth="0" styleClass="bottom-panel" HBox.hgrow="ALWAYS">
-                <HBox alignment="CENTER_LEFT" maxHeight="40" minHeight="40" prefHeight="40" styleClass="panel-header-box">
-                    <Label styleClass="panel-header-label" text="?  EXPLANATION" />
-                    <Region HBox.hgrow="ALWAYS" />
-                    <Label styleClass="panel-lang-badge" text="Hướng dẫn" />
-                </HBox>
-                <TextArea fx:id="explanationArea" editable="false" styleClass="explanation-area" wrapText="true" VBox.vgrow="ALWAYS">
-                    <VBox.margin><Insets bottom="12.0" left="12.0" right="12.0" top="12.0" /></VBox.margin>
-                </TextArea>
-            </VBox>
+                <VBox styleClass="bottom-panel" HBox.hgrow="ALWAYS">
+                    <children>
+                        <HBox alignment="CENTER_LEFT" maxHeight="40" minHeight="40" prefHeight="40" styleClass="panel-header-box">
+                            <children>
+                                <Label styleClass="panel-header-label" text="?  EXPLANATION" />
+                                <Region HBox.hgrow="ALWAYS" />
+                                <Label styleClass="panel-lang-badge" text="Hướng dẫn" />
+                            </children>
+                        </HBox>
+                        <TextArea fx:id="explanationArea" editable="false" minHeight="100.0" styleClass="explanation-area" wrapText="true" VBox.vgrow="ALWAYS">
+                            <VBox.margin><Insets bottom="12.0" left="12.0" right="12.0" top="12.0" /></VBox.margin>
+                        </TextArea>
+                    </children>
+                </VBox>
 
-            <Region maxWidth="1" minWidth="1" prefWidth="1" styleClass="bottom-divider" />
+                <Region maxWidth="1" minWidth="1" prefWidth="1" styleClass="bottom-divider" />
 
-            <VBox maxHeight="9999" prefWidth="0" styleClass="bottom-panel" HBox.hgrow="ALWAYS">
-                <HBox alignment="CENTER_LEFT" maxHeight="40" minHeight="40" prefHeight="40" styleClass="panel-header-box">
-                    <Label styleClass="panel-header-label" text="&gt;_  ACTIVITY LOG" />
-                    <Region HBox.hgrow="ALWAYS" />
-                    <Button onAction="#handleClearLog" styleClass="btn-clear-log" text="Clear" />
-                </HBox>
-                <TextArea fx:id="logArea" editable="false" styleClass="log-area" wrapText="true" VBox.vgrow="ALWAYS">
-                    <VBox.margin><Insets bottom="12.0" left="12.0" right="12.0" top="12.0" /></VBox.margin>
-                </TextArea>
-            </VBox>
+                <VBox styleClass="bottom-panel" HBox.hgrow="ALWAYS">
+                    <children>
+                        <HBox alignment="CENTER_LEFT" maxHeight="40" minHeight="40" prefHeight="40" styleClass="panel-header-box">
+                            <children>
+                                <Label styleClass="panel-header-label" text="&gt;_  ACTIVITY LOG" />
+                                <Region HBox.hgrow="ALWAYS" />
+                                <Button onAction="#handleClearLog" styleClass="btn-clear-log" text="Clear">
+                                    <HBox.margin><Insets right="14.0" /></HBox.margin>
+                                </Button>
+                            </children>
+                        </HBox>
+                        <TextArea fx:id="logArea" editable="false" minHeight="100.0" styleClass="log-area" wrapText="true" VBox.vgrow="ALWAYS">
+                            <VBox.margin><Insets bottom="12.0" left="12.0" right="12.0" top="12.0" /></VBox.margin>
+                        </TextArea>
+                    </children>
+                </VBox>
+            </children>
         </HBox>
     </bottom>
-
 </BorderPane>

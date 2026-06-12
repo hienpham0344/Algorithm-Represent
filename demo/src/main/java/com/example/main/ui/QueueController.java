@@ -17,6 +17,7 @@ public class QueueController implements Initializable {
 
     @FXML private TextField inputField;
     @FXML private HBox queueFrame;
+    @FXML private ScrollPane vizScrollPane;
     @FXML private TextArea codeArea;
     @FXML private TextArea logArea;
     @FXML private TextArea explanationArea;

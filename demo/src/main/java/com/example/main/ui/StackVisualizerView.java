@@ -62,7 +62,18 @@ public class StackVisualizerView extends BorderPane {
                 getClass().getResource("/styles/stack.css").toExternalForm()
         );
         getStyleClass().add("stack-root");
-        setLeft(buildLeftPanel());
+        VBox leftContent = buildLeftPanel();
+        ScrollPane leftScrollPane = new ScrollPane(leftContent);
+        leftScrollPane.setFitToWidth(true);
+        leftScrollPane.setFitToHeight(true);
+        leftScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        leftScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        leftScrollPane.getStyleClass().add("left-scroll-pane");
+        leftScrollPane.setPrefWidth(280);
+        leftScrollPane.setMinWidth(280);
+        leftScrollPane.setMaxWidth(280);
+
+        setLeft(leftScrollPane);
         setCenter(buildVizArea());
         setBottom(buildBottomPanel());
 
@@ -87,9 +98,9 @@ public class StackVisualizerView extends BorderPane {
     private VBox buildLeftPanel() {
         VBox panel = new VBox(14);
         panel.getStyleClass().add("left-panel");
-        panel.setPrefWidth(265);
-        panel.setMinWidth(265);
-        panel.setMaxWidth(265);
+        panel.setPrefWidth(260);
+        panel.setMinWidth(260);
+        panel.setMaxWidth(260);
         panel.setPadding(new Insets(22, 18, 22, 18));
 
         Label title = new Label("STACK (LIFO)");
@@ -346,7 +357,7 @@ public class StackVisualizerView extends BorderPane {
         codeArea.getStyleClass().add("code-area");
         codeArea.setText("// Chọn 1 hành động để trực quan hóa mã giả");
         codeArea.setEditable(false);
-        codeArea.setWrapText(false);
+        codeArea.setWrapText(true);
         VBox.setVgrow(codeArea, Priority.ALWAYS);
         VBox.setMargin(codeArea, new Insets(12, 12, 12, 12));
         VBox codeBox = new VBox(codeHeader, codeArea);
@@ -382,7 +393,7 @@ public class StackVisualizerView extends BorderPane {
         divider2.getStyleClass().add("bottom-divider");
 
         // 3.Khối Giải thích
-        HBox expHeader = panelHeader("?  EXPLANATION", "Hướng dẫn");
+        HBox expHeader = panelHeader("?  EXPLANATION", "Guide");
         explanationArea = new TextArea();
         explanationArea.getStyleClass().add("explanation-area");
         explanationArea.setEditable(false);
