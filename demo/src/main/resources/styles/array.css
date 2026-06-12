@@ -322,6 +322,7 @@
 }
 
 .code-area,
+.explanation-area,
 .log-area {
     -fx-control-inner-background: #020817;
     -fx-background-color: #020817;
@@ -342,14 +343,21 @@
     -fx-text-fill: #4ADE80;
 }
 
+.explanation-area {
+    -fx-text-fill: #CBD5E1;
+}
+
 .code-area .content,
+.explanation-area .content,
 .log-area .content {
     -fx-background-color: #020817;
 }
 
 .code-area .scroll-pane,
+.explanation-area .scroll-pane,
 .log-area .scroll-pane,
 .code-area .scroll-pane .viewport,
+.explanation-area .scroll-pane .viewport,
 .log-area .scroll-pane .viewport {
     -fx-background-color: transparent;
 }

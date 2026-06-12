@@ -2,9 +2,9 @@ package com.example.main.ui;
 
 import com.example.main.service.ArrayService;
 import javafx.animation.*;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.Node;
+import javafx.geometry.Insets; // kiểu giống padding hoặc margin trong css
+import javafx.geometry.Pos; // căn vị trí (vd: giữa, trái , phải)
+import javafx.scene.Node; // class cha của button, label, textfield, vbox, hbox, pane
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.util.Duration;
@@ -22,11 +22,13 @@ public class ArrayVisualizerView extends BorderPane {
     private HBox arrayFrame;
     private Label statusText;
     private TextArea codeArea;
+    private TextArea explanationArea;
     private TextArea logArea;
     private Slider speedSlider;
     private Timeline animation;
     private int highlightedIndex = -1;
     private int foundIndex = -1;
+    private String explanationText = "";
 
     private static final String CODE_IDLE =
             "// Choose an operation to view pseudo-code.\n";
@@ -107,6 +109,11 @@ public class ArrayVisualizerView extends BorderPane {
         redrawArray();
         setStatus("Ready. Choose an array operation.");
         setCode(CODE_IDLE);
+        setExplanation(
+                "• The sample array contains 7 values stored in consecutive indexed positions.\n" +
+                "• Each value can be accessed directly through its index, from 0 to size - 1.\n" +
+                "• Choose an operation to see how the array changes step by step."
+        );
         addLog("[SYSTEM] Array visualizer loaded.");
     }
 
@@ -298,6 +305,22 @@ public class ArrayVisualizerView extends BorderPane {
         Region divider = new Region();
         divider.getStyleClass().add("bottom-divider");
 
+        HBox explanationHeader = panelHeader("?  EXPLANATION", "Guide");
+        explanationArea = new TextArea();
+        explanationArea.getStyleClass().add("explanation-area");
+        explanationArea.setEditable(false);
+        explanationArea.setWrapText(true);
+        VBox.setVgrow(explanationArea, Priority.ALWAYS);
+        VBox.setMargin(explanationArea, new Insets(12));
+        VBox explanationBox = new VBox(explanationHeader, explanationArea);
+        explanationBox.getStyleClass().add("bottom-section");
+        HBox.setHgrow(explanationBox, Priority.ALWAYS);
+        explanationBox.setPrefWidth(0);
+        explanationBox.setMaxHeight(Double.MAX_VALUE);
+
+        Region divider2 = new Region();
+        divider2.getStyleClass().add("bottom-divider");
+
         HBox logHeader = panelHeader(">_  ACTIVITY LOG", null);
         Button clearBtn = new Button("Clear");
         clearBtn.getStyleClass().add("btn-clear-log");
@@ -316,7 +339,7 @@ public class ArrayVisualizerView extends BorderPane {
         logBox.setPrefWidth(0);
         logBox.setMaxHeight(Double.MAX_VALUE);
 
-        HBox bottom = new HBox(codeBox, divider, logBox);
+        HBox bottom = new HBox(codeBox, divider, explanationBox, divider2, logBox);
         bottom.getStyleClass().add("bottom-dock");
         bottom.setPrefHeight(210);
         bottom.setMinHeight(180);
@@ -356,6 +379,11 @@ public class ArrayVisualizerView extends BorderPane {
         setControlsDisabled(true);
         foundIndex = -1;
         setStatus("Appending value at the end...");
+        setExplanation(
+                "• Insert End places " + value + " in the first free position.\n" +
+                "• No existing value needs to move because the new value is appended after the current last element.\n" +
+                "• The array size increases from " + service.size() + " to " + (service.size() + 1) + "."
+        );
         addLog("[STEP] Appending value at the end...");
 
         ArrayService.Result result = service.insertEnd(value);
@@ -375,6 +403,11 @@ public class ArrayVisualizerView extends BorderPane {
         setCode(CODE_DELETE_END);
         foundIndex = -1;
         int lastIndex = service.size() - 1;
+        setExplanation(lastIndex >= 0
+                ? "• Delete End targets the last occupied index, " + lastIndex + ".\n" +
+                  "• The value at this index is removed without shifting any earlier values.\n" +
+                  "• The array size decreases by one."
+                : "• Delete End cannot run because the array has no values to remove.");
         runOperationAnimation("Removing the last value...", lastIndex >= 0 ? List.of(lastIndex) : List.of(), () -> {
             ArrayService.Result result = service.deleteEnd();
             highlightedIndex = -1;
@@ -390,10 +423,19 @@ public class ArrayVisualizerView extends BorderPane {
         setCode(CODE_INSERT_AT);
         foundIndex = -1;
         if (index < 0 || index > service.size()) {
+            setExplanation(
+                    "• Insert at Index accepts an index from 0 through " + service.size() + ".\n" +
+                    "• Index " + index + " is outside that valid range, so the array remains unchanged."
+            );
             afterAction(service.insertAt(index, value));
             return;
         }
 
+        setExplanation(
+                "• To insert " + value + " at index " + index + ", values from that index onward must shift one position right.\n" +
+                "• Shifting starts at the end to avoid overwriting existing values.\n" +
+                "• After space is available, the new value is written at index " + index + "."
+        );
         runOperationAnimation("Shifting values to the right...", indicesDescending(service.size() - 1, index), () -> {
             ArrayService.Result result = service.insertAt(index, value);
             highlightedIndex = result.success() && result.index() != null ? result.index() : -1;
@@ -408,10 +450,19 @@ public class ArrayVisualizerView extends BorderPane {
         setCode(CODE_DELETE_AT);
         foundIndex = -1;
         if (index < 0 || index >= service.size()) {
+            setExplanation(
+                    "• Delete at Index requires an occupied index from 0 through " + (service.size() - 1) + ".\n" +
+                    "• Index " + index + " is invalid, so no value is removed."
+            );
             afterAction(service.deleteAt(index));
             return;
         }
 
+        setExplanation(
+                "• The value at index " + index + " is selected for removal.\n" +
+                "• Every value to its right shifts one position left to close the gap.\n" +
+                "• The final duplicate slot is discarded and the array size decreases by one."
+        );
         runOperationAnimation("Shifting values to the left...", indicesAscending(index, service.size() - 1), () -> {
             ArrayService.Result result = service.deleteAt(index);
             highlightedIndex = -1;
@@ -427,10 +478,20 @@ public class ArrayVisualizerView extends BorderPane {
         setCode(CODE_UPDATE_AT);
         foundIndex = -1;
         if (index < 0 || index >= service.size()) {
+            setExplanation(
+                    "• Update requires an occupied index from 0 through " + (service.size() - 1) + ".\n" +
+                    "• Index " + index + " is invalid, so the array remains unchanged."
+            );
             afterAction(service.updateAt(index, value));
             return;
         }
 
+        int oldValue = service.toList().get(index);
+        setExplanation(
+                "• Direct index access locates position " + index + " in O(1) time.\n" +
+                "• The old value " + oldValue + " is replaced by " + value + ".\n" +
+                "• No other array element needs to move."
+        );
         runOperationAnimation("Updating one indexed value...", List.of(index), () -> {
             ArrayService.Result result = service.updateAt(index, value);
             highlightedIndex = result.success() && result.index() != null ? result.index() : -1;
@@ -444,12 +505,18 @@ public class ArrayVisualizerView extends BorderPane {
 
         setCode(CODE_SEARCH);
         if (service.isEmpty()) {
+            setExplanation("• Linear search cannot scan an empty array because there are no values to compare.");
             afterAction(service.search(value));
             return;
         }
 
         int targetIndex = service.indexOf(value);
         int end = targetIndex >= 0 ? targetIndex : service.size() - 1;
+        setExplanation(
+                "• Linear search compares " + value + " with each array element from left to right.\n" +
+                "• The scan stops as soon as a matching value is found.\n" +
+                "• If every index is checked without a match, the search reports that the value is absent."
+        );
         runOperationAnimation("Scanning values from left to right...", indicesAscending(0, end), () -> {
             ArrayService.Result result = service.search(value);
             foundIndex = result.success() && result.index() != null ? result.index() : -1;
@@ -464,6 +531,11 @@ public class ArrayVisualizerView extends BorderPane {
         highlightedIndex = -1;
         foundIndex = -1;
         setCode(CODE_IDLE);
+        setExplanation(
+                "• Randomize clears the current values and generates a new array with 7 random integers.\n" +
+                "• The indexes are rebuilt consecutively from 0 to 6.\n" +
+                "• This creates a fresh data set for trying the array operations."
+        );
         afterAction(result);
     }
 
@@ -475,6 +547,11 @@ public class ArrayVisualizerView extends BorderPane {
         valueField.clear();
         indexField.clear();
         setCode(CODE_IDLE);
+        setExplanation(
+                "• Reset discards the current array and restores the original sample values.\n" +
+                "• Highlighted and search-result states are cleared.\n" +
+                "• The array is ready for a new simulation."
+        );
         afterAction(result);
     }
 
@@ -501,6 +578,8 @@ public class ArrayVisualizerView extends BorderPane {
             }
 
             highlightedIndex = indices.get(step[0]++);
+            explanationArea.setText(explanationText +
+                    "\n\n• Current step: processing index " + highlightedIndex + ".");
             redrawArray();
         }));
         animation.setCycleCount(Timeline.INDEFINITE);
@@ -541,6 +620,7 @@ public class ArrayVisualizerView extends BorderPane {
         String text = valueField.getText().trim();
         if (text.isEmpty()) {
             setStatus("Enter a value first.");
+            setExplanation("• This operation needs an integer value. Enter a value, then run the operation again.");
             addLog("[ERROR] Missing value.");
             return null;
         }
@@ -549,6 +629,7 @@ public class ArrayVisualizerView extends BorderPane {
             return Integer.parseInt(text);
         } catch (NumberFormatException e) {
             setStatus("Value must be an integer.");
+            setExplanation("• Array values must be integers. \"" + text + "\" cannot be converted to an integer.");
             addLog("[ERROR] Invalid value: " + text);
             return null;
         }
@@ -558,6 +639,7 @@ public class ArrayVisualizerView extends BorderPane {
         String text = indexField.getText().trim();
         if (text.isEmpty()) {
             setStatus("Enter an index first.");
+            setExplanation("• This operation needs an index. Enter an integer index, then run the operation again.");
             addLog("[ERROR] Missing index.");
             return null;
         }
@@ -566,6 +648,7 @@ public class ArrayVisualizerView extends BorderPane {
             return Integer.parseInt(text);
         } catch (NumberFormatException e) {
             setStatus("Index must be an integer.");
+            setExplanation("• An array index must be an integer. \"" + text + "\" is not a valid index.");
             addLog("[ERROR] Invalid index: " + text);
             return null;
         }
@@ -639,6 +722,13 @@ public class ArrayVisualizerView extends BorderPane {
 
     private void setCode(String code) {
         codeArea.setText(code);
+    }
+
+    private void setExplanation(String explanation) {
+        explanationText = explanation;
+        if (explanationArea != null) {
+            explanationArea.setText(explanation);
+        }
     }
 
     private void addLog(String message) {
