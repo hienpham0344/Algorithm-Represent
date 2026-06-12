@@ -9,6 +9,7 @@ import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -30,9 +31,14 @@ import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
+import javafx.stage.Window;
 import javafx.util.Duration;
 
-import java.util.ArrayList;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -54,10 +60,10 @@ public class SortVisualizerView extends VBox {
     );
 
     // ── Bar colours ──────────────────────────────────────────────────────
-    private static final Color COL_DEFAULT = Color.web("#3b82f6");
-    private static final Color COL_COMPARE = Color.web("#f59e0b");
-    private static final Color COL_SWAP    = Color.web("#ef4444");
-    private static final Color COL_SORTED  = Color.web("#10b981");
+    private static final Color COL_DEFAULT = Color.web(SortTheme.DEFAULT_BAR);
+    private static final Color COL_COMPARE = Color.web(SortTheme.COMPARE_BAR);
+    private static final Color COL_SWAP    = Color.web(SortTheme.SWAP_BAR);
+    private static final Color COL_SORTED  = Color.web(SortTheme.SORTED_BAR);
 
     // ── State ────────────────────────────────────────────────────────────
     private final Map<String, SortStrategy> strategies = SortingRegistry.createStrategies();
@@ -72,6 +78,9 @@ public class SortVisualizerView extends VBox {
             new Slider(SortSpeed.MIN_RATE, SortSpeed.MAX_RATE, SortSpeed.DEFAULT_RATE);
     private final Label   speedValueLabel = new Label(SortSpeed.label(SortSpeed.DEFAULT_RATE));
     private final TextArea manualInput = new TextArea("42, 17, 88, 6, 31, 59, 12, 75");
+    private final Button importButton = new Button("Import TXT");
+    private final Label importStatusLabel = new Label();
+    private final VBox manualInputPanel = new VBox(8);
     private final Label   swapValueLabel = new Label("0");
     private final Label   statusLabel  = new Label("Creating an array to get started.");
     private final Label   explanationTitle = new Label("Giải thích thuật toán");
@@ -86,6 +95,9 @@ public class SortVisualizerView extends VBox {
     private final Button resetButton  = new Button("Reset");
     private final Button deleteButton = new Button("Delete");
     private final Button createButton = new Button("Create Array");
+
+    private String importedFileName;
+    private boolean updatingManualInput;
 
     // Panels
     private final HBox  chartPane = new HBox();
@@ -163,9 +175,17 @@ public class SortVisualizerView extends VBox {
         manualInput.setPrefRowCount(2);
         manualInput.setWrapText(true);
         manualInput.setPromptText("VD: 5, 1, 9, 3");
-        manualInput.setVisible(false);
-        manualInput.setManaged(false);
-        VBox dataSourceCard = labeledCard("Generate array data", new VBox(8, dataSourceBox, manualInput));
+        importStatusLabel.getStyleClass().add("import-status");
+        importStatusLabel.setWrapText(true);
+        HBox importRow = new HBox(8, importButton, importStatusLabel);
+        importRow.setAlignment(Pos.CENTER_LEFT);
+        HBox.setHgrow(importStatusLabel, Priority.ALWAYS);
+        manualInputPanel.getChildren().addAll(manualInput, importRow);
+        manualInputPanel.setVisible(false);
+        manualInputPanel.setManaged(false);
+        VBox dataSourceCard = labeledCard(
+                "Generate array data",
+                new VBox(8, dataSourceBox, manualInputPanel));
         HBox.setHgrow(dataSourceCard, Priority.ALWAYS);
 
         // Array size
@@ -345,9 +365,14 @@ public class SortVisualizerView extends VBox {
     }
 
     private void applyButtonStyles() {
-        sortButton.getStyleClass().add("btn-sort");
-        tangDanBtn.getStyleClass().add("btn-sort");
-        createButton.getStyleClass().add("btn-create");
+        sortButton.getStyleClass().add(SortTheme.PRIMARY_BUTTON);
+        tangDanBtn.getStyleClass().add(SortTheme.PRIMARY_BUTTON);
+        giamDanBtn.getStyleClass().add(SortTheme.PRIMARY_BUTTON);
+        createButton.getStyleClass().add(SortTheme.SUCCESS_BUTTON);
+        importButton.getStyleClass().add(SortTheme.INFO_BUTTON);
+        stopButton.getStyleClass().add(SortTheme.DANGER_BUTTON);
+        deleteButton.getStyleClass().add(SortTheme.DANGER_BUTTON);
+        resetButton.getStyleClass().add(SortTheme.SECONDARY_BUTTON);
     }
 
     // ── Events ───────────────────────────────────────────────────────────
@@ -365,9 +390,15 @@ public class SortVisualizerView extends VBox {
 
         dataSourceBox.valueProperty().addListener((o, ov, nv) -> {
             boolean manual = "Manual Entry".equals(nv);
-            manualInput.setVisible(manual);
-            manualInput.setManaged(manual);
+            manualInputPanel.setVisible(manual);
+            manualInputPanel.setManaged(manual);
             sizeSlider.setDisable(manual);
+        });
+
+        manualInput.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!updatingManualInput && importedFileName != null) {
+                importStatusLabel.setText(importedFileName + " \u00B7 Edited");
+            }
         });
 
         algorithmBox.valueProperty().addListener((o, ov, nv) -> {
@@ -375,6 +406,7 @@ public class SortVisualizerView extends VBox {
             renderCode(null);
         });
 
+        importButton.setOnAction(e -> importTextFile());
         createButton.setOnAction(e -> createArray());
         deleteButton.setOnAction(e -> deleteArray());
         resetButton.setOnAction(e -> resetArray());
@@ -388,19 +420,21 @@ public class SortVisualizerView extends VBox {
     private boolean isManual() { return "Manual Entry".equals(dataSourceBox.getValue()); }
 
     private void createArray() {
+        int[] array;
+        try {
+            array = isManual()
+                    ? SortInputParser.parse(manualInput.getText())
+                    : randomArray((int) sizeSlider.getValue());
+        } catch (SortInputValidationException exception) {
+            showError("Invalid manual input", exception.getMessage());
+            return;
+        }
+
         stopAnimation();
         sortedIndices.clear();
         swapCount = 0; stepIndex = 0;
         swapValueLabel.setText("0");
 
-        int[] array = isManual() ? parseManualInput() : randomArray((int) sizeSlider.getValue());
-        if (array.length == 0) {
-            statusLabel.setText("Empty or invalid data.");
-            currentArray = originalArray = new int[0];
-            refreshChart(currentArray, null);
-            updateLesson();
-            return;
-        }
         originalArray = array.clone();
         currentArray  = array.clone();
         steps = List.of();
@@ -413,13 +447,21 @@ public class SortVisualizerView extends VBox {
 
     private void sort(boolean ascending) {
         if (currentArray.length == 0) { statusLabel.setText("Please create an array first."); return; }
+
+        int[] source;
+        try {
+            source = isManual()
+                    ? SortInputParser.parse(manualInput.getText())
+                    : currentArray.clone();
+        } catch (SortInputValidationException exception) {
+            showError("Invalid manual input", exception.getMessage());
+            return;
+        }
+
         stopAnimation();
         sortedIndices.clear();
         swapCount = 0; stepIndex = 0;
         swapValueLabel.setText("0");
-
-        int[] source = isManual() ? parseManualInput() : currentArray.clone();
-        if (source.length == 0) { statusLabel.setText("Empty or invalid data."); return; }
 
         originalArray = source.clone();
         currentArray  = source.clone();
@@ -521,17 +563,50 @@ public class SortVisualizerView extends VBox {
         stopButton.setText("Stop");
     }
 
-    // ── Parsing / utils ───────────────────────────────────────────────────
-    private int[] parseManualInput() {
-        String text = manualInput.getText();
-        if (text == null || text.isBlank()) return new int[0];
-        List<Integer> vals = new ArrayList<>();
-        for (String tok : text.split("[,\\s]+")) {
-            if (tok.isBlank()) continue;
-            try { vals.add(Integer.parseInt(tok.trim())); }
-            catch (NumberFormatException ex) { return new int[0]; }
+    // ── Import / utils ────────────────────────────────────────────────────
+    private void importTextFile() {
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Import array data");
+        chooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("Text files (*.txt)", "*.txt"));
+
+        Window owner = getScene() == null ? null : getScene().getWindow();
+        File selectedFile = chooser.showOpenDialog(owner);
+        if (selectedFile == null) {
+            return;
         }
-        return vals.stream().mapToInt(Integer::intValue).toArray();
+
+        try {
+            String content = Files.readString(selectedFile.toPath(), StandardCharsets.UTF_8);
+            int[] values = SortInputParser.parse(content);
+            updatingManualInput = true;
+            try {
+                manualInput.setText(SortInputParser.normalize(values));
+            } finally {
+                updatingManualInput = false;
+            }
+            importedFileName = selectedFile.getName();
+            importStatusLabel.setText(
+                    importedFileName + " \u00B7 " + values.length + " values");
+            statusLabel.setText("TXT data imported. Click Create Array to use it.");
+        } catch (SortInputValidationException exception) {
+            showError("Invalid TXT data", exception.getMessage());
+        } catch (IOException exception) {
+            showError(
+                    "Unable to import TXT",
+                    "The selected file could not be read as UTF-8.\n" + exception.getMessage());
+        }
+    }
+
+    private void showError(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        if (getScene() != null && getScene().getWindow() != null) {
+            alert.initOwner(getScene().getWindow());
+        }
+        alert.showAndWait();
     }
 
     private int[] randomArray(int size) {
@@ -663,6 +738,7 @@ public class SortVisualizerView extends VBox {
         dataSourceBox.setDisable(running);
         sizeSlider.setDisable(running || isManual());
         manualInput.setDisable(running);
+        importButton.setDisable(running);
         stopButton.setDisable(!running);
     }
 }
