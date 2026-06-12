@@ -91,6 +91,7 @@ public class ArrayVisualizerView extends BorderPane {
         ScrollPane leftScrollPane = new ScrollPane(buildLeftPanel());
         leftScrollPane.getStyleClass().add("left-scroll-pane");
         leftScrollPane.setFitToWidth(true);
+        leftScrollPane.setFitToHeight(true);
         leftScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         leftScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         leftScrollPane.setPrefWidth(285);
