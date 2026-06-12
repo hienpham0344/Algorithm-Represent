@@ -27,20 +27,20 @@
     -fx-font-size: 14px;
     -fx-text-fill: #94A3B8;
     -fx-wrap-text: true;
-    -fx-font-family: roboto;
+    -fx-font-family: "Roboto", sans-serif;
 }
 
 .section-label {
     -fx-font-size: 12px;
     -fx-font-weight: bold;
     -fx-text-fill: #64748B;
-    -fx-font-family: roboto;
+    -fx-font-family: "Roboto", sans-serif;
 }
 
 .input-label {
     -fx-font-size: 12px;
     -fx-text-fill: #94A3B8;
-    -fx-font-family: roboto;
+    -fx-font-family: "Roboto", sans-serif;
 }
 
 .input-field {
@@ -83,7 +83,7 @@
     -fx-background-radius: 8;
     -fx-cursor: hand;
     -fx-padding: 9 0 9 0;
-        -fx-font-family: roboto;
+        -fx-font-family: "Roboto", sans-serif;
 
 }
 .btn-pop:hover    { -fx-background-color: #F97316; }
@@ -97,7 +97,7 @@
     -fx-background-radius: 8;
     -fx-cursor: hand;
     -fx-padding: 9 0 9 0;
-        -fx-font-family: roboto;
+        -fx-font-family: "Roboto", sans-serif;
 
 }
 .btn-peek:hover    { -fx-background-color: #10B981; }
@@ -111,7 +111,7 @@
     -fx-background-radius: 8;
     -fx-cursor: hand;
     -fx-padding: 9 0 9 0;
-        -fx-font-family: roboto;
+        -fx-font-family: "Roboto", sans-serif;
 
 }
 .btn-reset:hover   { -fx-background-color: #475569; }
@@ -125,14 +125,14 @@
     -fx-background-radius: 6;
     -fx-cursor: hand;
     -fx-padding: 9 0 9 0;
-    -fx-font-family: roboto;
+    -fx-font-family: "Roboto", sans-serif;
 }
 
 .btn-pause:hover {
-    -fx-background-color: #EF4444;;
+    -fx-background-color: #EF4444;
 }
 .btn-pause:pressed {
-    -fx-background-color: #991B1B;;
+    -fx-background-color: #991B1B;
 
 }
 /* ── STATUS BOX ── */
@@ -150,7 +150,7 @@
     -fx-font-size: 12px;
     -fx-font-weight: bold;
     -fx-text-fill: #818CF8;
-        -fx-font-family: roboto;
+        -fx-font-family: "Roboto", sans-serif;
 
 }
 
@@ -280,7 +280,7 @@
     -fx-background-color: #1E293B;
     -fx-background-radius: 4;
     -fx-padding: 2 7 2 7;
-    -fx-font-family: "Courier New", monospace;
+    -fx-font-family: "Roboto", sans-serif;
 }
 
 .code-area,
@@ -292,7 +292,7 @@
     -fx-border-color: #334155;
     -fx-border-width: 1;
     -fx-border-radius: 10;
-    -fx-font-family: "Roboto", sans serif;
+    -fx-font-family: "Roboto", sans-serif;
     -fx-font-size: 12px;
     -fx-padding: 15;
 }
@@ -330,7 +330,7 @@
     -fx-cursor: hand;
     -fx-padding: 2 6 2 6;
     -fx-background-radius: 4;
-        -fx-font-family: roboto
+        -fx-font-family: "Roboto", sans-serif;
 
 }
 .btn-clear-log:hover { -fx-text-fill: #EF4444; }

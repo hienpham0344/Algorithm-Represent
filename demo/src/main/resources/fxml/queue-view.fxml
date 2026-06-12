@@ -34,7 +34,9 @@
                     </HBox>
 
                     <HBox alignment="CENTER">
-                        <Button fx:id="pauseBtn" maxWidth="1.7976931348623157E308" styleClass="btn-pause" text="Pause" HBox.hgrow="ALWAYS" />
+                        <Button fx:id="pauseBtn" maxWidth="1.7976931348623157E308"
+                                onAction="#handlePause"
+                                styleClass="btn-pause" text="Pause" HBox.hgrow="ALWAYS" />
                     </HBox>
 
                     <Label styleClass="input-label" text="⏱ Speed:" />

@@ -79,7 +79,7 @@ public class QueueController implements Initializable {
                         "• Phần tử 45 vào sau cùng tạm thời đứng xếp hàng ở vị trí REAR."
         );
 
-        appendLog("[Hệ Thống]: Đã tải xong ngăn xếp mô phỏng.");
+        appendLog("[Hệ Thống]: Đã tải xong hàng đợi mô phỏng.");
         appendLog("[Hệ Thống]: Sẵn sàng hoạt động.");
 
 
@@ -89,7 +89,10 @@ public class QueueController implements Initializable {
         private void handleEnqueue() {
             if (isSimulating) return;
             String txt = inputField.getText().trim();
-            if (txt.isEmpty()) return;
+            if (txt.isEmpty()) {
+                setStatus("⚠ Vui lòng nhập một số nguyên hoặc một dãy số hợp lệ!", false);
+                return;
+            }
 
             // Tách chuỗi dựa vào dấu phẩy
             String[] tokens = txt.split(",");
@@ -306,6 +309,7 @@ public class QueueController implements Initializable {
             queueFrame.setPrefWidth(160);
             queueFrame.setMinWidth(160);
             queueFrame.setMaxWidth(160);
+            queueFrame.getChildren().add(empty);
             return;
         }
 
@@ -321,6 +325,14 @@ public class QueueController implements Initializable {
             boolean isRear  = (i == items.size() - 1);
             VBox cellNode = buildCellNode(items.get(i), isFront, isRear);
             queueFrame.getChildren().add(cellNode);
+
+            if (i == animIdx) {
+                switch (type) {
+                    case ENQUEUE -> playEnqueueAnim(cellNode);
+                    case PEEK    -> playPeekAnim(cellNode);
+                    default      -> {}
+                }
+            }
 
         }
     }
@@ -355,5 +367,40 @@ public class QueueController implements Initializable {
     private void setStatus(String text, boolean success) {
         statusText.setText(text);
         statusText.setStyle("-fx-text-fill: " + (success ? "#34D399;" : "#F87171;"));
+    }
+
+    private void playEnqueueAnim(VBox node) {
+        node.setScaleX(0); node.setScaleY(0); node.setOpacity(0);
+        Timeline tl = new Timeline(
+                new KeyFrame(Duration.ZERO,
+                        new KeyValue(node.scaleXProperty(), 0),
+                        new KeyValue(node.scaleYProperty(), 0),
+                        new KeyValue(node.opacityProperty(), 0)
+                ),
+                new KeyFrame(Duration.millis(200),
+                        new KeyValue(node.scaleXProperty(), 1.15, Interpolator.EASE_OUT),
+                        new KeyValue(node.scaleYProperty(), 1.15, Interpolator.EASE_OUT),
+                        new KeyValue(node.opacityProperty(), 1.0)
+                ),
+                new KeyFrame(Duration.millis(320),
+                        new KeyValue(node.scaleXProperty(), 1.0, Interpolator.EASE_IN),
+                        new KeyValue(node.scaleYProperty(), 1.0, Interpolator.EASE_IN)
+                )
+        );
+        currentAnimation = tl;
+        tl.setRate(speedSlider.getValue());
+        tl.play();
+    }
+
+    private void playPeekAnim(VBox node) {
+        ScaleTransition st = new ScaleTransition(Duration.millis(400), node);
+        st.setFromX(1.0); st.setToX(1.1);
+        st.setFromY(1.0); st.setToY(1.1);
+        st.setCycleCount(4);
+        st.setAutoReverse(true);
+        st.setInterpolator(Interpolator.EASE_BOTH);
+        currentAnimation = st;
+        st.setRate(speedSlider.getValue());
+        st.play();
     }
 }

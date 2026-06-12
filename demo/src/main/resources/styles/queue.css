@@ -62,13 +62,13 @@
     -fx-font-size: 13px;
 }
 
-.btn-enqueue { -fx-background-color:#4F46E5; }
-.btn-push:hover    { -fx-background-color: #6366F1; }
-.btn-push:pressed  { -fx-background-color: #3730A3; }
+.btn-enqueue { -fx-background-color: #4F46E5; }
+.btn-enqueue:hover    { -fx-background-color: #6366F1; }
+.btn-enqueue:pressed  { -fx-background-color: #3730A3; }
 
-.btn-dequeue {  -fx-background-color: #EA580C; }
-.btn-pop:hover    { -fx-background-color: #F97316; }
-.btn-pop:pressed  { -fx-background-color: #C2410C; }
+.btn-dequeue { -fx-background-color: #EA580C; }
+.btn-dequeue:hover    { -fx-background-color: #F97316; }
+.btn-dequeue:pressed  { -fx-background-color: #C2410C; }
 
 .btn-peek { -fx-background-color: #059669; }
 .btn-peek:hover    { -fx-background-color: #10B981; }
@@ -80,10 +80,10 @@
 
 .btn-pause{-fx-background-color: #DC2626; }
 .btn-pause:hover {
-    -fx-background-color: #EF4444;;
+    -fx-background-color: #EF4444;
 }
 .btn-pause:pressed {
-    -fx-background-color: #991B1B;;
+    -fx-background-color: #991B1B;
 
 }
 
@@ -111,18 +111,16 @@
     -fx-font-size: 12px;
         -fx-font-weight: bold;
         -fx-text-fill: #818CF8;
-            -fx-font-family: roboto;
+            -fx-font-family: "Roboto", sans-serif;
 }
 .status-text {
     -fx-font-size: 12px;
         -fx-text-fill: #C7D2FE;
         -fx-wrap-text: true;
-        -fx-font-family: "Roboto", sans serif;
+        -fx-font-family: "Roboto", sans-serif;
 }
 
-.viz-area {
-    -fx-background-color: #020817;
-}
+
 
 .queue-frame {
    -fx-background-color: #0B132B;
@@ -212,7 +210,7 @@
         -fx-background-color: #1E293B;
         -fx-background-radius: 4;
         -fx-padding: 2 7 2 7;
-        -fx-font-family: "Courier New", monospace;
+        -fx-font-family: "Roboto", sans-serif;
 }
 
 .code-area,
@@ -224,7 +222,7 @@
     -fx-border-color: #334155;
     -fx-border-width: 1;
     -fx-border-radius: 10;
-    -fx-font-family: "Roboto", sans serif;
+    -fx-font-family: "Roboto", sans-serif;
     -fx-font-size: 12px;
     -fx-padding: 15;
 }
@@ -270,10 +268,10 @@
 }
 
 .viz-area {
+    -fx-background-color: #020817;
     -fx-min-height: 380px;
 }
 
-/* ── TRIỆT TIÊU KHUNG TRẮNG VIỀN XÁM CỦA SCROLLPANE TRÁI ── */
 .left-scroll-pane {
     -fx-background-color: transparent !important;
     -fx-border-color: transparent !important;
