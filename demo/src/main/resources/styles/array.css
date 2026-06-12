@@ -36,6 +36,21 @@
     -fx-background-color: #475569;
 }
 
+.left-scroll-pane .scroll-bar:vertical .increment-button,
+.left-scroll-pane .scroll-bar:vertical .decrement-button {
+    -fx-background-color: transparent;
+    -fx-min-height: 0;
+    -fx-pref-height: 0;
+    -fx-max-height: 0;
+    -fx-padding: 0;
+}
+
+.left-scroll-pane .scroll-bar:vertical .increment-arrow,
+.left-scroll-pane .scroll-bar:vertical .decrement-arrow {
+    -fx-shape: "";
+    -fx-padding: 0;
+}
+
 .ds-title {
     -fx-font-size: 16px;
     -fx-font-weight: bold;
@@ -332,7 +347,7 @@
     -fx-border-radius: 10;
     -fx-font-family: "Courier New", monospace;
     -fx-font-size: 12px;
-    -fx-padding: 15;
+    -fx-padding: 3;
 }
 
 .code-area {
@@ -351,6 +366,7 @@
 .explanation-area .content,
 .log-area .content {
     -fx-background-color: #020817;
+    -fx-padding: 12;
 }
 
 .code-area .scroll-pane,
@@ -360,6 +376,63 @@
 .explanation-area .scroll-pane .viewport,
 .log-area .scroll-pane .viewport {
     -fx-background-color: transparent;
+}
+
+.code-area .scroll-bar,
+.explanation-area .scroll-bar,
+.log-area .scroll-bar {
+    -fx-background-color: transparent;
+}
+
+.code-area .scroll-bar:vertical,
+.explanation-area .scroll-bar:vertical,
+.log-area .scroll-bar:vertical {
+    -fx-pref-width: 8;
+}
+
+.code-area .scroll-bar:horizontal,
+.explanation-area .scroll-bar:horizontal,
+.log-area .scroll-bar:horizontal {
+    -fx-pref-height: 8;
+}
+
+.code-area .scroll-bar .track,
+.explanation-area .scroll-bar .track,
+.log-area .scroll-bar .track {
+    -fx-background-color: transparent;
+}
+
+.code-area .scroll-bar .thumb,
+.explanation-area .scroll-bar .thumb,
+.log-area .scroll-bar .thumb {
+    -fx-background-color: #334155;
+    -fx-background-radius: 8;
+}
+
+.code-area .scroll-bar .thumb:hover,
+.explanation-area .scroll-bar .thumb:hover,
+.log-area .scroll-bar .thumb:hover {
+    -fx-background-color: #475569;
+}
+
+.code-area .scroll-bar .increment-button,
+.code-area .scroll-bar .decrement-button,
+.explanation-area .scroll-bar .increment-button,
+.explanation-area .scroll-bar .decrement-button,
+.log-area .scroll-bar .increment-button,
+.log-area .scroll-bar .decrement-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.code-area .scroll-bar .increment-arrow,
+.code-area .scroll-bar .decrement-arrow,
+.explanation-area .scroll-bar .increment-arrow,
+.explanation-area .scroll-bar .decrement-arrow,
+.log-area .scroll-bar .increment-arrow,
+.log-area .scroll-bar .decrement-arrow {
+    -fx-shape: "";
+    -fx-padding: 0;
 }
 
 .btn-clear-log {
