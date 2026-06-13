@@ -8,6 +8,10 @@ import javafx.stage.Stage;
 
 public final class DashboardApplication extends Application {
 
+    // Kích thước tối thiểu
+    private static final double MIN_WINDOW_WIDTH = 900;
+    private static final double MIN_WINDOW_HEIGHT = 600;
+
     @Override
     public void start(Stage stage) throws Exception {
         Parent root = FXMLLoader.load(
@@ -21,6 +25,8 @@ public final class DashboardApplication extends Application {
 
         stage.setTitle("Algorithm Visualizer");
         stage.setScene(scene);
+        stage.setMinWidth(MIN_WINDOW_WIDTH);
+        stage.setMinHeight(MIN_WINDOW_HEIGHT);
         stage.show();
     }
 }

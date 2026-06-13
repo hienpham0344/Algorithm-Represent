@@ -17,6 +17,7 @@ public class QueueController implements Initializable {
 
     @FXML private TextField inputField;
     @FXML private HBox queueFrame;
+    @FXML private ScrollPane vizScrollPane;
     @FXML private TextArea codeArea;
     @FXML private TextArea logArea;
     @FXML private TextArea explanationArea;
@@ -59,6 +60,9 @@ public class QueueController implements Initializable {
         speedSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
             if (currentAnimation != null && currentAnimation.getStatus() == Animation.Status.RUNNING) {
                 currentAnimation.setRate(newVal.doubleValue());
+            }
+            if (batchTransition != null && batchTransition.getStatus() != Animation.Status.STOPPED) {
+                batchTransition.setRate(newVal.doubleValue());
             }
         });
         // init data

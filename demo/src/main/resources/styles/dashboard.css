@@ -55,13 +55,17 @@
 }
 
 .sidebar-btn-active {
-    -fx-background-color: #3B82F6;
+    -fx-background-color: #4F46E5;
     -fx-text-fill: white;
     -fx-font-weight: bold;
 }
 
 .sidebar-btn-active:hover {
-    -fx-background-color: #2563EB;
+    -fx-background-color: #6366F1;
+}
+
+.sidebar-btn-active:pressed {
+    -fx-background-color: #3730A3;
 }
 
 .sidebar-separator {
