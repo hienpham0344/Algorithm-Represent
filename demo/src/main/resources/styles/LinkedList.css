@@ -12,6 +12,7 @@
 
 .section-title {
     -fx-text-fill: #94a3b8;
+    -fx-padding: 0 0 0 8;
     -fx-font-size: 12px;
     -fx-font-weight: bold;
 }
@@ -90,19 +91,35 @@
 }
 
 /* STATUS */
+.status-card {
+    -fx-background-color: #1e1b4b;
+    -fx-background-radius: 12;
+
+    -fx-border-color: #4338ca;
+    -fx-border-radius: 12;
+
+    -fx-padding: 12;
+}
+
+.status-title {
+    -fx-text-fill: #93c5fd;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.status-text {
+    -fx-text-fill: white;
+    -fx-font-size: 13px;
+}
 
 .status-area {
     -fx-pref-height: 240px;
-
     -fx-control-inner-background: #1e1b4b;
-
     -fx-text-fill: #e2e8f0;
     -fx-font-size: 12px;
-
     -fx-background-radius: 10;
     -fx-border-radius: 10;
-
-    -fx-border-color: #312e81;
+    -fx-border-color: #6366F1;
 }
 
 /* CANVAS */
@@ -117,32 +134,47 @@
 /* BOTTOM PANEL */
 
 .bottom-area {
-    -fx-padding: 10;
-
     -fx-background-color: #020617;
-
     -fx-border-color: #1e293b;
     -fx-border-width: 1 0 0 0;
-
-    -fx-pref-height: 220px;
+}
+.bottom-card {
+    -fx-background-color: #0f172a;
+    -fx-border-color: #1e293b;
+    -fx-border-radius: 10;
+    -fx-padding: 10;
 }
 
 /* CODE + LOG */
 
 .code-area {
     -fx-control-inner-background: #020617;
-
+    -fx-background-color: #020617;
     -fx-text-fill: #22c55e;
-
     -fx-font-family: Consolas;
     -fx-font-size: 12px;
-
-    -fx-background-radius: 8;
-    -fx-border-radius: 8;
-
-    -fx-border-color: #1e293b;
+    -fx-background-radius: 10;
+    -fx-pref-height: 9999;
+    -fx-border-color: #334155;
+    -fx-border-radius: 10;
+    -fx-padding: 8;
+}
+.code-area .content {
+    -fx-background-color: #020617;
+    -fx-background-radius: 10;
+}
+.tag-label {
+    -fx-background-color: #334155;
+    -fx-text-fill: #94a3b8;
+    -fx-font-size: 10px;
+    -fx-padding: 3 8;
+    -fx-background-radius: 5;
 }
 
+.clear-label {
+    -fx-text-fill: #94a3b8;
+    -fx-font-size: 11px;
+}
 /* SCROLL BAR */
 
 .scroll-bar:vertical,
@@ -159,28 +191,4 @@
 
 .separator .line {
     -fx-border-color: #1e293b;
-}
-
-.speed-box {
-    -fx-padding: 4 0 4 0;
-}
-
-.speed-label {
-    -fx-text-fill: #cbd5e1;
-    -fx-font-size: 12px;
-    -fx-font-weight: bold;
-}
-
-.speed-slider {
-    -fx-show-tick-labels: true;
-    -fx-show-tick-marks: true;
-}
-
-.speed-slider .track {
-    -fx-background-color: #334155;
-    -fx-background-radius: 10;
-}
-
-.speed-slider .thumb {
-    -fx-background-color: #38bdf8;
 }

@@ -43,32 +43,19 @@
                 <Button text="↻ Reset" onAction="#handleReset" styleClass="btn-reset" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
             </GridPane>
 
-            <!-- SPEED CONTROL -->
-                <VBox spacing="8" styleClass="speed-box">
-                    <Label text="⏱ Speed:" styleClass="speed-label"/>
-
-                    <Slider fx:id="speedSlider"
-                            min="0.2"
-                            max="3"
-                            value="1"
-                            majorTickUnit="1"
-                            minorTickCount="4"
-                            showTickMarks="true"
-                            showTickLabels="true"
-                            blockIncrement="0.2"
-                            styleClass="speed-slider"/>
-                </VBox>
 
             <Separator/>
+            <VBox spacing="8" styleClass="status-card">
 
-            <Label text="〽 SIMULATION STATUS" styleClass="section-title"/>
+                <Label text="SIMULATION STATUS"
+                    styleClass="status-title"/>
 
-            <TextArea fx:id="statusArea"
-                      text="Ready to start simulation."
-                      editable="false"
-                      wrapText="true"
-                      prefHeight="240"
-                      styleClass="status-area"/>
+                <Label fx:id="statusLabel"
+                    text="Ready. Choose an array operation."
+                    wrapText="true"
+                    styleClass="status-text"/>
+
+            </VBox>
         </VBox>
     </left>
 
@@ -81,27 +68,56 @@
 
     <!-- BOTTOM PANEL -->
     <bottom>
-        <HBox spacing="12" styleClass="bottom-area" prefHeight="210">
+    <HBox  styleClass="bottom-area" prefHeight="210">
 
-            <VBox spacing="8" HBox.hgrow="ALWAYS">
-                <Label text="◇ PSEUDO-CODE" styleClass="section-title"/>
-                <TextArea fx:id="pseudoCodeArea"
-                          text="// Select an operation to view pseudo-code."
-                          editable="false"
-                          styleClass="code-area"
-                          VBox.vgrow="ALWAYS"/>
-            </VBox>
+        <!-- PSEUDO-CODE -->
+        <VBox spacing="8" HBox.hgrow="ALWAYS"  VBox.vgrow="ALWAYS" styleClass="bottom-card">
+            <HBox  alignment="CENTER_LEFT">
+                <Label text="&lt;&gt; PSEUDO-CODE" styleClass="section-title"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label text="Java code" styleClass="tag-label"/>
+            </HBox>
 
-            <VBox spacing="8" HBox.hgrow="ALWAYS">
-                <Label text="⌁ ACTIVITY LOG" styleClass="section-title"/>
-                <TextArea fx:id="logArea"
-                          text="[System]: DSA Visualizer initialized. Ready."
-                          editable="false"
-                          styleClass="code-area"
-                          VBox.vgrow="ALWAYS"/>
-            </VBox>
+            <TextArea fx:id="pseudoCodeArea"
+                      text="// Choose an operation to view pseudo-code."
+                      editable="false"
+                      styleClass="code-area"
+                      VBox.vgrow="ALWAYS"/>
+        </VBox>
 
-        </HBox>
-    </bottom>
+        <!-- EXPLANATION -->
+        <VBox spacing="8"
+              HBox.hgrow="ALWAYS"
+              VBox.vgrow="ALWAYS"
+              styleClass="bottom-card">
+
+            <HBox alignment="CENTER_LEFT">
+                <Label text="? EXPLANATION" styleClass="section-title"/>
+            </HBox>
+
+            <TextArea fx:id="explanationArea"
+                      text="Select an operation to see a step-by-step explanation."
+                      editable="false"
+                      styleClass="code-area"
+                      VBox.vgrow="ALWAYS"/>
+        </VBox>
+
+        <!-- ACTIVITY LOG -->
+        <VBox spacing="8" HBox.hgrow="ALWAYS"  VBox.vgrow="ALWAYS" styleClass="bottom-card">
+            <HBox  alignment="CENTER_LEFT">
+                <Label text="&gt; ACTIVITY LOG" styleClass="section-title"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label text="Clear" styleClass="clear-label"/>
+            </HBox>
+
+            <TextArea fx:id="logArea"
+                      text="[SYSTEM] DSA Visualizer initialized. Ready."
+                      editable="false"
+                      styleClass="code-area"
+                      VBox.vgrow="ALWAYS"/>
+        </VBox>
+
+    </HBox>
+</bottom>
 
 </BorderPane>
