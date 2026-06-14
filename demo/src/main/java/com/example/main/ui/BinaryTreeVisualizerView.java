@@ -22,7 +22,6 @@ public class BinaryTreeVisualizerView extends BorderPane {
     private Label statusText;
     private Button btnInsert, btnSearch, btnDelete, btnReset, btnTraverse;
     private ComboBox<String> traversalBox;
-    private Slider speedSlider = new Slider(0.5, 3.0, 1.5);
     private int currentSearchValue = -1, foundValue = -1;
 
     public BinaryTreeVisualizerView() {
@@ -90,15 +89,6 @@ public class BinaryTreeVisualizerView extends BorderPane {
         traversalBox.setMaxWidth(Double.MAX_VALUE);
         btnTraverse = createButton("▶ Traverse Tree", "btn-insert");
 
-        Label lblSpeed = new Label("SPEED");
-        lblSpeed.getStyleClass().add("section-label");
-        speedSlider.setBlockIncrement(0.5);
-        speedSlider.setMajorTickUnit(0.5);
-        speedSlider.setShowTickMarks(true);
-        speedSlider.setShowTickLabels(true);
-        speedSlider.getStyleClass().add("speed-slider");
-        VBox speedBox = new VBox(8, lblSpeed, speedSlider);
-
         Label lblStatusHeader = new Label("SIMULATION STATUS");
         lblStatusHeader.getStyleClass().add("status-header");
         statusText = new Label("Ready.");
@@ -109,7 +99,7 @@ public class BinaryTreeVisualizerView extends BorderPane {
         Region spacer = new Region();
         VBox.setVgrow(spacer, Priority.ALWAYS);
         panel.getChildren().addAll(title, desc, new Separator(), lblOps, inputField, btnGrid,
-                new Label("TRAVERSAL"), traversalBox, btnTraverse, speedBox, statusBox, spacer);
+                new Label("TRAVERSAL"), traversalBox, btnTraverse, statusBox, spacer);
 
         btnInsert.setOnAction(e -> executeOp("INSERT"));
         btnSearch.setOnAction(e -> executeOp("SEARCH"));
@@ -329,8 +319,7 @@ public class BinaryTreeVisualizerView extends BorderPane {
     private void animatePath(List<Integer> path, Runnable onComplete) {
         setControlsDisabled(true);
 
-        double speed = speedSlider.getValue();
-        double delayMs = 1200 / speed;
+        double delayMs = 800;
 
         Timeline timeline = new Timeline();
 

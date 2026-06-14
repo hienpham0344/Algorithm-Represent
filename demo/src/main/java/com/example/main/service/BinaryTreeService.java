@@ -58,7 +58,6 @@ public class BinaryTreeService {
 
     private Node deleteRec(Node root, int value) {
         if (root == null) return null;
-
         if (value < root.value) {
             root.left = deleteRec(root.left, value);
         } else if (value > root.value) {
