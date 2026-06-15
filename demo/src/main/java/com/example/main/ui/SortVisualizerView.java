@@ -167,6 +167,8 @@ public class SortVisualizerView extends VBox {
 
         VBox algoCard = labeledCard("Select a sorting algorithm", algorithmBox);
         HBox.setHgrow(algoCard, Priority.ALWAYS);
+        // Allow the flexible cards to shrink before fixed controls overflow the row.
+        algoCard.setMinWidth(0);
 
         // Data source picker
         dataSourceBox.getItems().addAll("Random", "Manual Entry");
@@ -187,6 +189,7 @@ public class SortVisualizerView extends VBox {
                 "Generate array data",
                 new VBox(8, dataSourceBox, manualInputPanel));
         HBox.setHgrow(dataSourceCard, Priority.ALWAYS);
+        dataSourceCard.setMinWidth(0);
 
         // Array size
         sizeSlider.setMajorTickUnit(1);
@@ -205,8 +208,9 @@ public class SortVisualizerView extends VBox {
         VBox sizeCard = new VBox(sizeContent);
         sizeCard.getStyleClass().add("card");
         sizeCard.setPadding(new Insets(14, 16, 14, 16));
-        sizeCard.setPrefWidth(280);
-        sizeCard.setMinWidth(240);
+        sizeCard.setPrefWidth(SortLayout.SIZE_CARD_PREF_WIDTH);
+        sizeCard.setMinWidth(SortLayout.SIZE_CARD_MIN_WIDTH);
+        HBox.setHgrow(sizeCard, Priority.SOMETIMES);
 
         HBox row = new HBox(12, algoCard, dataSourceCard, sizeCard);
         row.setAlignment(Pos.TOP_LEFT);
@@ -244,13 +248,14 @@ public class SortVisualizerView extends VBox {
         VBox buttonsCard = new VBox(grid);
         buttonsCard.getStyleClass().add("card");
         buttonsCard.setPadding(new Insets(14, 16, 14, 16));
+        buttonsCard.setMinWidth(SortLayout.BUTTONS_CARD_MIN_WIDTH);
         HBox.setHgrow(buttonsCard, Priority.ALWAYS);
 
         // Swap count card
         swapValueLabel.getStyleClass().add("stat-value");
         VBox swapCard = labeledCard("Swap Count", swapValueLabel);
-        swapCard.setPrefWidth(180);
-        swapCard.setMinWidth(150);
+        swapCard.setPrefWidth(150);
+        swapCard.setMinWidth(SortLayout.SWAP_CARD_MIN_WIDTH);
 
         // Speed card
         speedSlider.setMajorTickUnit(0.5);
@@ -271,8 +276,8 @@ public class SortVisualizerView extends VBox {
         VBox speedCard = new VBox(10, speedHeader, speedSlider);
         speedCard.getStyleClass().add("card");
         speedCard.setPadding(new Insets(14, 16, 14, 16));
-        speedCard.setPrefWidth(260);
-        speedCard.setMinWidth(200);
+        speedCard.setPrefWidth(220);
+        speedCard.setMinWidth(SortLayout.SPEED_CARD_MIN_WIDTH);
         HBox.setHgrow(speedCard, Priority.SOMETIMES);
 
         // Create button
@@ -282,8 +287,8 @@ public class SortVisualizerView extends VBox {
         createCard.getStyleClass().add("card");
         createCard.setPadding(new Insets(14, 16, 14, 16));
         createCard.setAlignment(Pos.CENTER);
-        createCard.setPrefWidth(160);
-        createCard.setMinWidth(140);
+        createCard.setPrefWidth(150);
+        createCard.setMinWidth(SortLayout.CREATE_CARD_MIN_WIDTH);
 
         HBox row = new HBox(12, buttonsCard, swapCard, speedCard, createCard);
         row.setAlignment(Pos.CENTER_LEFT);
@@ -322,6 +327,8 @@ public class SortVisualizerView extends VBox {
         VBox chartCard = new VBox(10, sortLabel, chartScroll, explanationCard);
         chartCard.getStyleClass().add("card");
         chartCard.setPadding(new Insets(16));
+        // Let the chart yield horizontal space to the code panel on smaller windows.
+        chartCard.setMinWidth(0);
         VBox.setVgrow(chartScroll, Priority.ALWAYS);
         HBox.setHgrow(chartCard, Priority.ALWAYS);
 
@@ -345,6 +352,8 @@ public class SortVisualizerView extends VBox {
         codeCard.setPrefWidth(SortLayout.CODE_PANEL_PREF_WIDTH);
         codeCard.setMinWidth(SortLayout.CODE_PANEL_MIN_WIDTH);
         codeCard.setMaxWidth(SortLayout.CODE_PANEL_MAX_WIDTH);
+        // Keep code readable while still allowing the panel to resize with the window.
+        HBox.setHgrow(codeCard, Priority.SOMETIMES);
         VBox.setVgrow(codeScroll, Priority.ALWAYS);
 
         HBox row = new HBox(12, chartCard, codeCard);

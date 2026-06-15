@@ -9,10 +9,21 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class SortLayoutTest {
 
     @Test
-    void codePanelIsWideEnoughForEducationalJavaCode() {
-        assertEquals(480, SortLayout.CODE_PANEL_MIN_WIDTH);
-        assertEquals(520, SortLayout.CODE_PANEL_PREF_WIDTH);
+    void codePanelBalancesReadabilityWithResponsiveLayout() {
+        assertEquals(320, SortLayout.CODE_PANEL_MIN_WIDTH);
+        assertEquals(400, SortLayout.CODE_PANEL_PREF_WIDTH);
         assertTrue(SortLayout.CODE_PANEL_MAX_WIDTH >= SortLayout.CODE_PANEL_PREF_WIDTH);
+    }
+
+    @Test
+    void controlCardsFitInsideTheMinimumWindowWidth() {
+        double controlsWidth = SortLayout.BUTTONS_CARD_MIN_WIDTH
+                + SortLayout.SWAP_CARD_MIN_WIDTH
+                + SortLayout.SPEED_CARD_MIN_WIDTH
+                + SortLayout.CREATE_CARD_MIN_WIDTH
+                + 36;
+
+        assertTrue(controlsWidth <= 856);
     }
 
     @Test
