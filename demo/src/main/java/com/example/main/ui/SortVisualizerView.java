@@ -375,8 +375,8 @@ public class SortVisualizerView extends VBox {
 
     private void applyButtonStyles() {
         sortButton.getStyleClass().add(SortTheme.PRIMARY_BUTTON);
-        tangDanBtn.getStyleClass().add(SortTheme.PRIMARY_BUTTON);
-        giamDanBtn.getStyleClass().add(SortTheme.PRIMARY_BUTTON);
+        tangDanBtn.getStyleClass().add(SortTheme.DIRECTION_BUTTON);
+        giamDanBtn.getStyleClass().add(SortTheme.DIRECTION_BUTTON);
         createButton.getStyleClass().add(SortTheme.SUCCESS_BUTTON);
         importButton.getStyleClass().add(SortTheme.INFO_BUTTON);
         stopButton.getStyleClass().add(SortTheme.DANGER_BUTTON);

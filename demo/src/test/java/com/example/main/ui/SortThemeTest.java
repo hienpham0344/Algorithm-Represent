@@ -17,6 +17,7 @@ class SortThemeTest {
     @Test
     void exposesSemanticButtonStyleClasses() {
         assertEquals("btn-sort", SortTheme.PRIMARY_BUTTON);
+        assertEquals("btn-sort-direction", SortTheme.DIRECTION_BUTTON);
         assertEquals("btn-create", SortTheme.SUCCESS_BUTTON);
         assertEquals("btn-import", SortTheme.INFO_BUTTON);
         assertEquals("btn-danger", SortTheme.DANGER_BUTTON);

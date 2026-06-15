@@ -7,6 +7,7 @@ final class SortTheme {
     static final String SORTED_BAR = "#10B981";
 
     static final String PRIMARY_BUTTON = "btn-sort";
+    static final String DIRECTION_BUTTON = "btn-sort-direction";
     static final String SUCCESS_BUTTON = "btn-create";
     static final String INFO_BUTTON = "btn-import";
     static final String DANGER_BUTTON = "btn-danger";
