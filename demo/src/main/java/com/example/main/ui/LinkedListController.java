@@ -51,9 +51,9 @@ public class LinkedListController {
 
         if (explanationArea != null) {
             explanationArea.setText("""
-                Bước 1: Tạo node mới chứa giá trị %d.
-                Bước 2: Cho node mới trỏ tới head hiện tại.
-                Bước 3: Cập nhật head = node mới.
+                Step 1: Create a new node with value %d.
+                Step 2: Link the new node to the current head.
+                Step 3: Move head to the new node.
                 """.formatted(value));
         }
 
@@ -185,10 +185,10 @@ public class LinkedListController {
             """);
         if (explanationArea != null) {
             explanationArea.setText("""
-                Bước 1: Tạo node mới chứa giá trị %d.
-                Bước 2: Nếu head == null, head = node mới.
-                Bước 3: Ngược lại, duyệt từ head đến node cuối cùng.
-                Bước 4: Cho node cuối cùng trỏ tới node mới.
+                Step 1: Create a new node with value %d.
+                Step 2: If head == null, head = new node.
+                Step 3: Otherwise, traverse from head to the last node.
+                Step 4: Link the last node to the new node.
                 """.formatted(value));
         }
         
@@ -217,7 +217,7 @@ public class LinkedListController {
             """);
         if (explanationArea != null) {
             explanationArea.setText("""
-                Bước 1: Nếu head != null, head = head.next.
+                Step 1: If head != null, move head to the next node.
                 """);
         }
         statusLabel.setText("Delete Head clicked.");
@@ -244,10 +244,10 @@ public class LinkedListController {
         
         if (explanationArea != null) {
                 explanationArea.setText("""
-                    Bước 1: Nếu head == null, trả về.
-                    Bước 2: Nếu head.next == null, head = null.
-                    Bước 3: Duyệt từ head đến node kế cuối.
-                    Bước 4: Cho node kế cuối trỏ tới null.
+                    Step 1: If head == null, return.
+                    Step 2: If head.next == null, set head = null.
+                    Step 3: Traverse from head to the second-to-last node.
+                    Step 4: Set the next pointer of the second-to-last node to null.
                     """);
         }
 
@@ -324,11 +324,13 @@ public class LinkedListController {
 
             if (explanationArea != null) {
                     explanationArea.setText("""
-                        Bước 1: Khởi tạo current = head, index = 0.
-                        Bước 2: Trong khi current != null:
-                            - Nếu current.value == value, trả về index.
-                            - Ngược lại, current = current.next, index++.
-                        Bước 3: Nếu không tìm thấy, trả về -1.
+                Step 1: Initialize current = head and index = 0.
+                Step 2: While current != null:
+                    - If current.value == value, return index.
+                    - Otherwise, move to the next node:
+                    current = current.next;
+                    index++;
+                Step 3: If the value is not found, return -1.
                         """);
             }
 
@@ -348,6 +350,7 @@ public class LinkedListController {
 
         statusLabel.setText("Linked List has been reset.");
         pseudoCodeArea.setText("// Select an operation to view pseudo-code.");
+        explanationArea.setText("");
         logArea.appendText("\n[Reset]: Cleared linked list.");
 
         inputField.clear();
