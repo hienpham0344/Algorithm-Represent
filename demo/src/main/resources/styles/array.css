@@ -136,11 +136,11 @@
 .btn-array-delete:pressed { -fx-background-color: #991B1B; }
 
 .btn-array-update {
-    -fx-background-color: #F59E0B;
-    -fx-text-fill: #111827;
+    -fx-background-color: #EA580C;
+    -fx-text-fill: white;
 }
-.btn-array-update:hover { -fx-background-color: #FBBF24; }
-.btn-array-update:pressed { -fx-background-color: #D97706; }
+.btn-array-update:hover { -fx-background-color: #F97316; }
+.btn-array-update:pressed { -fx-background-color: #C2410C; }
 
 .btn-array-search {
     -fx-background-color: #059669;
