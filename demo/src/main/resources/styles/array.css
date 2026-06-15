@@ -93,31 +93,6 @@
     -fx-border-color: #6366F1;
 }
 
-.array-toolbar {
-    -fx-background-color: #020817;
-    -fx-padding: 12 18 4 18;
-}
-
-.speed-slider {
-    -fx-padding: 5 0 5 0;
-}
-
-.speed-slider .track {
-    -fx-background-color: #1E293B;
-    -fx-background-radius: 4;
-    -fx-pref-height: 6px;
-}
-
-.speed-slider .thumb {
-    -fx-background-color: #38BDF8;
-    -fx-background-radius: 10;
-    -fx-padding: 7;
-}
-
-.speed-slider .thumb:hover {
-    -fx-background-color: #0EA5E9;
-}
-
 .divider-line {
     -fx-background-color: #1E293B;
     -fx-pref-height: 1;
