@@ -6,6 +6,8 @@ import java.util.Random;
 
 public class ArrayService {
 
+    public static final int MAX_CAPACITY = 20;
+
     private final List<Integer> array = new ArrayList<>();
     private final Random random = new Random();
 
@@ -16,6 +18,10 @@ public class ArrayService {
     }
 
     public Result insertEnd(int value) {
+        if (array.size() >= MAX_CAPACITY) {
+            return new Result(false, "The array is full. Maximum capacity is " + MAX_CAPACITY + ".", value, null);
+        }
+
         array.add(value);
         return new Result(true, "Inserted " + value + " at the end of the array.", value, array.size() - 1);
     }
@@ -33,6 +39,10 @@ public class ArrayService {
     public Result insertAt(int index, int value) {
         if (index < 0 || index > array.size()) {
             return new Result(false, "Invalid index. Insert index must be in [0, " + array.size() + "].", value, index);
+        }
+
+        if (array.size() >= MAX_CAPACITY) {
+            return new Result(false, "The array is full. Maximum capacity is " + MAX_CAPACITY + ".", value, index);
         }
 
         array.add(index, value);
@@ -113,5 +123,9 @@ public class ArrayService {
 
     public int size() {
         return array.size();
+    }
+
+    public boolean isFull() {
+        return array.size() >= MAX_CAPACITY;
     }
 }

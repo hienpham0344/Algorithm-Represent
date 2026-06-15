@@ -134,11 +134,11 @@ public class ArrayVisualizerView extends BorderPane {
         Label sectionOp = new Label("OPERATIONS");
         sectionOp.getStyleClass().add("section-label");
 
-        Label valueLabel = new Label("Element Value");
+        Label valueLabel = new Label("Element Value(s)");
         valueLabel.getStyleClass().add("input-label");
 
         valueField = new TextField();
-        valueField.setPromptText("Example: 42");
+        valueField.setPromptText("Example: 42 or 10, 20, 30");
         valueField.getStyleClass().add("input-field");
         valueField.setMaxWidth(Double.MAX_VALUE);
         VBox valueBox = new VBox(5, valueLabel, valueField);
@@ -197,25 +197,6 @@ public class ArrayVisualizerView extends BorderPane {
         return panel;
     }
 
-    private HBox makeInfoCard(String label, String value) {
-        Label labelText = new Label(label);
-        labelText.getStyleClass().add("array-info-label");
-
-        Label valueText = new Label(value);
-        valueText.getStyleClass().add("array-info-value");
-
-        VBox box = new VBox(4, labelText, valueText);
-        box.getStyleClass().add("array-info-card");
-        box.setAlignment(Pos.CENTER);
-        box.setMaxWidth(Double.MAX_VALUE);
-
-        HBox wrapper = new HBox(box);
-        wrapper.setMaxWidth(Double.MAX_VALUE);
-        HBox.setHgrow(box, Priority.ALWAYS);
-        HBox.setHgrow(wrapper, Priority.ALWAYS);
-        return wrapper;
-    }
-
     private Node buildVizArea() {
         arrayFrame = new HBox(10);
         arrayFrame.setAlignment(Pos.CENTER);
@@ -231,6 +212,7 @@ public class ArrayVisualizerView extends BorderPane {
         scrollPane.setFitToWidth(true);
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollPane.setPannable(true);
         return scrollPane;
     }
 
@@ -318,30 +300,60 @@ public class ArrayVisualizerView extends BorderPane {
     }
 
     private void handleInsertEnd() {
-        Integer value = readValue();
-        if (value == null) return;
+        List<Integer> values = readValues();
+        if (values == null) return;
 
         setCode(CODE_INSERT_END);
+        if (service.isFull()) {
+            setExplanation(
+                    "• The array has reached its maximum capacity of " + ArrayService.MAX_CAPACITY + " values.\n" +
+                    "• Delete a value before inserting another one."
+            );
+            afterAction(service.insertEnd(values.get(0)));
+            return;
+        }
+
         stopAnimation();
         setControlsDisabled(true);
         foundIndex = -1;
-        setStatus("Appending value at the end...");
+        valueField.clear();
+        setStatus("Appending values at the end...");
         setExplanation(
-                "• Insert End places " + value + " in the first free position.\n" +
-                "• No existing value needs to move because the new value is appended after the current last element.\n" +
-                "• The array size increases from " + service.size() + " to " + (service.size() + 1) + "."
+                "• Insert End accepts one integer or a comma-separated list.\n" +
+                "• Each value is appended sequentially without shifting existing values.\n" +
+                "• The operation stops if the array reaches its capacity of " + ArrayService.MAX_CAPACITY + " values."
         );
-        addLog("[STEP] Appending value at the end...");
+        addLog("[STEP] Appending " + values.size() + " value(s) at the end...");
 
-        ArrayService.Result result = service.insertEnd(value);
-        highlightedIndex = result.index() == null ? -1 : result.index();
-        redrawArray();
-
+        final int[] step = {0};
         animation = new Timeline(new KeyFrame(Duration.millis(320), e -> {
-            stopAnimation();
-            afterAction(result);
-            setControlsDisabled(false);
+            if (step[0] >= values.size() || service.isFull()) {
+                boolean stoppedByCapacity = step[0] < values.size();
+                int insertedCount = step[0];
+                stopAnimation();
+                highlightedIndex = -1;
+                redrawArray();
+
+                if (stoppedByCapacity) {
+                    setStatus("Array full. Inserted " + insertedCount + " value(s); remaining values were skipped.");
+                    addLog("[ERROR] Array reached the maximum capacity of " + ArrayService.MAX_CAPACITY + ".");
+                } else {
+                    setStatus("Inserted " + insertedCount + " value(s) at the end.");
+                    addLog("[OK] Batch Insert End completed.");
+                }
+                setControlsDisabled(false);
+                return;
+            }
+
+            int value = values.get(step[0]++);
+            ArrayService.Result result = service.insertEnd(value);
+            highlightedIndex = result.index() == null ? -1 : result.index();
+            explanationArea.setText(explanationText +
+                    "\n\n• Current step: appending " + value + " at index " + highlightedIndex + ".");
+            addLog("[OK] " + result.message());
+            redrawArray();
         }));
+        animation.setCycleCount(Timeline.INDEFINITE);
         animation.play();
     }
 
@@ -372,6 +384,15 @@ public class ArrayVisualizerView extends BorderPane {
             setExplanation(
                     "• Insert at Index accepts an index from 0 through " + service.size() + ".\n" +
                     "• Index " + index + " is outside that valid range, so the array remains unchanged."
+            );
+            afterAction(service.insertAt(index, value));
+            return;
+        }
+
+        if (service.isFull()) {
+            setExplanation(
+                    "• The array has reached its maximum capacity of " + ArrayService.MAX_CAPACITY + " values.\n" +
+                    "• Delete a value before inserting another one."
             );
             afterAction(service.insertAt(index, value));
             return;
@@ -409,7 +430,7 @@ public class ArrayVisualizerView extends BorderPane {
                 "• Every value to its right shifts one position left to close the gap.\n" +
                 "• The final duplicate slot is discarded and the array size decreases by one."
         );
-        runOperationAnimation("Shifting values to the left...", indicesAscending(index, service.size() - 1), () -> {
+        runOperationAnimation("Shifting values to the left...", indicesAscending(index, service.size() - 2), () -> {
             ArrayService.Result result = service.deleteAt(index);
             highlightedIndex = -1;
             afterAction(result);
@@ -578,6 +599,37 @@ public class ArrayVisualizerView extends BorderPane {
             addLog("[ERROR] Invalid value: " + text);
             return null;
         }
+    }
+
+    private List<Integer> readValues() {
+        String text = valueField.getText().trim();
+        if (text.isEmpty()) {
+            setStatus("Enter one or more values first.");
+            setExplanation("• Insert End accepts integers separated by commas, for example: 10, 20, 30.");
+            addLog("[ERROR] Missing value.");
+            return null;
+        }
+
+        List<Integer> values = new ArrayList<>();
+        for (String token : text.split(",", -1)) {
+            String value = token.trim();
+            if (value.isEmpty()) {
+                setStatus("The value list contains an empty item.");
+                setExplanation("• Every item between commas must be an integer. Example: 10, 20, 30.");
+                addLog("[ERROR] Invalid value list: " + text);
+                return null;
+            }
+
+            try {
+                values.add(Integer.parseInt(value));
+            } catch (NumberFormatException e) {
+                setStatus("Value must be an integer: " + value);
+                setExplanation("• Array values must be integers. \"" + value + "\" cannot be converted to an integer.");
+                addLog("[ERROR] Invalid value: " + value);
+                return null;
+            }
+        }
+        return values;
     }
 
     private Integer readIndex() {

@@ -1,5 +1,4 @@
-.array-root,
-.array-main-content {
+.array-root {
     -fx-background-color: #020817;
     -fx-font-family: "Segoe UI", sans-serif;
 }
@@ -96,28 +95,6 @@
 .divider-line {
     -fx-background-color: #1E293B;
     -fx-pref-height: 1;
-}
-
-/* Info cards */
-.array-info-card {
-    -fx-background-color: #1E293B;
-    -fx-background-radius: 8;
-    -fx-border-color: #334155;
-    -fx-border-radius: 8;
-    -fx-border-width: 1;
-    -fx-padding: 8 6 8 6;
-}
-
-.array-info-label {
-    -fx-font-size: 9px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #64748B;
-}
-
-.array-info-value {
-    -fx-font-size: 11px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #38BDF8;
 }
 
 /* Buttons */
