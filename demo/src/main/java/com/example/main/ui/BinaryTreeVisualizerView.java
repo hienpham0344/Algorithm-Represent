@@ -211,18 +211,18 @@ public class BinaryTreeVisualizerView extends BorderPane {
             if (type.equals("SEARCH")) {
                 setPseudoCode("function search(node, key):\n  if node is null or node.key == key\n    return node\n  if key < node.key\n    return search(node.left, key)\n  return search(node.right, key)");
                 explanationArea.setText(
-                        "• Thao tác TÌM KIẾM (Search):\n" +
-                                "• Bước 1: Bắt đầu từ gốc (Root).\n" +
-                                "• Bước 2: So sánh giá trị cần tìm (" + val + ") với nút hiện tại.\n" +
-                                "• Bước 3: Nếu bằng thì dừng lại. Nếu nhỏ hơn thì rẽ qua trái, lớn hơn thì rẽ qua phải.\n" +
-                                "• Bước 4: Lặp lại quá trình cho đến khi tìm thấy nút hoặc gặp vị trí rỗng (Null)."
+                        "• SEARCH Operation:\n" +
+                                "• Step 1: Start at the Root.\n" +
+                                "• Step 2: Compare the target value (" + val + ") with the current node.\n" +
+                                "• Step 3: If equal, stop. If less, traverse left. If greater, traverse right.\n" +
+                                "• Step 4: Repeat the process until the node is found or a null position is reached."
                 );
 
                 BinaryTreeService.SearchResult res = service.search(val);
 
                 animatePath(res.path(), () -> {
                     if (res.success()) foundValue = val;
-                    statusText.setText(res.success() ? "Đã tìm thấy!" : "Không tìm thấy!");
+                    statusText.setText(res.success() ? "Found!" : "Not found!");
                     logActivity(res.message());
                     redrawTree();
                 });
@@ -230,17 +230,17 @@ public class BinaryTreeVisualizerView extends BorderPane {
             } else if (type.equals("INSERT")) {
                 setPseudoCode("function insert(node, key):\n  if node is null return new Node(key)\n  if key < node.key\n    node.left = insert(node.left, key)\n  else\n    node.right = insert(node.right, key)\n  return node");
                 explanationArea.setText(
-                        "• Thao tác THÊM NÚT (Insert):\n" +
-                                "• Bước 1: Khởi hành từ gốc. Thuật toán hoạt động tương tự như Tìm kiếm.\n" +
-                                "• Bước 2: Đi theo quy luật Trái < Cha < Phải để dò đường đi xuống dưới.\n" +
-                                "• Bước 3: Ngay khi gặp một vị trí trống (Null), tạo một nút chứa số " + val + " tại vị trí đó và liên kết với cha."
+                        "• INSERT Operation:\n" +
+                                "• Step 1: Start at the Root. The algorithm works similarly to Search.\n" +
+                                "• Step 2: Follow the Left < Parent < Right rule to traverse down the tree.\n" +
+                                "• Step 3: Upon reaching an empty spot (Null), create a new node with value " + val + " and link it to its parent."
                 );
 
                 BinaryTreeService.SearchResult searchRes = service.search(val);
 
                 animatePath(searchRes.path(), () -> {
                     BinaryTreeService.Result res = service.insert(val);
-                    statusText.setText(res.success() ? "Thành công!" : "Thất bại!");
+                    statusText.setText(res.success() ? "Success!" : "Failed!");
                     logActivity(res.message());
                     redrawTree();
                 });
@@ -248,18 +248,18 @@ public class BinaryTreeVisualizerView extends BorderPane {
             } else if (type.equals("DELETE")) {
                 setPseudoCode("function delete(node, key):\n  if node is null return null\n  if key < node.key node.left = delete(node.left, key)\n  else if key > node.key node.right = delete(node.right, key)\n  else:\n    if left is null return right\n    if right is null return left\n    node.key = min(node.right)\n    node.right = delete(node.right, node.key)\n  return node");
                 explanationArea.setText(
-                        "• Thao tác XÓA NÚT (Delete):\n" +
-                                "• Bước 1: Dò tìm vị trí của nút " + val + " cần xóa.\n" +
-                                "• Bước 2: Nếu là nút lá (0 con), xóa trực tiếp.\n" +
-                                "• Bước 3: Nếu có 1 con, kéo đứa con đó lên thay thế vị trí nút bị xóa.\n" +
-                                "• Bước 4: Nếu có 2 con, tìm nút Nhỏ Nhất của nhánh Bên Phải để đưa lên thế chỗ, sau đó xóa nút thế chỗ ở dưới cùng."
+                        "• DELETE Operation:\n" +
+                                "• Step 1: Locate the target node " + val + " to be deleted.\n" +
+                                "• Step 2: If it is a leaf node (0 children), delete it directly.\n" +
+                                "• Step 3: If it has 1 child, replace the deleted node with that child.\n" +
+                                "• Step 4: If it has 2 children, find the minimum node in the Right subtree (Inorder Successor) to replace it, then delete the duplicate at the bottom."
                 );
 
                 BinaryTreeService.SearchResult searchRes = service.search(val);
 
                 animatePath(searchRes.path(), () -> {
                     BinaryTreeService.Result res = service.delete(val);
-                    statusText.setText(res.success() ? "Thành công!" : "Thất bại!");
+                    statusText.setText(res.success() ? "Success!" : "Failed!");
                     logActivity(res.message());
                     redrawTree();
                 });
@@ -267,8 +267,8 @@ public class BinaryTreeVisualizerView extends BorderPane {
 
             inputField.clear();
         } catch (NumberFormatException ex) {
-            statusText.setText("Lỗi đầu vào.");
-            logActivity("[Error]: Vui lòng nhập số nguyên hợp lệ.");
+            statusText.setText("Invalid input.");
+            logActivity("[Error]: Please enter a valid integer.");
         }
     }
 
@@ -293,10 +293,10 @@ public class BinaryTreeVisualizerView extends BorderPane {
         setPseudoCode(pseudoCode);
 
         explanationArea.setText(
-                "• Thao tác DUYỆT CÂY (" + type + "):\n" +
-                        "• Thuật toán đệ quy sẽ đi qua tất cả các nút trên cây theo thứ tự chỉ định.\n" +
-                        "• Các nút đang được quét sẽ hiển thị màu sáng (Highlight).\n" +
-                        "• Mảng kết quả sau khi duyệt xong sẽ được in ra tại bảng Nhật ký (Log) bên cạnh."
+                "• TRAVERSAL Operation (" + type + "):\n" +
+                        "• The recursive algorithm will visit all nodes in the tree according to the specified order.\n" +
+                        "• The currently visited nodes will be highlighted.\n" +
+                        "• The final sequence will be printed in the Activity Log below once completed."
         );
 
         BinaryTreeService.SearchResult res = service.traverse(type);
@@ -306,12 +306,12 @@ public class BinaryTreeVisualizerView extends BorderPane {
             return;
         }
 
-        statusText.setText("Đang duyệt: " + type + "...");
-        logActivity("[Traverse]: Bắt đầu duyệt " + type + ".");
+        statusText.setText("Traversing: " + type + "...");
+        logActivity("[Traverse]: Starting " + type + " traversal.");
 
         animatePath(res.path(), () -> {
-            statusText.setText("Duyệt xong!");
-            logActivity(res.message() + "\n>> Kết quả: " + res.path().toString());
+            statusText.setText("Traversal complete!");
+            logActivity(res.message() + "\n>> Result: " + res.path().toString());
             redrawTree();
         });
     }
@@ -329,7 +329,7 @@ public class BinaryTreeVisualizerView extends BorderPane {
             KeyFrame kf = new KeyFrame(Duration.millis(i * delayMs), e -> {
                 currentSearchValue = val;
                 redrawTree();
-                logActivity("[Traverse]: Đang thăm/duyệt qua nút " + val + "...");
+                logActivity("[Traverse]: Visiting node " + val + "...");
             });
             timeline.getKeyFrames().add(kf);
         }
@@ -362,12 +362,12 @@ public class BinaryTreeVisualizerView extends BorderPane {
         service.clear();
         foundValue = -1;
         currentSearchValue = -1;
-        logActivity("Đã xóa toàn bộ cây (Reset).");
+        logActivity("Cleared the entire tree (Reset).");
         setPseudoCode("function reset():\n  tree.root = null");
         explanationArea.setText(
-                "• Toàn bộ cấu trúc cây cũ đã bị hủy bỏ.\n" +
-                        "• Cây hiện tại đang rỗng (Root = Null).\n" +
-                        "• Bạn có thể bắt đầu Thêm (Insert) các phần tử mới để xây dựng lại cây."
+                "• The previous tree structure has been destroyed.\n" +
+                        "• The current tree is empty (Root = Null).\n" +
+                        "• You can start Inserting new elements to rebuild the tree."
         );
         redrawTree();
     }
