@@ -13,20 +13,19 @@ public class QueueService {
 
     public Result enqueue(int value) {
         queue.addLast(value);
-        return new Result(true, "Đã Enqueue " + value + " vào cuối hàng đợi (REAR).", value);
-    }
+        return new Result(true, "Enqueued " + value + " to the end of the queue (REAR).", value);    }
 
     public Result dequeue() {
         if (queue.isEmpty())
-            return new Result(false, "Hàng đợi đang rỗng, không thể Dequeue.", null);
+            return new Result(false, "Queue is empty, cannot Dequeue.", null);
         int val = queue.removeFirst(); // Lấy ra từ đầu hàng (FRONT)
-        return new Result(true, "Đã Dequeue " + val + " ra khỏi đầu hàng đợi (FRONT).", val);
+        return new Result(true, "Dequeued " + val + " from the front of the queue (FRONT).", val);
     }
 
     public Result peek() {
         if (queue.isEmpty())
-            return new Result(false, "Hàng đợi đang rỗng, không có phần tử đầu hàng.", null);
-        return new Result(true, "Đầu hàng đợi (peek): " + queue.peekFirst(), queue.peekFirst());
+            return new Result(false, "Queue is empty, no front element exists.", null);
+        return new Result(true, "Front of queue (peek): " + queue.peekFirst(), queue.peekFirst());
     }
 
     public void reset() {

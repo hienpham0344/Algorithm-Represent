@@ -1,9 +1,12 @@
 package com.example.main;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 public final class DashboardApplication extends Application {
@@ -27,6 +30,20 @@ public final class DashboardApplication extends Application {
         stage.setScene(scene);
         stage.setMinWidth(MIN_WINDOW_WIDTH);
         stage.setMinHeight(MIN_WINDOW_HEIGHT);
+
+        // Đặt lại vị trí và kích thước cửa sổ theo màn hình chính để tránh bị lệch hoặc cắt
+        Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+        stage.setX(screenBounds.getMinX());
+        stage.setY(screenBounds.getMinY());
+        stage.setWidth(screenBounds.getWidth());
+        stage.setHeight(screenBounds.getHeight());
+        stage.setMaximized(true);
         stage.show();
+
+        // Cập nhật lại CSS và layout khi phóng to cửa sổ
+        Platform.runLater(() -> {
+            root.applyCss();
+            root.layout();
+        });
     }
 }

@@ -1,5 +1,8 @@
 
-
+.stack-main-content {
+    -fx-background-color: #020817;
+    -fx-font-family: "Segoe UI", sans-serif;
+}
 
 .stack-root {
     -fx-background-color: #020817;

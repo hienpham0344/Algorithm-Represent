@@ -4,7 +4,7 @@ import com.example.main.service.BinaryTreeService;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Circle;
@@ -18,213 +18,186 @@ public class BinaryTreeVisualizerView extends BorderPane {
     private final BinaryTreeService service = new BinaryTreeService();
     private TextField inputField;
     private Pane vizPane;
-    private TextArea pseudoCodeArea;
-    private TextArea explanationArea;
-    private TextArea activityLogArea;
+    private TextArea pseudoCodeArea, explanationArea, activityLogArea;
     private Label statusText;
-
     private Button btnInsert, btnSearch, btnDelete, btnReset, btnTraverse;
     private ComboBox<String> traversalBox;
-    private Slider speedSlider = new Slider(0.5, 3.0, 1.5);
-
-    private int currentSearchValue = -1;
-    private int foundValue = -1;
+    private int currentSearchValue = -1, foundValue = -1;
 
     public BinaryTreeVisualizerView() {
         getStylesheets().add(getClass().getResource("/styles/tree.css").toExternalForm());
         getStyleClass().add("tree-root");
 
-        setLeft(buildLeftPanel());
-        setCenter(buildCanvasArea());
-        setBottom(buildBottomPanels());
+        ScrollPane leftScroll = new ScrollPane(buildLeftPanel());
+        leftScroll.setFitToWidth(true);
+        leftScroll.setFitToHeight(true);
+        leftScroll.setPrefWidth(285);
+        leftScroll.setMinWidth(285);
+        leftScroll.getStyleClass().add("left-panel");
 
-        logActivity("[System]: Binary Search Tree initialized. Ready.");
+        setLeft(leftScroll);
+        setCenter(buildVizArea());
+        setBottom(buildBottomDock());
+
         service.insert(50);
         service.insert(30);
         service.insert(70);
-        service.insert(20);
-        service.insert(40);
-        service.insert(60);
-        service.insert(80);
         redrawTree();
 
-        explanationArea.setText(
-                "• Cây nhị phân tìm kiếm (BST) đã được nạp trạng thái mặc định.\n" +
-                        "• Cây tuân thủ quy tắc: Nhánh trái < Nút cha < Nhánh phải.\n" +
-                        "• Chọn một thao tác trên thanh công cụ bên trái để bắt đầu mô phỏng."
-        );
+        explanationArea.setText("• Binary Search Tree initialized.\n• Rule: Left < Root < Right.");
+        logActivity("[System]: Binary Search Tree initialized. Ready.");
     }
 
     private VBox buildLeftPanel() {
         VBox panel = new VBox(16);
+        panel.setPadding(new Insets(22, 18, 22, 18));
         panel.getStyleClass().add("left-panel");
-        panel.setPrefWidth(280);
-        panel.setPadding(new Insets(20));
 
-        Label title = new Label("Binary Search Tree");
+        Label title = new Label("BINARY SEARCH TREE");
         title.getStyleClass().add("ds-title");
-        Label desc = new Label("Trái < Cha < Phải. Hỗ trợ Tìm kiếm, Thêm, Xóa và Duyệt toàn bộ cây.");
+        Label desc = new Label("A node-based data structure where each node has at most two children.");
         desc.getStyleClass().add("ds-desc");
-        desc.setWrapText(true);
 
-        Label lblOps = new Label("☷ THAO TÁC NÚT (CẦN NHẬP SỐ)");
+        Label lblOps = new Label("OPERATIONS");
         lblOps.getStyleClass().add("section-label");
 
         inputField = new TextField();
-        inputField.setPromptText("Nhập một số (VD: 55)...");
+        inputField.setPromptText("Enter value...");
         inputField.getStyleClass().add("input-field");
 
-        btnInsert = createButton("Insert", "btn-purple");
-        btnInsert.setOnAction(e -> executeOp("INSERT"));
-
-        btnDelete = createButton("Delete", "btn-red");
-        btnDelete.setOnAction(e -> executeOp("DELETE"));
-
-        btnSearch = createButton("Search", "btn-green");
-        btnSearch.setOnAction(e -> executeOp("SEARCH"));
-
-        btnReset = createButton("Reset", "btn-gray");
-        btnReset.setOnAction(e -> {
-            service.clear();
-            foundValue = -1;
-            currentSearchValue = -1;
-            logActivity("Đã xóa toàn bộ cây (Reset).");
-            setPseudoCode("function reset():\n  tree.root = null");
-            explanationArea.setText(
-                    "• Toàn bộ cấu trúc cây cũ đã bị hủy bỏ.\n" +
-                            "• Cây hiện tại đang rỗng (Root = Null).\n" +
-                            "• Bạn có thể bắt đầu Thêm (Insert) các phần tử mới để xây dựng lại cây."
-            );
-            redrawTree();
-        });
-
         GridPane btnGrid = new GridPane();
-        btnGrid.setHgap(10);
-        btnGrid.setVgap(10);
+        btnGrid.setHgap(8);
+        btnGrid.setVgap(8);
 
-        ColumnConstraints cc = new ColumnConstraints();
-        cc.setPercentWidth(50);
-        btnGrid.getColumnConstraints().addAll(cc, cc);
+        btnInsert = createButton("Insert", "btn-insert");
+        btnDelete = createButton("Delete", "btn-delete");
+        btnSearch = createButton("Search", "btn-search");
+        btnReset = createButton("Reset", "btn-reset");
 
         btnGrid.add(btnInsert, 0, 0);
         btnGrid.add(btnDelete, 1, 0);
         btnGrid.add(btnSearch, 0, 1);
         btnGrid.add(btnReset, 1, 1);
 
-        VBox opsBox = new VBox(12, inputField, btnGrid);
-
-        Label lblTraverse = new Label("☍ DUYỆT CÂY (TRAVERSAL)");
-        lblTraverse.getStyleClass().add("section-label");
+        ColumnConstraints col = new ColumnConstraints();
+        col.setPercentWidth(50);
+        btnGrid.getColumnConstraints().addAll(col, col);
 
         traversalBox = new ComboBox<>();
         traversalBox.getItems().addAll("Pre-order (NLR)", "In-order (LNR)", "Post-order (LRN)");
         traversalBox.getSelectionModel().select(0);
         traversalBox.setMaxWidth(Double.MAX_VALUE);
+        btnTraverse = createButton("▶ Traverse Tree", "btn-insert");
 
-        btnTraverse = createButton("▶ Duyệt", "btn-purple");
+        Label lblStatusHeader = new Label("SIMULATION STATUS");
+        lblStatusHeader.getStyleClass().add("status-header");
+        statusText = new Label("Ready.");
+        statusText.getStyleClass().add("status-text");
+        VBox statusBox = new VBox(8, lblStatusHeader, statusText);
+        statusBox.getStyleClass().add("status-box");
+        statusBox.setPadding(new Insets(12));
+        Region spacer = new Region();
+        VBox.setVgrow(spacer, Priority.ALWAYS);
+        panel.getChildren().addAll(title, desc, new Separator(), lblOps, inputField, btnGrid,
+                new Label("TRAVERSAL"), traversalBox, btnTraverse, statusBox, spacer);
+
+        btnInsert.setOnAction(e -> executeOp("INSERT"));
+        btnSearch.setOnAction(e -> executeOp("SEARCH"));
+        btnDelete.setOnAction(e -> executeOp("DELETE"));
+        btnReset.setOnAction(e -> handleReset());
         btnTraverse.setOnAction(e -> executeTraversal());
 
-        VBox traverseBox = new VBox(8, traversalBox, btnTraverse);
-
-        Label lblSpeed = new Label("⏱ TỐC ĐỘ (SPEED)");
-        lblSpeed.getStyleClass().add("section-label");
-
-        speedSlider.setBlockIncrement(0.5);
-        speedSlider.setMajorTickUnit(0.5);
-        speedSlider.setShowTickMarks(true);
-        speedSlider.setShowTickLabels(true);
-
-        VBox speedBox = new VBox(speedSlider);
-        speedBox.setStyle("-fx-background-color: #1e1b4b; -fx-background-radius: 8; -fx-padding: 10 10 0 10;");
-
-        Label lblStatus = new Label("∿ TRẠNG THÁI (STATUS)");
-        lblStatus.getStyleClass().add("section-label");
-
-        statusText = new Label("Sẵn sàng hoạt động.");
-        statusText.setStyle("-fx-text-fill: #a78bfa; -fx-font-family: 'Courier New';");
-        VBox statusBox = new VBox(statusText);
-        statusBox.setStyle("-fx-background-color: #1e1b4b; -fx-background-radius: 8; -fx-padding: 10;");
-
-        panel.getChildren().addAll(
-                title, desc,
-                lblOps, opsBox,
-                lblTraverse, traverseBox,
-                lblSpeed, speedBox,
-                lblStatus, statusBox
-        );
         return panel;
     }
 
-    private Button createButton(String text, String colorClass) {
-        Button btn = new Button(text);
-        btn.getStyleClass().addAll("btn-action", colorClass);
-        btn.setMaxWidth(Double.MAX_VALUE);
-        return btn;
-    }
-
-    private VBox buildCanvasArea() {
+    private Node buildVizArea() {
         vizPane = new Pane();
-        vizPane.setMinSize(2000, 1000);
-        vizPane.setPrefSize(2000, 1000);
-        vizPane.setStyle("-fx-background-color: #0f172a;");
+        vizPane.getStyleClass().add("viz-area");
+        vizPane.widthProperty().addListener(o -> redrawTree());
 
-        ScrollPane scrollPane = new ScrollPane(vizPane);
-        scrollPane.setPannable(true);
-        scrollPane.setStyle("-fx-background: #0f172a; -fx-background-color: #0f172a; -fx-padding: 0; -fx-border-width: 0;");
-        javafx.application.Platform.runLater(() -> scrollPane.setHvalue(0.5));
-        VBox.setVgrow(scrollPane, Priority.ALWAYS);
-
-        VBox canvasContainer = new VBox(scrollPane);
-        canvasContainer.getStyleClass().add("viz-area");
-        VBox.setVgrow(canvasContainer, Priority.ALWAYS);
-
-        return canvasContainer;
+        ScrollPane sp = new ScrollPane(vizPane);
+        sp.setFitToHeight(true);
+        sp.setFitToWidth(true);
+        sp.getStyleClass().add("viz-area");
+        return sp;
     }
 
-    private HBox buildBottomPanels() {
-        HBox bottomPanels = new HBox(12);
-        bottomPanels.setMinHeight(220);
-        bottomPanels.setMaxHeight(220);
-        bottomPanels.setPrefHeight(220);
-        bottomPanels.setPadding(new Insets(12, 12, 12, 12));
-        bottomPanels.setStyle("-fx-background-color: #0b1120; -fx-border-color: #1e293b; -fx-border-width: 1 0 0 0;");
+    private HBox buildBottomDock() {
+        HBox dock = new HBox(0);
+        dock.getStyleClass().add("bottom-dock");
+        dock.setPrefHeight(210);
 
-        VBox pseudoBox = new VBox();
-        pseudoBox.getStyleClass().add("bottom-panel");
-        HBox.setHgrow(pseudoBox, Priority.ALWAYS);
-        Label lblPseudo = new Label("< > MÃ GIẢ (PSEUDO-CODE)");
-        lblPseudo.getStyleClass().add("panel-header");
-        pseudoCodeArea = new TextArea();
-        pseudoCodeArea.getStyleClass().add("code-area");
-        pseudoCodeArea.setEditable(false);
-        VBox.setVgrow(pseudoCodeArea, Priority.ALWAYS);
-        pseudoBox.getChildren().addAll(lblPseudo, pseudoCodeArea);
+        VBox codeCol = buildInfoCol("<> PSEUDO-CODE", pseudoCodeArea = new TextArea(), true);
+        VBox explCol = buildInfoCol("💡 EXPLANATION", explanationArea = new TextArea(), false);
+        VBox logCol = buildInfoCol(">_ ACTIVITY LOG", activityLogArea = new TextArea(), false);
 
-        VBox explBox = new VBox();
-        explBox.getStyleClass().add("bottom-panel");
-        HBox.setHgrow(explBox, Priority.ALWAYS);
-        Label lblExpl = new Label("💡 GIẢI THÍCH (EXPLANATION)");
-        lblExpl.getStyleClass().add("panel-header");
-        explanationArea = new TextArea();
-        explanationArea.getStyleClass().add("log-area");
-        explanationArea.setEditable(false);
-        explanationArea.setWrapText(true);
-        VBox.setVgrow(explanationArea, Priority.ALWAYS);
-        explBox.getChildren().addAll(lblExpl, explanationArea);
+        dock.getChildren().addAll(codeCol, new Separator(), explCol, new Separator(), logCol);
+        HBox.setHgrow(codeCol, Priority.ALWAYS);
+        HBox.setHgrow(explCol, Priority.ALWAYS);
+        HBox.setHgrow(logCol, Priority.ALWAYS);
 
-        VBox logBox = new VBox();
-        logBox.getStyleClass().add("bottom-panel");
-        HBox.setHgrow(logBox, Priority.ALWAYS);
-        Label lblLog = new Label(">_ NHẬT KÝ (ACTIVITY LOG)");
-        lblLog.getStyleClass().add("panel-header");
-        activityLogArea = new TextArea();
-        activityLogArea.getStyleClass().add("log-area");
-        activityLogArea.setEditable(false);
-        VBox.setVgrow(activityLogArea, Priority.ALWAYS);
-        logBox.getChildren().addAll(lblLog, activityLogArea);
+        return dock;
+    }
 
-        bottomPanels.getChildren().addAll(pseudoBox, explBox, logBox);
-        return bottomPanels;
+    private VBox buildInfoCol(String title, TextArea area, boolean isCode) {
+        HBox header = new HBox(new Label(title));
+        header.getStyleClass().add("panel-header-box");
+        area.setEditable(false);
+        area.getStyleClass().add(isCode ? "code-area" : "log-area");
+        if (!isCode) area.setWrapText(true);
+
+        VBox col = new VBox(header, area);
+        VBox.setVgrow(area, Priority.ALWAYS);
+        col.setPadding(new Insets(10));
+        return col;
+    }
+
+    private Button createButton(String text, String style) {
+        Button b = new Button(text);
+        b.getStyleClass().addAll("btn-action", style);
+        b.setMaxWidth(Double.MAX_VALUE);
+        return b;
+    }
+
+    private void redrawTree() {
+        vizPane.getChildren().clear();
+        BinaryTreeService.Node root = service.getRoot();
+        if (root != null) {
+            double startX = vizPane.getWidth() / 2;
+            if (startX <= 0) startX = 500;
+            drawNode(root, startX, 50, 200);
+        }
+    }
+
+    private void drawNode(BinaryTreeService.Node node, double x, double y, double hGap) {
+        if (node == null) return;
+
+        if (node.left != null) {
+            Line line = new Line(x, y, x - hGap, y + 80);
+            line.getStyleClass().add("tree-line");
+            vizPane.getChildren().add(line);
+            drawNode(node.left, x - hGap, y + 80, hGap / 2);
+        }
+
+        if (node.right != null) {
+            Line line = new Line(x, y, x + hGap, y + 80);
+            line.getStyleClass().add("tree-line");
+            vizPane.getChildren().add(line);
+            drawNode(node.right, x + hGap, y + 80, hGap / 2);
+        }
+
+        Circle c = new Circle(22);
+        c.getStyleClass().add(node.value == foundValue ? "tree-node-found" :
+                (node.value == currentSearchValue ? "tree-node-highlight" : "tree-node"));
+
+        Label l = new Label(String.valueOf(node.value));
+        l.getStyleClass().add("tree-value");
+
+        StackPane sp = new StackPane(c, l);
+        sp.setLayoutX(x - 22);
+        sp.setLayoutY(y - 22);
+
+        vizPane.getChildren().add(sp);
     }
 
     private void executeOp(String type) {
@@ -346,8 +319,7 @@ public class BinaryTreeVisualizerView extends BorderPane {
     private void animatePath(List<Integer> path, Runnable onComplete) {
         setControlsDisabled(true);
 
-        double speed = speedSlider.getValue();
-        double delayMs = 1200 / speed;
+        double delayMs = 800;
 
         Timeline timeline = new Timeline();
 
@@ -382,57 +354,22 @@ public class BinaryTreeVisualizerView extends BorderPane {
         traversalBox.setDisable(disabled);
     }
 
-    private void redrawTree() {
-        vizPane.getChildren().clear();
-        BinaryTreeService.Node root = service.getRoot();
-        if (root != null) {
-            drawNode(root, 1000, 40, 200);
-        }
-    }
-
-    private void drawNode(BinaryTreeService.Node node, double x, double y, double hGap) {
-        if (node == null) return;
-
-        if (node.left != null) {
-            double nextX = x - hGap;
-            double nextY = y + 70;
-            Line line = new Line(x, y, nextX, nextY);
-            line.getStyleClass().add("tree-line");
-            vizPane.getChildren().add(line);
-            drawNode(node.left, nextX, nextY, hGap / 2);
-        }
-
-        if (node.right != null) {
-            double nextX = x + hGap;
-            double nextY = y + 70;
-            Line line = new Line(x, y, nextX, nextY);
-            line.getStyleClass().add("tree-line");
-            vizPane.getChildren().add(line);
-            drawNode(node.right, nextX, nextY, hGap / 2);
-        }
-
-        Circle circle = new Circle(22);
-
-        if (node.value == foundValue) {
-            circle.getStyleClass().add("tree-node-found");
-        } else if (node.value == currentSearchValue) {
-            circle.getStyleClass().add("tree-node-highlight");
-        } else {
-            circle.getStyleClass().add("tree-node");
-        }
-
-        Label lbl = new Label(String.valueOf(node.value));
-        lbl.getStyleClass().add("tree-value");
-
-        StackPane nodeView = new StackPane(circle, lbl);
-        nodeView.setLayoutX(x - 22);
-        nodeView.setLayoutY(y - 22);
-
-        vizPane.getChildren().add(nodeView);
-    }
-
     private void logActivity(String msg) {
         activityLogArea.appendText(msg + "\n");
+    }
+
+    private void handleReset() {
+        service.clear();
+        foundValue = -1;
+        currentSearchValue = -1;
+        logActivity("Đã xóa toàn bộ cây (Reset).");
+        setPseudoCode("function reset():\n  tree.root = null");
+        explanationArea.setText(
+                "• Toàn bộ cấu trúc cây cũ đã bị hủy bỏ.\n" +
+                        "• Cây hiện tại đang rỗng (Root = Null).\n" +
+                        "• Bạn có thể bắt đầu Thêm (Insert) các phần tử mới để xây dựng lại cây."
+        );
+        redrawTree();
     }
 
     private void setPseudoCode(String code) {

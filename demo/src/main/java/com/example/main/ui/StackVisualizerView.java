@@ -26,21 +26,21 @@ public class StackVisualizerView extends BorderPane {
 
     private Slider    speedSlider;
     private Animation currentAnimation;
-    private SequentialTransition batchTransition;
-    private Button               btnPause;
+    private SequentialTransition batchTransition; // Animation chuỗi (nhiều phần tử)
+    private Button btnPause;
 //Dữ liệu mã giả tương ứng của các buttons để nạp vào codeArea(mã giả)
     private static final String CODE_IDLE =
-            "// Chọn một hành động để trực quan hóa mã giả\n";
+            "// Select an action to visualize the Stack pseudocode\n";
 
     private static final String CODE_PUSH =
-            "// Push: Đẩy phần tử vào đỉnh ngăn xếp\n" +
+            "// Push: Pushes an element onto the top of the stack\n" +
                     "void push(int value) {\n" +
-                    "    elements.add(value); // Thêm phần tử\n" +
-                    "    top = value;         // Đỉnh mới cập nhật\n" +
+                    "    elements.add(value); // Add element\n" +
+                    "    top = value;         // Update new top\n" +
                     "}\n";
 
     private static final String CODE_POP =
-            "// Pop: Lấy phần tử ra khỏi đỉnh\n" +
+            "// Pop: Removes an element from the top of the stack\n" +
                     "int pop() {\n" +
                     "    if (isEmpty()) return error;\n" +
                     "    int value = elements[size - 1];\n" +
@@ -49,7 +49,7 @@ public class StackVisualizerView extends BorderPane {
                     "}\n";
 
     private static final String CODE_PEEK =
-            "// Peek: Đọc thử giá trị ở đỉnh, không xóa\n" +
+            "// Peek: Views the top element without removing it\n" +
                     "int peek() {\n" +
                     "    if (isEmpty()) return error;\n" +
                     "    return elements[size - 1];\n" +
@@ -62,6 +62,7 @@ public class StackVisualizerView extends BorderPane {
                 getClass().getResource("/styles/stack.css").toExternalForm()
         );
         getStyleClass().add("stack-root");
+
         VBox leftContent = buildLeftPanel();
         ScrollPane leftScrollPane = new ScrollPane(leftContent);
         leftScrollPane.setFitToWidth(true);
@@ -175,7 +176,7 @@ public class StackVisualizerView extends BorderPane {
 
         speedSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (currentAnimation != null && currentAnimation.getStatus() == Animation.Status.RUNNING) {
-                currentAnimation.setRate(newValue.doubleValue());
+                currentAnimation.setRate(newValue.doubleValue()); //Thay tốc độ ngay lập tức
             }
             if (batchTransition != null && batchTransition.getStatus() != Animation.Status.STOPPED) {
                 batchTransition.setRate(newValue.doubleValue());
@@ -187,8 +188,7 @@ public class StackVisualizerView extends BorderPane {
 
         Label statusHeader = new Label("ℹ  SIMULATION STATUS");
         statusHeader.getStyleClass().add("status-header");
-        statusText = new Label("Hệ thống đã sẵn sàng. Hãy chọn một thao tác.");
-        statusText.getStyleClass().add("status-text");
+        statusText = new Label("System is ready. Please select an operation.");        statusText.getStyleClass().add("status-text");
         statusText.setWrapText(true);
 
         //Hộp thông báo trạng thái
@@ -200,7 +200,7 @@ public class StackVisualizerView extends BorderPane {
         panel.getChildren().addAll(
                 title, desc, divider(),
                 sectionOp, inputLabel, inputField,
-                row1, row2,pauseRow,speedBox, divider(), statusBox
+                row1, row2,pauseRow, divider(), statusBox
         );
         return panel;
     }
@@ -242,12 +242,12 @@ public class StackVisualizerView extends BorderPane {
 
         VBox centerWrapper = new VBox(frameWrapper);
         centerWrapper.setAlignment(Pos.CENTER);
-        centerWrapper.setPadding(new Insets(20, 0, 20, 0)); // Tạo khoảng đệm trên/dưới thoáng đãng
+        centerWrapper.setPadding(new Insets(50, 0, 50, 0)); // Tạo khoảng đệm trên/dưới thoáng đãng
 
         scrollPane = new ScrollPane(centerWrapper);
 
         scrollPane.setFitToWidth(true);
-        scrollPane.setFitToHeight(false);
+        scrollPane.setFitToHeight(true);
 
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
@@ -282,7 +282,7 @@ public class StackVisualizerView extends BorderPane {
             stackFrame.getChildren().add(emptyBox);
             return;
         }
-        //Tính toán chiều cao thích nghi
+        // Tính chiều cao cần thiết: mỗi cell cao 52px, spacing 8px, padding 30px
         double calculatedHeight = (items.size() * 52) + ((items.size() - 1) * 8) + 30;
 
         // Ép stackframe tuân theo calculatedHeight
@@ -305,12 +305,13 @@ public class StackVisualizerView extends BorderPane {
     }
 
     private HBox buildCellRow(int value, boolean isTop) {
+        //Label hiển thị số
         Label valLabel = new Label(String.valueOf(value));
         valLabel.getStyleClass().add(isTop ? "stack-cell-value-top" : "stack-cell-value");
 
+        // Ô vuông chứa số (StackPane = xếp chồng, label nằm chính giữa)
         StackPane cell = new StackPane(valLabel);
         cell.getStyleClass().add(isTop ? "stack-cell-top" : "stack-cell");
-
         cell.setMinWidth(190);
         cell.setMaxWidth(190);
         cell.setPrefWidth(190);
@@ -355,7 +356,7 @@ public class StackVisualizerView extends BorderPane {
         HBox codeHeader = panelHeader("<>  PSEUDO-CODE", "Java code");
         codeArea = new TextArea();
         codeArea.getStyleClass().add("code-area");
-        codeArea.setText("// Chọn 1 hành động để trực quan hóa mã giả");
+        codeArea.setText("// Select an action to visualize the Stack pseudocode");
         codeArea.setEditable(false);
         codeArea.setWrapText(true);
         VBox.setVgrow(codeArea, Priority.ALWAYS);
@@ -505,8 +506,7 @@ public class StackVisualizerView extends BorderPane {
         if (isSimulating) return;
         String raw = inputField.getText().trim();
         if (raw.isEmpty()) {
-            setStatus("⚠ Vui lòng nhập một số nguyên hoặc một dãy số hợp lệ!", false);
-            return;
+            setStatus("⚠ Please enter a valid integer or sequence of numbers!", false);            return;
         }
 
         // Tách chuỗi dựa vào dấu phẩy
@@ -526,7 +526,7 @@ public class StackVisualizerView extends BorderPane {
                 int val = Integer.parseInt(trimmedToken);
                 validValues.add(val);
             } catch (NumberFormatException ex) {
-                setStatus("⚠ Dãy nhập vào chứa giá trị không hợp lệ: '" + trimmedToken + "'", false);
+                setStatus("⚠ Input sequence contains an invalid value: '" + trimmedToken + "'", false);
                 return;
             }
         }
@@ -535,7 +535,7 @@ public class StackVisualizerView extends BorderPane {
 
         isSimulating = true;
         codeArea.setText(CODE_PUSH);
-        inputField.clear(); // Xóa khung nhập sau khi đã nhận dữ liệu thành công
+        //inputField.clear(); // Xóa khung nhập sau khi đã nhận dữ liệu thành công
 
         // 2. Tạo chuỗi hiệu ứng đổ tuần tự từng số vào Ngăn xếp (Stack)
         for (int i = 0; i < validValues.size(); i++) {
@@ -548,8 +548,8 @@ public class StackVisualizerView extends BorderPane {
             step.setOnFinished(e -> {
                 // Kiểm tra xem Ngăn xếp tại thời điểm chèn này đã bị đầy hay chưa
                 if (service.size() >= 20) {
-                    appendLog("✖ [Lỗi]: Không thể đẩy " + val + ". Stack đã đầy (Tối đa 20 phần tử).");
-                    setStatus("Stack đầy. Dừng đẩy các phần tử còn lại.", false);
+                    appendLog("✖ [Error]: Cannot push " + val + ". Stack is full (Max 20 elements).");
+                    setStatus("Stack is full. Stopping remaining pushes.", false);
 
                     // Nếu gặp lỗi đầy bộ nhớ, hủy bỏ toàn bộ các bước chèn phía sau ngay lập tức
                     batchTransition.stop();
@@ -559,23 +559,23 @@ public class StackVisualizerView extends BorderPane {
 
                 // Cập nhật lời giải thích tương ứng với phần tử đang được xử lý
                 explanationArea.setText(
-                        "• Thao tác Push đang xử lý giá trị: " + val + "\n" +
-                                "• Bước 1: Kiểm tra giới hạn bộ nhớ (Hiện tại size = " + service.size() + ").\n" +
-                                "• Bước 2: Cấp phát ô nhớ mới để lưu giá trị " + val + ".\n" +
-                                "• Bước 3: Đẩy phần tử vào đỉnh. Theo nguyên lý LIFO, phần tử mới sẽ nằm trên cùng và che khuất phần tử cũ.\n" +
-                                "• Bước 4: Con trỏ TOP được cập nhật bám sát lên để quản lý giá trị " + val + " vừa thêm."
+                        "• Push operation is processing value: " + val + "\n" +
+                                "• Step 1: Check memory limits (Current size = " + service.size() + ").\n" +
+                                "• Step 2: Allocate a new memory slot to store the value " + val + ".\n" +
+                                "• Step 3: Push the element onto the top. According to the LIFO principle, the new element will sit on top and obscure the older elements.\n" +
+                                "• Step 4: The TOP pointer is updated to point directly to the newly added value " + val + "."
                 );
 
-                appendLog("⚡ [Đang xử lý]: Đang Push(" + val + ") vào đỉnh Ngăn xếp...");
-                setStatus("Đang Push phần tử " + val + "...");
+                appendLog("⚡ [Processing]: Pushing Push(" + val + ") to the top of the Stack...");
+                setStatus("Pushing element " + val + "...");
 
                 // Đưa dữ liệu vào service và vẽ lại giao diện với chỉ mục hoạt họa mới nhất
                 service.push(val);
                 redrawStack(AnimType.PUSH, 0);
 
 
-                appendLog("✔ [Thành công]: Push " + val + " lên đỉnh Ngăn xếp thành công.");
-                setStatus("Đã Push thành công phần tử " + val + ".", true);
+                appendLog("✔ [Success]: Pushed " + val + " onto the Stack top successfully.");
+                setStatus("Successfully pushed element " + val + ".", true);
 
                 // Nếu đây là phần tử cuối cùng trong dãy, chính thức mở khóa mô phỏng
                 if (isLast) {
@@ -596,21 +596,21 @@ public class StackVisualizerView extends BorderPane {
     private void handlePop() {
         if (isSimulating) return;
         if (service.isEmpty()) {
-            appendLog("✖ [Lỗi]: Ngăn xếp rỗng (Stack Empty). Không thể Pop!");
-            setStatus("Ngăn xếp rỗng, không thể Pop.", false);
+            appendLog("✖ [Error]: Stack is empty. Cannot Pop!");
+            setStatus("Stack is empty, cannot Pop.", false);
             return;
         }
         isSimulating = true;
         codeArea.setText(CODE_POP);
         int topVal = service.toList().get(0);
         explanationArea.setText(
-                "• Bước 1: Kiểm tra xem Ngăn xếp có trống không. Nếu trống sẽ báo lỗi Underflow.\n" +
-                        "• Bước 2: Định vị phần tử đang nằm ở đỉnh trên cùng (Giá trị hiện tại là: " + topVal + ").\n" +
-                        "• Bước 3: Thực hiện nhấc phần tử " + topVal + " ra khỏi Ngăn xếp và giải phóng ô nhớ này.\n" +
-                        "• Bước 4: Tự động dịch chuyển hạ con trỏ TOP xuống phần tử liền kề phía dưới."
+                "• Step 1: Check if the Stack is empty. If it is, an Underflow error will be reported.\n" +
+                        "• Step 2: Locate the element currently at the top (Current value is: " + topVal + ").\n" +
+                        "• Step 3: Remove the element " + topVal + " from the Stack and free up this memory slot.\n" +
+                        "• Step 4: Automatically move the TOP pointer down to the immediate element below."
         );
-        appendLog("⚡ [Đang xử lý]: Đang Pop(" + topVal + ") ra khỏi Ngăn xếp...");
-        setStatus("Đang trích xuất dữ liệu từ đỉnh (POP)...");
+        appendLog("⚡ [Processing]: Popping " + topVal + " from the Stack...");
+        setStatus("Extracting data from the top (POP)...");
 
         stackFrame.getChildren().clear();
         List<Integer> items = service.toList();
@@ -626,8 +626,8 @@ public class StackVisualizerView extends BorderPane {
         playPopAnim(finalTopRow, () -> {
             service.pop();
             redrawStack(AnimType.NONE, -1);
-            appendLog("✔ [Thành công]: Pop(" + topVal + ") ra khỏi Ngăn xếp thành công.");
-            setStatus("Pop thành công.", true);
+            appendLog("✔ [Success]: Popped " + topVal + " from the Stack successfully.");
+            setStatus("Pop successful.", true);
             isSimulating = false;
         });
     }
@@ -643,16 +643,16 @@ public class StackVisualizerView extends BorderPane {
         codeArea.setText(CODE_PEEK);
         int peeked = service.toList().get(0);
         explanationArea.setText(
-                "• Điểm khác biệt: Lệnh Peek() chỉ kiểm tra (đọc trộm) giá trị đỉnh mà hoàn toàn không làm thay đổi cấu trúc dữ liệu.\n" +
-                        "• Hệ thống lần theo vị trí con trỏ TOP để lấy ra giá trị tại ô trên cùng (Đang hiển thị số: " + peeked + ").\n" +
-                        "• Phần tử " + peeked + " vẫn nằm nguyên vẹn trên Ngăn xếp, con trỏ TOP giữ nguyên vị trí."
+                "• Key Difference: The Peek() command only checks (peeks at) the top value without altering the data structure at all.\n" +
+                        "• The system tracks the TOP pointer position to retrieve the value at the topmost slot (Currently showing: " + peeked + ").\n" +
+                        "• The element " + peeked + " remains intact on the Stack; the TOP pointer stays in place."
         );
-        appendLog("⚡ [Đang xử lý]: Đang đọc giá trị đỉnh...");
-        setStatus("Kiểm tra giá trị đỉnh ngăn xếp...");
+        appendLog("⚡ [Processing]: Reading top value...");
+        setStatus("Checking stack top value...");
         redrawStack(AnimType.PEEK, 0);
         PauseTransition pause = new PauseTransition(Duration.millis(1800));
         pause.setOnFinished(e -> {
-            appendLog("✔ [Thành công]: Giá trị đỉnh hiện tại: " + peeked);
+            appendLog("✔ [Success]: Current top value: " + peeked);
             setStatus("Peek: " + peeked, true);
             isSimulating = false;
         });
@@ -667,13 +667,13 @@ public class StackVisualizerView extends BorderPane {
         service.push(45);
         codeArea.setText(CODE_IDLE);
         explanationArea.setText(
-                "• Hệ thống thực hiện dọn sạch bộ nhớ và nạp lại trạng thái ban đầu.\n" +
-                        "• Ba phần tử mặc định (15, 30, 45) được đưa vào khung chứa.\n" +
-                        "• Con trỏ TOP quay trở lại quản lý phần tử số 45 nằm ở đỉnh."
+                "• The system clears the memory and reloads the initial state.\n" +
+                        "• Three default elements (15, 30, 45) are loaded into the container.\n" +
+                        "• The TOP pointer returns to manage element 45 at the top."
         );
         redrawStack(AnimType.NONE, -1);
-        appendLog("[Nhật ký]: Đã làm mới Ngăn xếp về trạng thái mặc định.");
-        setStatus("Đã khởi tạo lại.", true);
+        appendLog("[Log]: Stack has been reset to the default state.");
+        setStatus("Reinitialized successfully.", true);
         inputField.clear();
     }
 }

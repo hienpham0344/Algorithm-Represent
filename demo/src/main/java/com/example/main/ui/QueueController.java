@@ -15,22 +15,31 @@ import java.util.ResourceBundle;
 
 public class QueueController implements Initializable {
 
-    @FXML private TextField inputField;
-    @FXML private HBox queueFrame;
-    @FXML private ScrollPane vizScrollPane;
-    @FXML private TextArea codeArea;
-    @FXML private TextArea logArea;
-    @FXML private TextArea explanationArea;
-    @FXML private Label statusText;
-    @FXML private Slider speedSlider;
-    @FXML private Button pauseBtn;
+    @FXML
+    private TextField inputField;
+    @FXML
+    private HBox queueFrame;
+    @FXML
+    private ScrollPane vizScrollPane;
+    @FXML
+    private TextArea codeArea;
+    @FXML
+    private TextArea logArea;
+    @FXML
+    private TextArea explanationArea;
+    @FXML
+    private Label statusText;
+    @FXML
+    private Slider speedSlider;
+    @FXML
+    private Button pauseBtn;
     private SequentialTransition batchTransition;
 
     private final QueueService service = new QueueService();
     private boolean isSimulating = false;
     private Animation currentAnimation;
 
-    private static final String CODE_IDLE = "// Chọn một hành động để trực quan hóa mã giả của Hàng đợi\n";
+    private static final String CODE_IDLE = "//Select an action to visualize the Queue pseudocode\n";
     private static final String CODE_ENQUEUE =
             "void enqueue(int value) {\n" +
                     "    if (isFull()) return error;\n" +
@@ -52,134 +61,134 @@ public class QueueController implements Initializable {
                     "    return elements[front];\n" +
                     "}\n";
 
-    private enum AnimType { NONE, ENQUEUE, PEEK }
+    private enum AnimType {NONE, ENQUEUE, PEEK}
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
-        speedSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
-            if (currentAnimation != null && currentAnimation.getStatus() == Animation.Status.RUNNING) {
-                currentAnimation.setRate(newVal.doubleValue());
-            }
-            if (batchTransition != null && batchTransition.getStatus() != Animation.Status.STOPPED) {
-                batchTransition.setRate(newVal.doubleValue());
-            }
-        });
+//        speedSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
+//            if (currentAnimation != null && currentAnimation.getStatus() == Animation.Status.RUNNING) {
+//                currentAnimation.setRate(newVal.doubleValue());
+//            }
+//            if (batchTransition != null && batchTransition.getStatus() != Animation.Status.STOPPED) {
+//                batchTransition.setRate(newVal.doubleValue());
+//            }
+//        });
+
         // init data
-
-
         service.enqueue(15);
         service.enqueue(30);
         service.enqueue(45);
         redrawQueue(AnimType.NONE, -1);
 
         explanationArea.setText(
-                "• Hàng đợi (Queue) được khởi tạo mặc định với 3 phần tử: 15, 30, 45.\n" +
-                        "• Theo nguyên lý FIFO (Vào trước, Ra trước), phần tử 15 vào đầu tiên nên nằm ở vị trí FRONT (Sẽ được lấy ra trước).\n" +
-                        "• Phần tử 45 vào sau cùng tạm thời đứng xếp hàng ở vị trí REAR."
+                "• The Queue is initialized by default with 3 elements: 15, 30, and 45.\n" +
+                        "According to the FIFO (First-In, First-Out) principle, since the element 15 enters first, it is positioned at the FRONT (and will be removed first).\n" +
+                        "The element 45, entering last, temporarily waits in line at the REAR position."
         );
 
-        appendLog("[Hệ Thống]: Đã tải xong hàng đợi mô phỏng.");
-        appendLog("[Hệ Thống]: Sẵn sàng hoạt động.");
-
+        appendLog("[System]: Simulated queue loaded successfully.");
+        appendLog("[System]: Ready for operation.");
 
 
     }
-        @FXML
-        private void handleEnqueue() {
-            if (isSimulating) return;
-            String txt = inputField.getText().trim();
-            if (txt.isEmpty()) {
-                setStatus("⚠ Vui lòng nhập một số nguyên hoặc một dãy số hợp lệ!", false);
+
+    @FXML
+    private void handleEnqueue() {
+        if (isSimulating) return;
+        String txt = inputField.getText().trim();
+        if (txt.isEmpty()) {
+            setStatus("⚠ Please enter a valid integer or sequence of numbers!", false);
+            return;
+        }
+
+        // Tách chuỗi dựa vào dấu phẩy
+        String[] tokens = txt.split(",");
+
+        // Tạo một luồng thực thi tuần tự các hiệu ứng chèn phần tử
+        batchTransition = new SequentialTransition();
+        // Biến tạm để lưu danh sách các số hợp lệ đã parse thành công
+        java.util.List<Integer> validValues = new java.util.ArrayList<>();
+
+        // 1. Kiểm tra tính hợp lệ của toàn bộ chuỗi trước khi chạy mô phỏng
+        for (String token : tokens) {
+            String trimmedToken = token.trim();
+            if (trimmedToken.isEmpty()) continue; // Bỏ qua khoảng trắng thừa giữa các dấu phẩy
+            try {
+                int val = Integer.parseInt(trimmedToken);
+                validValues.add(val);
+            } catch (NumberFormatException ex) {
+                setStatus("⚠ The input sequence contains an invalid value. '" + trimmedToken + "'", false);
                 return;
             }
+        }
 
-            // Tách chuỗi dựa vào dấu phẩy
-            String[] tokens = txt.split(",");
+        if (validValues.isEmpty()) return;
 
-            // Tạo một luồng thực thi tuần tự các hiệu ứng chèn phần tử
-            batchTransition = new SequentialTransition();
-            // Biến tạm để lưu danh sách các số hợp lệ đã parse thành công
-            java.util.List<Integer> validValues = new java.util.ArrayList<>();
+        isSimulating = true;
+        codeArea.setText(CODE_ENQUEUE);
+        inputField.clear(); // Xóa khung nhập sau khi đã nhận dữ liệu thành công
 
-            // 1. Kiểm tra tính hợp lệ của toàn bộ chuỗi trước khi chạy mô phỏng
-            for (String token : tokens) {
-                String trimmedToken = token.trim();
-                if (trimmedToken.isEmpty()) continue; // Bỏ qua khoảng trắng thừa giữa các dấu phẩy
-                try {
-                    int val = Integer.parseInt(trimmedToken);
-                    validValues.add(val);
-                } catch (NumberFormatException ex) {
-                    setStatus("⚠ Dãy nhập vào chứa giá trị không hợp lệ: '" + trimmedToken + "'", false);
+        // 2. Tạo chuỗi hiệu ứng đổ tuần tự từng số vào hàng đợi
+        for (int i = 0; i < validValues.size(); i++) {
+            final int val = validValues.get(i);
+            final boolean isLast = (i == validValues.size() - 1);
+
+            PauseTransition step = new PauseTransition(Duration.millis(1400));
+
+            step.setOnFinished(e -> {
+                // Kiểm tra xem hàng đợi tại thời điểm chèn này đã bị đầy hay chưa
+                if (service.size() >= 20) {
+                    appendLog("✖ [Error]: Cannot enqueue " + val + ". Queue is full (Maximum 10 elements).");
+                    setStatus("Queue is full. Stopping insertion of the remaining elements.", false);
+
+                    // Nếu gặp lỗi đầy hàng đợi, hủy bỏ toàn bộ các bước chèn phía sau ngay lập tức
+                    batchTransition.stop();
+                    isSimulating = false;
                     return;
                 }
-            }
 
-            if (validValues.isEmpty()) return;
+                // Cập nhật lời giải thích tương ứng với phần tử đang được xử lý
+                explanationArea.setText(
+                        "• Enqueue operation is processing value: " + val + "\n" +
+                                "• Step 1: Check isFull() status (Current size = " + service.size() + ").\n" +
+                                "• Step 2: Advance the REAR index to the new position to prepare for the element.\n" +
+                                "• Step 3: Insert the value " + val + " at the end of the queue.\n" +
+                                "• Step 4: Increment the queue size (size++)."
+                );
 
-            isSimulating = true;
-            codeArea.setText(CODE_ENQUEUE);
-            inputField.clear(); // Xóa khung nhập sau khi đã nhận dữ liệu thành công
+                appendLog("⚡ [Processing]: Enqueuing " + val + " to the end of the queue (REAR)...");
+                setStatus("Enqueuing element " + val + "...");
 
-            // 2. Tạo chuỗi hiệu ứng đổ tuần tự từng số vào hàng đợi
-            for (int i = 0; i < validValues.size(); i++) {
-                final int val = validValues.get(i);
-                final boolean isLast = (i == validValues.size() - 1);
+                // Đưa dữ liệu vào service và vẽ lại giao diện với chỉ mục hoạt họa mới nhất
+                service.enqueue(val);
+                redrawQueue(AnimType.ENQUEUE, service.size() - 1);
 
-                PauseTransition step = new PauseTransition(Duration.millis(1400));
+                appendLog("✔ [Success]: Element " + val + " added to REAR.");
+                setStatus("Enqueue(" + val + ") successful.", true);
 
-                step.setOnFinished(e -> {
-                    // Kiểm tra xem hàng đợi tại thời điểm chèn này đã bị đầy hay chưa
-                    if (service.size() >= 10) {
-                        appendLog("✖ [Lỗi]: Không thể chèn " + val + ". Hàng đợi đã đầy (Tối đa 10 phần tử).");
-                        setStatus("Queue đầy. Dừng chèn các phần tử còn lại.", false);
+                // Nếu đây là phần tử cuối cùng trong dãy, chính thức mở khóa mô phỏng
+                if (isLast) {
+                    isSimulating = false;
+                    pauseBtn.setText("Pause");
+                    pauseBtn.setStyle("");
+                }
+            });
 
-                        // Nếu gặp lỗi đầy hàng đợi, hủy bỏ toàn bộ các bước chèn phía sau ngay lập tức
-                        batchTransition.stop();
-                        isSimulating = false;
-                        return;
-                    }
-
-                    // Cập nhật lời giải thích tương ứng với phần tử đang được xử lý
-                    explanationArea.setText(
-                            "• Thao tác Enqueue đang xử lý giá trị: " + val + "\n" +
-                                    "• Bước 1: Kiểm tra trạng thái isFull() (Hiện tại size = " + service.size() + ").\n" +
-                                    "• Bước 2: Tịnh tiến chỉ mục REAR lên vị trí mới để chuẩn bị đón nhận phần tử.\n" +
-                                    "• Bước 3: Đưa giá trị " + val + " vào cuối hàng đợi.\n" +
-                                    "• Bước 4: Tăng kích thước (size++) của Hàng đợi lên thêm 1."
-                    );
-
-                    appendLog("⚡ [Đang xử lý]: Đang Enqueue " + val + " vào cuối hàng đợi (REAR)...");
-                    setStatus("Đang Enqueue phần tử " + val + "...");
-
-                    // Đưa dữ liệu vào service và vẽ lại giao diện với chỉ mục hoạt họa mới nhất
-                    service.enqueue(val);
-                    redrawQueue(AnimType.ENQUEUE, service.size() - 1);
-
-                    appendLog("✔ [Thành công]: Đã thêm phần tử " + val + " vào REAR.");
-                    setStatus("Enqueue(" + val + ") thành công.", true);
-
-                    // Nếu đây là phần tử cuối cùng trong dãy, chính thức mở khóa mô phỏng
-                    if (isLast) {
-                        isSimulating = false;
-                        pauseBtn.setText("Pause");
-                        pauseBtn.setStyle("");
-                    }
-                });
-
-                batchTransition.getChildren().add(step);            }
-
-            // Bắt đầu chạy chuỗi hiệu ứng chèn hàng loạt phần tử
-            batchTransition.setRate(speedSlider.getValue());
-            batchTransition.play();
+            batchTransition.getChildren().add(step);
         }
+
+        // Bắt đầu chạy chuỗi hiệu ứng chèn hàng loạt phần tử
+        //batchTransition.setRate(speedSlider.getValue());
+        batchTransition.play();
+    }
 
     @FXML
     private void handleDequeue() {
         if (isSimulating) return;
         if (service.isEmpty()) {
-            appendLog("✖ [Lỗi]: Hàng đợi trống (Queue Empty). Không thể Dequeue!");
-            setStatus("Hàng đợi rỗng.", false);
+            appendLog("✖ [Error]: Queue is empty. Cannot Dequeue!");
+            setStatus("Queue is empty.", false);
             return;
         }
 
@@ -188,20 +197,21 @@ public class QueueController implements Initializable {
         int frontVal = service.toList().get(0);
 
         explanationArea.setText(
-                "• Bước 1: Kiểm tra xem Hàng đợi có bị rỗng hay không (isEmpty()).\n" +
-                        "• Bước 2: Định vị và lấy ra dữ liệu tại vị trí đầu hàng FRONT (Hiện tại là giá trị: " + frontVal + ").\n" +
-                        "• Bước 3: Di chuyển con trỏ FRONT sang vị trí tiếp theo bằng mảng vòng: front = (front + 1) % capacity.\n" +
-                        "• Bước 4: Giảm kích thước tổng thể (size--) của Hàng đợi đi 1 đơn vị."
+                "• Step 1: Check if the Queue is empty (isEmpty()).\n" +
+                        "• Step 2: Locate and retrieve the data at the FRONT position (Current value: " + frontVal + ").\n" +
+                        "• Step 3: Move the FRONT pointer to the next position using a circular array: front = (front + 1) % capacity.\n" +
+                        "• Step 4: Decrement the overall queue size (size--)."
         );
 
-        appendLog("⚡ [Đang xử lý]: Đang rút phần tử " + frontVal + " ra khỏi đầu hàng (FRONT)...");
-        setStatus("Đang thực hiện Dequeue...");
+        appendLog("⚡ [Processing]: Dequeuing element " + frontVal + " from the FRONT...");
+        setStatus("Dequeuing...");
 
         VBox frontNode = (VBox) queueFrame.getChildren().get(0);
 
 
         ScaleTransition st = new ScaleTransition(Duration.millis(450), frontNode);
-        st.setToX(0); st.setToY(0);
+        st.setToX(0);
+        st.setToY(0);
         FadeTransition ft = new FadeTransition(Duration.millis(450), frontNode);
         ft.setToValue(0);
         ParallelTransition pt = new ParallelTransition(st, ft);
@@ -209,13 +219,13 @@ public class QueueController implements Initializable {
         pt.setOnFinished(e -> {
             service.dequeue();
             redrawQueue(AnimType.NONE, -1);
-            appendLog("✔ [Thành công]: Đã rút thành công " + frontVal + " ra khỏi FRONT.");
-            setStatus("Dequeue thành công.", true);
+            appendLog("✔ [Success]: Successfully dequeued " + frontVal + " from FRONT.");
+            setStatus("Dequeue successful.", true);
             isSimulating = false;
         });
 
         currentAnimation = pt;
-        pt.setRate(speedSlider.getValue());
+        //pt.setRate(speedSlider.getValue());
         pt.play();
     }
 
@@ -223,8 +233,8 @@ public class QueueController implements Initializable {
     private void handlePeek() {
         if (isSimulating) return;
         if (service.isEmpty()) {
-            appendLog("✖ [Lỗi]: Hàng đợi rỗng (Queue Empty). Không thể Peek!");
-            setStatus("Hàng đợi rỗng.", false);
+            appendLog("✖ [Error]: Queue is empty. Cannot Peek!");
+            setStatus("Queue is empty.", false);
             return;
         }
 
@@ -233,19 +243,19 @@ public class QueueController implements Initializable {
         int frontVal = service.toList().get(0);
 
         explanationArea.setText(
-                "• Lệnh Peek() (hoặc Front()) giúp xem trước thông tin của phần tử đang chuẩn bị xuất xưởng ở đầu hàng.\n" +
-                        "• Hệ thống truy cập trực tiếp vào chỉ mục của con trỏ FRONT và trích xuất giá trị: " + frontVal + ".\n" +
-                        "• Hành động này hoàn toàn KHÔNG xóa phần tử, vị trí FRONT và REAR được bảo toàn nguyên vẹn."
+                "• The Peek() (or Front()) command allows you to preview the element that is about to be removed at the front of the queue.\n" +
+                        "• The system directly accesses the FRONT pointer index and extracts the value: " + frontVal + ".\n" +
+                        "• This action does NOT delete the element; the FRONT and REAR positions remain completely intact."
         );
 
-        appendLog("⚡ [Đang xử lý]: Đang đọc giá trị phần tử FRONT...");
-        setStatus("Kiểm tra giá trị FRONT...");
+        appendLog("⚡ [Processing]: Reading the FRONT element value...");
+        setStatus("Checking FRONT value...");
 
         redrawQueue(AnimType.PEEK, 0);
 
         PauseTransition pause = new PauseTransition(Duration.millis(1500));
         pause.setOnFinished(e -> {
-            appendLog("✔ [Thành công]: Giá trị ở FRONT hiện tại là: " + frontVal);
+            appendLog("✔ [Success]: Current value at FRONT is: " + frontVal);
             setStatus("Front Value: " + frontVal, true);
             isSimulating = false;
         });
@@ -263,18 +273,19 @@ public class QueueController implements Initializable {
         codeArea.setText(CODE_IDLE);
 
         explanationArea.setText(
-                "• Toàn bộ cấu trúc cũ đã bị hủy bỏ để nạp lại trạng thái mô phỏng Hàng đợi mặc định.\n" +
-                        "• Hệ thống tự động xếp lại 3 phần tử ban đầu: 15 (FRONT) → 30 → 45 (REAR).\n" +
-                        "• Hàng đợi đã sẵn sàng tiếp nhận các phần tử mới đi vào từ REAR."
+                "• The entire old structure has been cleared to reload the default Queue simulation state.\n" +
+                        "• The system automatically enqueued the 3 initial elements: 15 (FRONT) → 30 → 45 (REAR).\n" +
+                        "• The Queue is now ready to accept new elements entering from the REAR."
         );
 
         logArea.clear();
-        appendLog("[Hệ Thống]: Đã nạp lại trạng thái mô phỏng Hàng Đợi mặc định.");
-        appendLog("[Hệ Thống]: Khởi tạo 3 phần tử ban đầu: 15 (FRONT) → 30 → 45 (REAR).");
-        setStatus("Hệ thống đã sẵn sàng.", true);
+        appendLog("[System]: Default Queue simulation state reloaded.");
+        appendLog("[System]: Initialized 3 initial elements: 15 (FRONT) → 30 → 45 (REAR).");
+        setStatus("System is ready.", true);
 
         redrawQueue(AnimType.NONE, -1);
     }
+
     @FXML
     private void handlePause() {
         if (batchTransition != null && isSimulating) {
@@ -282,19 +293,20 @@ public class QueueController implements Initializable {
                 batchTransition.pause();
                 pauseBtn.setText("Resume");
                 pauseBtn.setStyle("-fx-background-color: #EAB308; -fx-text-fill: #FFFFFF;");
-                setStatus("⏸ Đã tạm dừng mô phỏng chuỗi Queue.");
+                setStatus("⏸ Simulation paused.");
             } else if (batchTransition.getStatus() == Animation.Status.PAUSED) {
                 batchTransition.play();
                 pauseBtn.setText("Pause");
                 pauseBtn.setStyle("");
-                setStatus("▶ Tiếp tục nạp các phần tử Queue còn lại...");
+                setStatus("▶ Resuming Queue enqueues...");
             }
         }
     }
+
     @FXML
     private void handleClearLog() {
         logArea.clear();
-        appendLog("[Hệ Thống]: Nhật ký đã được dọn sạch.");
+        appendLog("[System]: Log has been cleared.");
     }
 
     private void redrawQueue(AnimType type, int animIdx) {
@@ -302,7 +314,7 @@ public class QueueController implements Initializable {
         List<Integer> items = service.toList();
 
         if (items.isEmpty()) {
-            Label empty = new Label("QUEUE RỖNG (EMPTY)");
+            Label empty = new Label("QUEUE EMPTY");
             empty.getStyleClass().add("queue-empty-label");
 
             // Khi rỗng, chiếc máng ngang có kích thước cố định ngắn
@@ -322,15 +334,16 @@ public class QueueController implements Initializable {
 
         for (int i = 0; i < items.size(); i++) {
             boolean isFront = (i == 0);
-            boolean isRear  = (i == items.size() - 1);
+            boolean isRear = (i == items.size() - 1);
             VBox cellNode = buildCellNode(items.get(i), isFront, isRear);
             queueFrame.getChildren().add(cellNode);
 
             if (i == animIdx) {
                 switch (type) {
                     case ENQUEUE -> playEnqueueAnim(cellNode);
-                    case PEEK    -> playPeekAnim(cellNode);
-                    default      -> {}
+                    case PEEK -> playPeekAnim(cellNode);
+                    default -> {
+                    }
                 }
             }
 
@@ -343,8 +356,8 @@ public class QueueController implements Initializable {
 
         String tagText = "";
         if (isFront && isRear) tagText = "FRONT / REAR";
-        else if (isFront)      tagText = "FRONT (ĐẦU)";
-        else if (isRear)       tagText = "REAR (CUỐI)";
+        else if (isFront) tagText = "FRONT";
+        else if (isRear) tagText = "REAR";
 
         Label topLabel = new Label(tagText);
         topLabel.getStyleClass().add(isFront ? "queue-tag-front" : (isRear ? "queue-tag-rear" : "queue-tag-mid"));
@@ -357,7 +370,9 @@ public class QueueController implements Initializable {
         return cell;
     }
 
-    private void appendLog(String msg) { logArea.appendText(msg + "\n"); }
+    private void appendLog(String msg) {
+        logArea.appendText(msg + "\n");
+    }
 
     private void setStatus(String text) {
         statusText.setText(text);
@@ -370,7 +385,9 @@ public class QueueController implements Initializable {
     }
 
     private void playEnqueueAnim(VBox node) {
-        node.setScaleX(0); node.setScaleY(0); node.setOpacity(0);
+        node.setScaleX(0);
+        node.setScaleY(0);
+        node.setOpacity(0);
         Timeline tl = new Timeline(
                 new KeyFrame(Duration.ZERO,
                         new KeyValue(node.scaleXProperty(), 0),
@@ -388,19 +405,21 @@ public class QueueController implements Initializable {
                 )
         );
         currentAnimation = tl;
-        tl.setRate(speedSlider.getValue());
+        //tl.setRate(speedSlider.getValue());
         tl.play();
     }
 
     private void playPeekAnim(VBox node) {
         ScaleTransition st = new ScaleTransition(Duration.millis(400), node);
-        st.setFromX(1.0); st.setToX(1.1);
-        st.setFromY(1.0); st.setToY(1.1);
+        st.setFromX(1.0);
+        st.setToX(1.1);
+        st.setFromY(1.0);
+        st.setToY(1.1);
         st.setCycleCount(4);
         st.setAutoReverse(true);
         st.setInterpolator(Interpolator.EASE_BOTH);
         currentAnimation = st;
-        st.setRate(speedSlider.getValue());
+        //st.setRate(speedSlider.getValue());
         st.play();
     }
 }

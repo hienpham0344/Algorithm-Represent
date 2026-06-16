@@ -34,13 +34,11 @@
                     </HBox>
 
                     <HBox alignment="CENTER">
-                        <Button fx:id="pauseBtn" maxWidth="1.7976931348623157E308"
-                                onAction="#handlePause"
-                                styleClass="btn-pause" text="Pause" HBox.hgrow="ALWAYS" />
+                        <Button fx:id="pauseBtn" maxWidth="1.7976931348623157E308" onAction="#handlePause" styleClass="btn-pause" text="Pause" HBox.hgrow="ALWAYS" />
                     </HBox>
 
-                    <Label styleClass="input-label" text="⏱ Speed:" />
-                    <Slider fx:id="speedSlider" blockIncrement="0.1" maxWidth="1.7976931348623157E308" majorTickUnit="1.0" max="3.0" min="0.2" showTickLabels="true" showTickMarks="true" styleClass="speed-slider" value="1.0" />
+<!--                    <Label styleClass="input-label" text="⏱ Speed:" />-->
+<!--                    <Slider fx:id="speedSlider" blockIncrement="0.1" majorTickUnit="1.0" max="3.0" maxWidth="1.7976931348623157E308" min="0.2" showTickLabels="true" showTickMarks="true" styleClass="speed-slider" value="1.0" />-->
 
                     <Region styleClass="sidebar-divider" />
 
@@ -49,7 +47,7 @@
                             <Insets bottom="12.0" left="14.0" right="14.0" top="12.0" />
                         </padding>
                         <Label styleClass="status-header" text="ℹ  SIMULATION STATUS" />
-                        <Label fx:id="statusText" styleClass="status-text" text="Hệ thống đã sẵn sàng. Hãy chọn một thao tác." wrapText="true" />
+                        <Label fx:id="statusText" styleClass="status-text" text="System is ready. Please select an operation." wrapText="true" />
                     </VBox>
                 </VBox>
             </content>
@@ -59,12 +57,7 @@
     <center>
         <StackPane styleClass="viz-area" BorderPane.alignment="CENTER">
             <children>
-                <ScrollPane fx:id="vizScrollPane"
-                            fitToHeight="true"
-                            fitToWidth="true"
-                            hbarPolicy="AS_NEEDED"
-                            vbarPolicy="NEVER"
-                            styleClass="viz-scroll-pane">
+                <ScrollPane fx:id="vizScrollPane" fitToHeight="true" fitToWidth="true" hbarPolicy="AS_NEEDED" styleClass="viz-scroll-pane" vbarPolicy="NEVER">
                     <content>
                         <HBox alignment="CENTER" maxWidth="1.7976931348623157E308">
                             <children>
@@ -85,12 +78,7 @@
     </center>
 
     <bottom>
-        <HBox fillHeight="true"
-              prefHeight="210.0"
-              minHeight="180.0"
-              maxHeight="260.0"
-              styleClass="bottom-dock"
-              BorderPane.alignment="CENTER">
+        <HBox fillHeight="true" maxHeight="260.0" minHeight="180.0" prefHeight="210.0" styleClass="bottom-dock" BorderPane.alignment="CENTER">
             <children>
                 <VBox styleClass="bottom-panel" HBox.hgrow="ALWAYS">
                     <children>
@@ -101,7 +89,7 @@
                                 <Label styleClass="panel-lang-badge" text="Java code" />
                             </children>
                         </HBox>
-                        <TextArea fx:id="codeArea" editable="false" minHeight="100.0" styleClass="code-area" wrapText="false" VBox.vgrow="ALWAYS">
+                        <TextArea fx:id="codeArea" editable="false" minHeight="100.0" styleClass="code-area" text="// Select an action to visualize the Queue pseudocode" wrapText="false" VBox.vgrow="ALWAYS">
                             <VBox.margin><Insets bottom="12.0" left="12.0" right="12.0" top="12.0" /></VBox.margin>
                         </TextArea>
                     </children>
@@ -115,7 +103,7 @@
                             <children>
                                 <Label styleClass="panel-header-label" text="?  EXPLANATION" />
                                 <Region HBox.hgrow="ALWAYS" />
-                                <Label styleClass="panel-lang-badge" text="Hướng dẫn" />
+                                <Label styleClass="panel-lang-badge" text="Guide" />
                             </children>
                         </HBox>
                         <TextArea fx:id="explanationArea" editable="false" minHeight="100.0" styleClass="explanation-area" wrapText="true" VBox.vgrow="ALWAYS">

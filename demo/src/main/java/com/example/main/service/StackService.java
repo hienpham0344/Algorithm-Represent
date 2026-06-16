@@ -13,20 +13,20 @@ public class StackService {
 
     public Result push(int value) {
         stack.push(value);
-        return new Result(true, "Đã push " + value + " vào đỉnh stack.", value);
+        return new Result(true, "Successfully pushed " + value + " onto the stack top.", value);
     }
 
     public Result pop() {
         if (stack.isEmpty())
-            return new Result(false, "Stack đang rỗng, không thể pop.", null);
+            return new Result(false, "Stack is empty, cannot pop.", null);
         int val = stack.pop();
-        return new Result(true, "Đã pop " + val + " ra khỏi đỉnh stack.", val);
+        return new Result(true, "Successfully popped " + val + " from the stack top.", val);
     }
 
     public Result peek() {
         if (stack.isEmpty())
-            return new Result(false, "Stack đang rỗng, không có phần tử đỉnh.", null);
-        return new Result(true, "Đỉnh stack (peek): " + stack.peek(), stack.peek());
+            return new Result(false, "Stack is empty, no top element exists.", null);
+        return new Result(true, "Stack top (peek): " + stack.peek(), stack.peek());
     }
 
     public void reset() {
