@@ -87,13 +87,13 @@ public class StackVisualizerView extends BorderPane {
         redrawStack(AnimType.NONE, -1);
 
         explanationArea.setText(
-                "• Ngăn xếp (Stack) được khởi tạo mặc định với 3 phần tử: 15, 30, 45.\n" +
-                        "• Theo nguyên lý LIFO, phần tử 45 được đưa vào cuối cùng nên nó nằm ở trên cùng (Đỉnh Ngăn xếp).\n" +
-                        "• Con trỏ TOP hiện tại đang chỉ thẳng vào phần tử số 45 này."
+                "• The stack is initialized by default with 3 elements: 15, 30, and 45.\n" +
+                        "• According to the LIFO (Last In, First Out) principle, the element 45 was added last, so it sits at the very top (Top of the Stack).\n" +
+                        "• The TOP pointer is currently pointing directly to this element 45."
         );
 
-        appendLog("[Hệ Thống]: Đã tải xong ngăn xếp mô phỏng.");
-        appendLog("[Hệ Thống]: Sẵn sàng hoạt động.");
+        appendLog("[System]: Simulation stack loaded successfully.");
+        appendLog("[System]: Ready for operation.");
     }
 
     private VBox buildLeftPanel() {

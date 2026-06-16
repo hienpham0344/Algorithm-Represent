@@ -29,20 +29,20 @@
             <!-- Sorting Section -->
             <Label styleClass="sidebar-section" text="THUẬT TOÁN" />
 
-            <Button onAction="#openSortingVisualizer" styleClass="sidebar-btn, sidebar-btn-active" text="⚙  Mô phỏng sắp xếp" />
+            <Button fx:id="btnSort" onAction="#openSortingVisualizer" styleClass="sidebar-btn" text="⚙  Mô phỏng sắp xếp" />
 
             <!-- Data Structures Section -->
             <Label styleClass="sidebar-section" text="CẤU TRÚC DỮ LIỆU" />
 
-            <Button onAction="#openArray" styleClass="sidebar-btn" text="▦  Array" />
+            <Button fx:id="btnArray" onAction="#openArray" styleClass="sidebar-btn" text="▦  Array" />
 
-            <Button onAction="#openLinkedList" styleClass="sidebar-btn" text="⬡  LinkedList" />
+            <Button fx:id="btnLinkedList" onAction="#openLinkedList" styleClass="sidebar-btn" text="⬡  LinkedList" />
 
-            <Button onAction="#openStack" styleClass="sidebar-btn" text="⏫  Stack" />
+            <Button fx:id="btnStack" onAction="#openStack" styleClass="sidebar-btn" text="⏫  Stack" />
 
-            <Button onAction="#openQueue" styleClass="sidebar-btn" text="△  Queue" />
+            <Button fx:id="btnQueue" onAction="#openQueue" styleClass="sidebar-btn" text="△  Queue" />
 
-            <Button onAction="#openBinaryTree" styleClass="sidebar-btn" text="⌥  Binary Tree" />
+            <Button fx:id="btnBinaryTree" onAction="#openBinaryTree" styleClass="sidebar-btn" text="⌥  Binary Tree" />
 
         </VBox>
     </left>
