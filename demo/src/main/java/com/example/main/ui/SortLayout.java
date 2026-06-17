@@ -24,6 +24,9 @@ final class SortLayout {
     }
 
     static double barWidth(int itemCount) {
+        if (itemCount > 20) {
+            return 32;
+        }
         if (itemCount > 12) {
             return 38;
         }
@@ -34,6 +37,9 @@ final class SortLayout {
     }
 
     static double barGap(int itemCount) {
+        if (itemCount > 20) {
+            return 6;
+        }
         if (itemCount > 12) {
             return 7;
         }

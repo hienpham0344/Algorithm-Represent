@@ -17,7 +17,7 @@ class SortPresentationTest {
     @Test
     void groupsMultipleMarkerLabelsAtTheSameBar() {
         Step step = new Step(new int[]{4, 8, 2}, StepAction.CONDITION, "quick.partition.condition",
-                "So sánh phần tử với pivot.",
+                "Compare element with pivot.",
                 List.of(new BarMarker(1, "i"), new BarMarker(1, "j"), new BarMarker(2, "pivot")),
                 Set.of(1, 2), Set.of());
 
@@ -29,9 +29,9 @@ class SortPresentationTest {
     @Test
     void addsSwapBadgeOnlyToAffectedBarsOfRealSwap() {
         Step swap = new Step(new int[]{1, 4}, StepAction.SWAP, "bubble.swap",
-                "Đổi chỗ.", List.of(), Set.of(0, 1), Set.of());
+                "Swap.", List.of(), Set.of(0, 1), Set.of());
         Step write = new Step(new int[]{1, 4}, StepAction.WRITE, "merge.writeLeft",
-                "Ghi giá trị.", List.of(), Set.of(0), Set.of());
+                "Write value.", List.of(), Set.of(0), Set.of());
 
         assertTrue(SortPresentation.showSwapBadge(swap, 0));
         assertTrue(SortPresentation.showSwapBadge(swap, 1));

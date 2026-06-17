@@ -125,7 +125,7 @@ public final class CodeSnippets {
     }
 
     public static CodeSnippet get(String algorithm) {
-        return SNIPPETS.getOrDefault(algorithm, new CodeSnippet(List.of(text("// Không có code"))));
+        return SNIPPETS.getOrDefault(algorithm, new CodeSnippet(List.of(text("// No code"))));
     }
 
     public static boolean containsLine(String algorithm, String lineId) {

@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 
 final class SortInputParser {
     static final int MIN_ITEMS = 2;
-    static final int MAX_ITEMS = 15;
+    static final int MAX_ITEMS = 25;
     static final int MIN_VALUE = 1;
     static final int MAX_VALUE = 280;
 

@@ -31,10 +31,10 @@ class SortInputParserTest {
     void acceptsMinimumAndMaximumItemCounts() {
         assertArrayEquals(new int[]{1, 280}, SortInputParser.parse("1, 280"));
 
-        String fifteenValues = IntStream.rangeClosed(1, 15)
+        String twentyFiveValues = IntStream.rangeClosed(1, 25)
                 .mapToObj(Integer::toString)
                 .collect(Collectors.joining(", "));
-        assertEquals(15, SortInputParser.parse(fifteenValues).length);
+        assertEquals(25, SortInputParser.parse(twentyFiveValues).length);
     }
 
     @Test
@@ -56,16 +56,16 @@ class SortInputParserTest {
     }
 
     @Test
-    void rejectsMoreThanFifteenValues() {
-        String sixteenValues = IntStream.rangeClosed(1, 16)
+    void rejectsMoreThanTwentyFiveValues() {
+        String twentySixValues = IntStream.rangeClosed(1, 26)
                 .mapToObj(Integer::toString)
                 .collect(Collectors.joining(" "));
 
         SortInputValidationException error = assertThrows(
                 SortInputValidationException.class,
-                () -> SortInputParser.parse(sixteenValues));
+                () -> SortInputParser.parse(twentySixValues));
 
-        assertTrue(error.getMessage().contains("at most 15"));
+        assertTrue(error.getMessage().contains("at most 25"));
     }
 
     @Test
