@@ -78,11 +78,15 @@ public class DashboardController {
 
     @FXML
     public void openArray() {
-        ArrayVisualizerView view = new ArrayVisualizerView();
-        contentPane.getChildren().setAll(view);
-
-        setActiveButton(btnArray);
-
+        try {
+            Parent view = FXMLLoader.load(
+                    getClass().getResource("/fxml/array-view.fxml")
+            );
+            contentPane.getChildren().setAll(view);
+            setActiveButton(btnArray);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         closeSidebar();
     }
 
@@ -114,12 +118,8 @@ public class DashboardController {
     @FXML
     public void openQueue() {
         try {
-            FXMLLoader loader = new FXMLLoader(
+            Parent view = FXMLLoader.load(
                     getClass().getResource("/fxml/queue-view.fxml")
-            );
-            Parent view = loader.load();
-            view.getStylesheets().add(
-                    getClass().getResource("/styles/queue.css").toExternalForm()
             );
             contentPane.getChildren().setAll(view);
 
