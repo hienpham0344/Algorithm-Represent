@@ -24,7 +24,7 @@ public class BinaryTreeService {
     public Result insert(int value) {
         if (root == null) {
             root = new Node(value);
-            return new Result(true, "Đã chèn " + value + " làm gốc (Root).");
+            return new Result(true, "Inserted " + value + " as the root.");
         }
         return insertRec(root, value);
     }
@@ -33,27 +33,27 @@ public class BinaryTreeService {
         if (value < current.value) {
             if (current.left == null) {
                 current.left = new Node(value);
-                return new Result(true, "Đã chèn " + value + " vào nhánh trái của " + current.value);
+                return new Result(true, "Inserted " + value + " into the left subtree of " + current.value + ".");
             } else {
                 return insertRec(current.left, value);
             }
         } else if (value > current.value) {
             if (current.right == null) {
                 current.right = new Node(value);
-                return new Result(true, "Đã chèn " + value + " vào nhánh phải của " + current.value);
+                return new Result(true, "Inserted " + value + " into the right subtree of " + current.value + ".");
             } else {
                 return insertRec(current.right, value);
             }
         }
-        return new Result(false, "Giá trị " + value + " đã tồn tại trong cây.");
+        return new Result(false, "Value " + value + " already exists in the tree.");
     }
 
     public Result delete(int value) {
         if (!contains(root, value)) {
-            return new Result(false, "Không tìm thấy giá trị " + value + " để xóa.");
+            return new Result(false, "Value " + value + " was not found for deletion.");
         }
         root = deleteRec(root, value);
-        return new Result(true, "Đã xóa thành công nút " + value + ".");
+        return new Result(true, "Successfully deleted node " + value + ".");
     }
 
     private Node deleteRec(Node root, int value) {
@@ -88,11 +88,11 @@ public class BinaryTreeService {
         while (current != null) {
             path.add(current.value);
             if (value == current.value) {
-                return new SearchResult(true, "Tìm thấy nút " + value + " trong cây.", path);
+                return new SearchResult(true, "Found node " + value + " in the tree.", path);
             }
             current = value < current.value ? current.left : current.right;
         }
-        return new SearchResult(false, "Không tìm thấy nút " + value + " trong cây.", path);
+        return new SearchResult(false, "Node " + value + " was not found in the tree.", path);
     }
 
     private boolean contains(Node current, int value) {
@@ -104,21 +104,21 @@ public class BinaryTreeService {
     public SearchResult traverse(String type) {
         List<Integer> path = new ArrayList<>();
         if (root == null) {
-            return new SearchResult(false, "Cây đang rỗng, không thể duyệt.", path);
+            return new SearchResult(false, "The tree is empty; traversal is not possible.", path);
         }
 
         switch (type) {
             case "NLR":
                 preOrderRec(root, path);
-                return new SearchResult(true, "Duyệt tiền thứ tự (NLR / Pre-order) hoàn tất.", path);
+                return new SearchResult(true, "Pre-order traversal (NLR) complete.", path);
             case "LNR":
                 inOrderRec(root, path);
-                return new SearchResult(true, "Duyệt trung thứ tự (LNR / In-order) hoàn tất.", path);
+                return new SearchResult(true, "In-order traversal (LNR) complete.", path);
             case "LRN":
                 postOrderRec(root, path);
-                return new SearchResult(true, "Duyệt hậu thứ tự (LRN / Post-order) hoàn tất.", path);
+                return new SearchResult(true, "Post-order traversal (LRN) complete.", path);
             default:
-                return new SearchResult(false, "Kiểu duyệt không hợp lệ.", path);
+                return new SearchResult(false, "Invalid traversal type.", path);
         }
     }
 

@@ -54,7 +54,7 @@ class SortTraceContractTest {
         java.util.Set<Integer> sorted = new java.util.LinkedHashSet<>(List.of(1));
 
         Step step = new Step(source, StepAction.SWAP, "bubble.swap",
-                "Đổi chỗ hai phần tử.", markers, affected, sorted);
+                "Swap two elements.", markers, affected, sorted);
 
         source[0] = 99;
         markers.clear();
@@ -72,11 +72,11 @@ class SortTraceContractTest {
     @Test
     void swapCountOnlyIncludesRealSwaps() {
         Step realSwap = new Step(new int[]{1, 2}, StepAction.SWAP, "bubble.swap",
-                "Đổi chỗ.", List.of(), java.util.Set.of(0, 1), java.util.Set.of());
+                "Swap.", List.of(), java.util.Set.of(0, 1), java.util.Set.of());
         Step selfSwap = new Step(new int[]{1}, StepAction.SWAP, "quick.placePivot",
-                "Pivot đã đúng vị trí.", List.of(), java.util.Set.of(0), java.util.Set.of());
+                "Pivot is already in place.", List.of(), java.util.Set.of(0), java.util.Set.of());
         Step write = new Step(new int[]{1, 2}, StepAction.WRITE, "merge.writeLeft",
-                "Ghi phần tử.", List.of(), java.util.Set.of(0), java.util.Set.of());
+                "Write element.", List.of(), java.util.Set.of(0), java.util.Set.of());
 
         assertTrue(realSwap.countsAsSwap());
         assertFalse(selfSwap.countsAsSwap());

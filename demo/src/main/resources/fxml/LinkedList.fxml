@@ -51,7 +51,7 @@
                     styleClass="status-title"/>
 
                 <Label fx:id="statusLabel"
-                    text="Ready. Choose an array operation."
+                    text="Ready. Choose a linked list operation."
                     wrapText="true"
                     styleClass="status-text"/>
 

@@ -18,6 +18,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.ToggleGroup;
+import javafx.util.StringConverter;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -47,7 +48,7 @@ import java.util.Random;
 import java.util.Set;
 
 
-public class SortVisualizerView extends VBox {
+public class    SortVisualizerView extends VBox {
 
     // ── Algorithm display names ──────────────────────────────────────────
     private static final Map<String, String> ALGORITHM_NAMES = Map.of(
@@ -72,8 +73,9 @@ public class SortVisualizerView extends VBox {
     // Controls
     private final ComboBox<String> algorithmBox = new ComboBox<>();
     private final ComboBox<String> dataSourceBox = new ComboBox<>();
-    private final Slider  sizeSlider   = new Slider(2, 15, 8);
-    private final Label   sizeRangeLabel = new Label("2 -> 15");
+    private final Slider  sizeSlider   = new Slider(
+            SortInputParser.MIN_ITEMS, SortInputParser.MAX_ITEMS, 8);
+    private final Label   sizeValueLabel = new Label("8");
     private final Slider  speedSlider =
             new Slider(SortSpeed.MIN_RATE, SortSpeed.MAX_RATE, SortSpeed.DEFAULT_RATE);
     private final Label   speedValueLabel = new Label(SortSpeed.label(SortSpeed.DEFAULT_RATE));
@@ -83,7 +85,7 @@ public class SortVisualizerView extends VBox {
     private final VBox manualInputPanel = new VBox(8);
     private final Label   swapValueLabel = new Label("0");
     private final Label   statusLabel  = new Label("Creating an array to get started.");
-    private final Label   explanationTitle = new Label("Giải thích thuật toán");
+    private final Label   explanationTitle = new Label("Algorithm explanation");
     private final Label   explanationText = new Label();
     private final Label   lessonFacts = new Label();
 
@@ -176,7 +178,7 @@ public class SortVisualizerView extends VBox {
         dataSourceBox.setMaxWidth(Double.MAX_VALUE);
         manualInput.setPrefRowCount(2);
         manualInput.setWrapText(true);
-        manualInput.setPromptText("VD: 5, 1, 9, 3");
+        manualInput.setPromptText("e.g. 5, 1, 9, 3");
         importStatusLabel.getStyleClass().add("import-status");
         importStatusLabel.setWrapText(true);
         HBox importRow = new HBox(8, importButton, importStatusLabel);
@@ -194,15 +196,29 @@ public class SortVisualizerView extends VBox {
         // Array size
         sizeSlider.setMajorTickUnit(1);
         sizeSlider.setMinorTickCount(0);
+        sizeSlider.setBlockIncrement(1);
         sizeSlider.setSnapToTicks(true);
+        sizeSlider.setShowTickMarks(true);
+        sizeSlider.setShowTickLabels(true);
+        sizeSlider.setLabelFormatter(new StringConverter<Double>() {
+            @Override
+            public String toString(Double value) {
+                return value == null ? "" : Integer.toString(value.intValue());
+            }
+
+            @Override
+            public Double fromString(String string) {
+                return Double.parseDouble(string);
+            }
+        });
         sizeSlider.setMaxWidth(Double.MAX_VALUE);
-        HBox sizeHeader = new HBox();
-        Label sizeTitle = new Label("ArraySize");
+        sizeValueLabel.getStyleClass().add("speed-value");
+        Label sizeTitle = new Label("Array Size");
         sizeTitle.getStyleClass().add("card-title");
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
-        sizeRangeLabel.getStyleClass().add("status-text");
-        sizeHeader.getChildren().addAll(sizeTitle, spacer, sizeRangeLabel);
+        HBox sizeHeader = new HBox(sizeTitle, spacer, sizeValueLabel);
+        sizeHeader.setAlignment(Pos.CENTER_LEFT);
 
         VBox sizeContent = new VBox(10, sizeHeader, sizeSlider);
         VBox sizeCard = new VBox(sizeContent);
@@ -387,7 +403,7 @@ public class SortVisualizerView extends VBox {
     // ── Events ───────────────────────────────────────────────────────────
     private void bindEvents() {
         sizeSlider.valueProperty().addListener((o, ov, nv) ->
-                sizeRangeLabel.setText("2 -> " + nv.intValue()));
+                sizeValueLabel.setText(Integer.toString(nv.intValue())));
 
         speedSlider.valueProperty().addListener((o, ov, nv) -> {
             double rate = SortSpeed.timelineRate(nv.doubleValue());
@@ -467,6 +483,7 @@ public class SortVisualizerView extends VBox {
             return;
         }
 
+        // đặt giá trị mặc định
         stopAnimation();
         sortedIndices.clear();
         swapCount = 0; stepIndex = 0;
@@ -518,9 +535,9 @@ public class SortVisualizerView extends VBox {
         stopAnimation();
         for (int i = 0; i < currentArray.length; i++) sortedIndices.add(i);
         refreshChart(currentArray, null);
-        explanationTitle.setText("Hoàn tất");
-        explanationText.setText("Mảng đã được sắp xếp. Tổng số lần đổi chỗ thực: " + swapCount + ".");
-        lessonFacts.setText("Đã thực hiện " + steps.size() + " bước mô phỏng.");
+        explanationTitle.setText("Complete");
+        explanationText.setText("The array is sorted. Total actual swaps: " + swapCount + ".");
+        lessonFacts.setText("Completed " + steps.size() + " simulation steps.");
         statusLabel.setText("Completed - " + swapCount + " swaps.");
         updateButtons(false);
     }
@@ -714,24 +731,24 @@ public class SortVisualizerView extends VBox {
 
     private void updateLesson() {
         AlgorithmLesson lesson = AlgorithmLessons.get(algorithmBox.getValue());
-        explanationTitle.setText("Cách hoạt động");
+        explanationTitle.setText("How it works");
         explanationText.setText(lesson.overview());
-        lessonFacts.setText("Thời gian: " + lesson.timeComplexity()
-                + "   |   Bộ nhớ: " + lesson.spaceComplexity()
+        lessonFacts.setText("Time: " + lesson.timeComplexity()
+                + "   |   Space: " + lesson.spaceComplexity()
                 + "   |   " + lesson.stability());
     }
 
     private void showStepExplanation(Step step) {
         explanationTitle.setText(switch (step.action()) {
-            case CONDITION -> "Kiểm tra điều kiện";
-            case VARIABLE_UPDATE -> "Cập nhật biến";
-            case SWAP -> step.countsAsSwap() ? "Đổi chỗ" : "Đặt phần tử";
-            case WRITE -> "Ghi giá trị";
-            case MARK_SORTED -> "Cố định vị trí";
-            case COMPLETE -> "Hoàn tất";
+            case CONDITION -> "Check condition";
+            case VARIABLE_UPDATE -> "Update variable";
+            case SWAP -> step.countsAsSwap() ? "Swap" : "Place element";
+            case WRITE -> "Write value";
+            case MARK_SORTED -> "Lock position";
+            case COMPLETE -> "Complete";
         });
         explanationText.setText(step.explanation());
-        lessonFacts.setText("Bước " + stepIndex + " / " + steps.size());
+        lessonFacts.setText("Step " + stepIndex + " / " + steps.size());
     }
 
     // ── Button state ──────────────────────────────────────────────────────

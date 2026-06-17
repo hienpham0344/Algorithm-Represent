@@ -30,13 +30,13 @@ public class HeapSortService implements SortStrategy {
             int endValue = a[i];
             swap(a, 0, i);
             steps.add(step(a, StepAction.SWAP, "heap.swapRoot",
-                    "Đưa gốc heap " + rootValue + " về a[" + i + "] và chuyển " + endValue + " lên gốc.",
+                    "Move heap root " + rootValue + " to a[" + i + "] and move " + endValue + " to the root.",
                     markers(0, "root", i, "i"), indices(0, i), sorted));
 
             sorted.add(i);
             steps.add(step(a, StepAction.MARK_SORTED, "heap.markSorted",
-                    "a[" + i + "] = " + a[i] + " đã ở vị trí cuối cùng.",
-                    markers(i, "đã xếp"), indices(i), sorted));
+                    "a[" + i + "] = " + a[i] + " is in its final position.",
+                    markers(i, "sorted"), indices(i), sorted));
             heapify(a, i, 0, asc, steps, sorted);
         }
 
@@ -44,7 +44,7 @@ public class HeapSortService implements SortStrategy {
             sorted.add(0);
         }
         steps.add(step(a, StepAction.COMPLETE, "heap.complete",
-                "Heap Sort hoàn tất.", List.of(), Set.of(), allIndices(a.length)));
+                "Heap Sort complete.", List.of(), Set.of(), allIndices(a.length)));
         return steps;
     }
 
@@ -61,14 +61,14 @@ public class HeapSortService implements SortStrategy {
         if (left < n) {
             boolean better = higherPriority(a[left], a[target], asc);
             steps.add(step(a, StepAction.CONDITION, "heapify.leftCondition",
-                    "So sánh con trái a[" + left + "] = " + a[left] + " với target a[" + target + "] = "
-                            + a[target] + ": " + (better ? "chọn con trái." : "giữ target."),
+                    "Compare left child a[" + left + "] = " + a[left] + " with target a[" + target + "] = "
+                            + a[target] + ": " + (better ? "choose left child." : "keep target."),
                     markers(root, "root", target, "target", left, "left"),
                     indices(target, left), sorted));
             if (better) {
                 target = left;
                 steps.add(step(a, StepAction.VARIABLE_UPDATE, "heapify.updateLeft",
-                        "Cập nhật target = left = " + left + ".",
+                        "Update target = left = " + left + ".",
                         markers(root, "root", target, "target", left, "left"),
                         indices(target), sorted));
             }
@@ -77,14 +77,14 @@ public class HeapSortService implements SortStrategy {
         if (right < n) {
             boolean better = higherPriority(a[right], a[target], asc);
             steps.add(step(a, StepAction.CONDITION, "heapify.rightCondition",
-                    "So sánh con phải a[" + right + "] = " + a[right] + " với target a[" + target + "] = "
-                            + a[target] + ": " + (better ? "chọn con phải." : "giữ target."),
+                    "Compare right child a[" + right + "] = " + a[right] + " with target a[" + target + "] = "
+                            + a[target] + ": " + (better ? "choose right child." : "keep target."),
                     markers(root, "root", target, "target", right, "right"),
                     indices(target, right), sorted));
             if (better) {
                 target = right;
                 steps.add(step(a, StepAction.VARIABLE_UPDATE, "heapify.updateRight",
-                        "Cập nhật target = right = " + right + ".",
+                        "Update target = right = " + right + ".",
                         markers(root, "root", target, "target", right, "right"),
                         indices(target), sorted));
             }
@@ -92,8 +92,8 @@ public class HeapSortService implements SortStrategy {
 
         boolean needsSwap = target != root;
         steps.add(step(a, StepAction.CONDITION, "heapify.swapCondition",
-                needsSwap ? "target khác root nên cần đổi chỗ để khôi phục heap."
-                        : "target bằng root, nhánh này đã thỏa tính chất heap.",
+                needsSwap ? "target differs from root, swap to restore the heap property."
+                        : "target equals root; this branch already satisfies the heap property.",
                 markers(root, "root", target, "target"),
                 indices(root, target), sorted));
 
@@ -102,7 +102,7 @@ public class HeapSortService implements SortStrategy {
             int targetValue = a[target];
             swap(a, root, target);
             steps.add(step(a, StepAction.SWAP, "heapify.swap",
-                    "Đổi chỗ root " + rootValue + " với target " + targetValue + ".",
+                    "Swap root " + rootValue + " with target " + targetValue + ".",
                     markers(root, "root", target, "target"),
                     indices(root, target), sorted));
             heapify(a, n, target, asc, steps, sorted);
