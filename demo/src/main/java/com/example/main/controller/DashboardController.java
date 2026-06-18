@@ -4,11 +4,15 @@ import com.example.main.utils.*;
 import com.example.main.dto.*;
 import com.example.main.enums.*;
 import com.example.main.view.*;
+import com.example.main.SceneManager;
+import com.example.main.dto.response.UserAccountResponse;
+import com.example.main.session.Session;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
@@ -26,6 +30,9 @@ public class DashboardController {
     @FXML private Button btnStack;
     @FXML private Button btnQueue;
     @FXML private Button btnBinaryTree;
+    @FXML private Button btnAccounts;
+    @FXML private Label adminSection;
+    @FXML private Label userLabel;
 
     private boolean sidebarVisible = false;
     private String currentModule = "Sorting";
@@ -36,9 +43,47 @@ public class DashboardController {
         sidebar.setManaged(false);
         sidebar.setVisible(false);
 
+        // Hiển thị thông tin người dùng + quyền quản trị
+        applyUserContext();
+
         // Load sorting screen mặc định và đặt nó làm active luôn
         openSortingVisualizer();
 
+    }
+
+    private void applyUserContext() {
+        UserAccountResponse user = Session.currentUser();
+        if (user != null && userLabel != null) {
+            userLabel.setText(user.username() + " · " + user.role());
+        }
+
+        boolean admin = Session.isAdmin();
+        if (btnAccounts != null) {
+            btnAccounts.setVisible(admin);
+            btnAccounts.setManaged(admin);
+        }
+        if (adminSection != null) {
+            adminSection.setVisible(admin);
+            adminSection.setManaged(admin);
+        }
+    }
+
+    @FXML
+    public void handleLogout() {
+        Session.clear();
+        SceneManager.showLogin();
+    }
+
+    @FXML
+    public void openAccountManagement() {
+        if (!Session.isAdmin()) {
+            return;
+        }
+        currentModule = "Account Management";
+        AccountManagementView view = new AccountManagementView();
+        contentPane.getChildren().setAll(view);
+        setActiveButton(btnAccounts);
+        closeSidebar();
     }
 
     @FXML
@@ -51,7 +96,7 @@ public class DashboardController {
     // Hàm dùng chung để đổi màu nút đang chọn
     private void setActiveButton(Button activeButton) {
         // Danh sách tất cả các nút sidebar
-        Button[] allButtons = {btnSort, btnArray, btnLinkedList, btnStack, btnQueue, btnBinaryTree};
+        Button[] allButtons = {btnSort, btnArray, btnLinkedList, btnStack, btnQueue, btnBinaryTree, btnAccounts};
 
         for (Button btn : allButtons) {
             if (btn != null) {

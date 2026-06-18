@@ -1,10 +1,5 @@
 package com.example.main.controller;
 
-import com.example.main.utils.*;
-import com.example.main.dto.*;
-import com.example.main.enums.*;
-import com.example.main.view.NoteDialog;
-
 import java.util.List;
 
 import com.example.main.service.LinkedListService;
@@ -26,6 +21,7 @@ import javafx.animation.SequentialTransition;
 public class LinkedListController {
 
     @FXML private TextField inputField;
+    @FXML private TextField indexField;
     @FXML private Pane canvasPane;
     @FXML private Label statusLabel;
     @FXML private TextArea pseudoCodeArea;
@@ -42,37 +38,37 @@ public class LinkedListController {
     @FXML
     private void handleAddHead() {
         try {
-        int value = Integer.parseInt(inputField.getText());
+            int value = Integer.parseInt(inputField.getText());
 
-        service.addHead(value);
+            service.addHead(value);
 
-        statusLabel.setText("Added " + value + " to head.");
+            statusLabel.setText("Added " + value + " to head.");
 
-        pseudoCodeArea.setText("""
+            pseudoCodeArea.setText("""
             Node newNode = new Node(value);
             newNode.next = head;
             head = newNode;
             """);
 
-        if (explanationArea != null) {
-            explanationArea.setText("""
+            if (explanationArea != null) {
+                explanationArea.setText("""
                 Step 1: Create a new node with value %d.
                 Step 2: Link the new node to the current head.
                 Step 3: Move head to the new node.
                 """.formatted(value));
+            }
+
+            logArea.appendText("\n[Add Head]: " + value);
+
+            renderList();
+            inputField.clear();
+
+        } catch (Exception e) {
+
+            statusLabel.setText(
+                    "Invalid input."
+            );
         }
-
-        logArea.appendText("\n[Add Head]: " + value);
-
-        renderList();
-        inputField.clear();
-
-    } catch (Exception e) {
-
-        statusLabel.setText(
-                "Invalid input."
-        );
-    }
     }
 
 
@@ -83,25 +79,25 @@ public class LinkedListController {
         int y=180;
         List<Integer> values= service.getValues();
         for (int i = 0; i < values.size(); i++) {
-           StackPane node= createNode(values.get(i));
-           node.setLayoutX(startX + i * 130);
-           node.setLayoutY(y);
-           canvasPane.getChildren().add(node);
-           renderedNodes.add(node);
+            StackPane node= createNode(values.get(i));
+            node.setLayoutX(startX + i * 130);
+            node.setLayoutY(y);
+            canvasPane.getChildren().add(node);
+            renderedNodes.add(node);
 
-           // Arrow
-           if(i < values.size()-1) {
-            Text arrow = new Text("→");
-            arrow.setFill(Color.web("#8b5cf6"));
-            arrow.setStyle("""
+            // Arrow
+            if(i < values.size()-1) {
+                Text arrow = new Text("→");
+                arrow.setFill(Color.web("#8b5cf6"));
+                arrow.setStyle("""
                 -fx-font-size: 28px;
                 -fx-font-weight: bold;
             """);
-            arrow.setLayoutX(startX + 92 + i * 130);
-            arrow.setLayoutY(y + 34);
-            canvasPane.getChildren().add(arrow);
+                arrow.setLayoutX(startX + 92 + i * 130);
+                arrow.setLayoutY(y + 34);
+                canvasPane.getChildren().add(arrow);
 
-           }
+            }
         }
 
         if(!values.isEmpty()) {
@@ -167,16 +163,16 @@ public class LinkedListController {
     private void handleAddTail() {
         try {
 
-        int value = Integer.parseInt(inputField.getText());
+            int value = Integer.parseInt(inputField.getText());
 
-        service.addTail(value);
+            service.addTail(value);
 
-        statusLabel.setText("Added " + value + " to tail.");
+            statusLabel.setText("Added " + value + " to tail.");
 
-        logArea.appendText("\n[Add Tail]: " + value);
+            logArea.appendText("\n[Add Tail]: " + value);
 
-        pseudoCodeArea.clear();
-        pseudoCodeArea.setText("""
+            pseudoCodeArea.clear();
+            pseudoCodeArea.setText("""
             Node newNode = new Node(value);
             if (head == null) {
                 head = newNode;
@@ -188,26 +184,26 @@ public class LinkedListController {
                 current.next = newNode;
             }
             """);
-        if (explanationArea != null) {
-            explanationArea.setText("""
+            if (explanationArea != null) {
+                explanationArea.setText("""
                 Step 1: Create a new node with value %d.
                 Step 2: If head == null, head = new node.
                 Step 3: Otherwise, traverse from head to the last node.
                 Step 4: Link the last node to the new node.
                 """.formatted(value));
+            }
+
+
+            renderList();
+
+            inputField.clear();
+
+        } catch (Exception e) {
+
+            statusLabel.setText(
+                    "Invalid input."
+            );
         }
-        
-
-        renderList();
-
-        inputField.clear();
-
-    } catch (Exception e) {
-
-        statusLabel.setText(
-                "Invalid input."
-        );
-    }
     }
 
     @FXML
@@ -246,9 +242,9 @@ public class LinkedListController {
             }
             current.next = null;
             """);
-        
+
         if (explanationArea != null) {
-                explanationArea.setText("""
+            explanationArea.setText("""
                     Step 1: If head == null, return.
                     Step 2: If head.next == null, set head = null.
                     Step 3: Traverse from head to the second-to-last node.
@@ -265,7 +261,7 @@ public class LinkedListController {
         rect.setStrokeWidth(3);
     }
 
-   @FXML
+    @FXML
     private void handleSearch() {
         try {
             int value = Integer.parseInt(inputField.getText());
@@ -328,7 +324,7 @@ public class LinkedListController {
                 """);
 
             if (explanationArea != null) {
-                    explanationArea.setText("""
+                explanationArea.setText("""
                 Step 1: Initialize current = head and index = 0.
                 Step 2: While current != null:
                     - If current.value == value, return index.
@@ -348,8 +344,129 @@ public class LinkedListController {
     }
 
     @FXML
+    private void handleInsertAtIndex() {
+        try {
+            int value = Integer.parseInt(inputField.getText());
+            int index = Integer.parseInt(indexField.getText());
+
+            if (index < 0) {
+                statusLabel.setText("Index must be >= 0.");
+                return;
+            }
+
+            if (index > service.getSize()) {
+                statusLabel.setText("Index out of bounds. Max index: " + service.getSize());
+                return;
+            }
+
+            boolean success = service.insertAtIndex(index, value);
+
+            if (success) {
+                statusLabel.setText("Inserted " + value + " at index " + index + ".");
+                logArea.appendText("\n[Insert At Index]: " + value + " at index " + index);
+
+                pseudoCodeArea.setText("""
+                    if (index == 0) {
+                        addHead(value);
+                        return;
+                    }
+                    
+                    Node newNode = new Node(value);
+                    Node current = head;
+                    int currentIndex = 0;
+                    
+                    while (currentIndex < index - 1) {
+                        current = current.next;
+                        currentIndex++;
+                    }
+                    
+                    newNode.next = current.next;
+                    current.next = newNode;
+                    """);
+
+                if (explanationArea != null) {
+                    explanationArea.setText("""
+                        Step 1: If index == 0, insert at head.
+                        Step 2: Create a new node with value %d.
+                        Step 3: Traverse to node at position (index - 1).
+                        Step 4: Link new node to the next node.
+                        Step 5: Link previous node to the new node.
+                        """.formatted(value));
+                }
+
+                renderList();
+                inputField.clear();
+                indexField.clear();
+            } else {
+                statusLabel.setText("Failed to insert at index " + index + ".");
+            }
+
+        } catch (NumberFormatException e) {
+            statusLabel.setText("Invalid input. Enter both value and index.");
+        }
+    }
+
+    @FXML
+    private void handleDeleteAtIndex() {
+        try {
+            int index = Integer.parseInt(indexField.getText());
+
+            if (index < 0) {
+                statusLabel.setText("Index must be >= 0.");
+                return;
+            }
+
+            if (index >= service.getSize()) {
+                statusLabel.setText("Index out of bounds. Max index: " + (service.getSize() - 1));
+                return;
+            }
+
+            boolean success = service.deleteAtIndex(index);
+
+            if (success) {
+                statusLabel.setText("Deleted node at index " + index + ".");
+                logArea.appendText("\n[Delete At Index]: Removed node at index " + index);
+
+                pseudoCodeArea.setText("""
+                    if (index == 0) {
+                        head = head.next;
+                        return;
+                    }
+                    
+                    Node current = head;
+                    int currentIndex = 0;
+                    
+                    while (currentIndex < index - 1) {
+                        current = current.next;
+                        currentIndex++;
+                    }
+                    
+                    current.next = current.next.next;
+                    """);
+
+                if (explanationArea != null) {
+                    explanationArea.setText("""
+                        Step 1: If index == 0, delete head.
+                        Step 2: Traverse to node at position (index - 1).
+                        Step 3: Link current node to the node after the target.
+                        Step 4: The target node is now removed from the chain.
+                        """);
+                }
+
+                renderList();
+                indexField.clear();
+            } else {
+                statusLabel.setText("Failed to delete at index " + index + ".");
+            }
+
+        } catch (NumberFormatException e) {
+            statusLabel.setText("Invalid index input.");
+        }
+    }
+
+    @FXML
     private void handleReset() {
-         service.reset();
+        service.reset();
 
         canvasPane.getChildren().clear();
 
@@ -359,10 +476,6 @@ public class LinkedListController {
         logArea.appendText("\n[Reset]: Cleared linked list.");
 
         inputField.clear();
-    }
-
-    @FXML
-    private void handleNotes() {
-        NoteDialog.show(inputField.getScene().getWindow(), "Linked List");
+        indexField.clear();
     }
 }
