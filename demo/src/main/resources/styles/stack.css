@@ -462,3 +462,22 @@
     -fx-shape: " ";
     -fx-padding: 0;
 }
+.import-btn {
+    -fx-background-color: #99FFFF;
+    -fx-text-fill: #0F172A;
+    -fx-font-weight: bold;
+    -fx-border-color: #7ADEDE;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-padding: 5px 12px;
+    -fx-cursor: hand;
+}
+
+.import-btn:hover {
+    -fx-background-color: #7DFFFF;
+    -fx-text-fill: #000000;
+}
+
+.import-btn:pressed {
+    -fx-background-color: #66CCCC;
+}

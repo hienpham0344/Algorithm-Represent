@@ -8,8 +8,12 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.util.Duration;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import javafx.stage.FileChooser;
 
 public class StackVisualizerView extends BorderPane {
 
@@ -127,7 +131,13 @@ public class StackVisualizerView extends BorderPane {
         inputField = new TextField();
         inputField.setPromptText("Example: 42");
         inputField.getStyleClass().add("input-field");
-        inputField.setMaxWidth(Double.MAX_VALUE);
+        //inputField.setMaxWidth(Double.MAX_VALUE);
+
+        Button btnImport = new Button("Import .txt");
+        btnImport.getStyleClass().add("import-btn");
+        btnImport.setOnAction(e -> handleImport());
+
+        HBox inputWrapper = new HBox(5, inputField, btnImport);
 
         Button btnPush  = makeBtn("Push", "btn-push");
         Button btnPop   = makeBtn("Pop",   "btn-pop");
@@ -202,7 +212,7 @@ public class StackVisualizerView extends BorderPane {
 
         panel.getChildren().addAll(
                 title, desc, divider(),
-                sectionOp, inputLabel, inputField,
+                sectionOp, inputLabel, inputWrapper,
                 row1, row2,pauseRow, divider(), statusBox
         );
         return panel;
@@ -473,8 +483,8 @@ public class StackVisualizerView extends BorderPane {
         if (row.getChildren().isEmpty()) return;
         var cell = row.getChildren().get(0);
         ScaleTransition st = new ScaleTransition(Duration.millis(400), cell);
-        st.setFromX(1.0); st.setToX(1.1);
-        st.setFromY(1.0); st.setToY(1.1);
+        st.setFromX(1.0); st.setToX(1.5);
+        st.setFromY(1.0); st.setToY(1.5);
         st.setCycleCount(4);
         st.setAutoReverse(true);
         st.setInterpolator(Interpolator.EASE_BOTH);
@@ -615,12 +625,12 @@ public class StackVisualizerView extends BorderPane {
         appendLog("⚡ [Processing]: Popping " + topVal + " from the Stack...");
         setStatus("Extracting data from the top (POP)...");
 
-        //stackFrame.getChildren().clear();
+        stackFrame.getChildren().clear();
         List<Integer> items = service.toList();
         HBox topRow = null;
         for (int i = 0; i < items.size(); i++) {
             HBox row = buildCellRow(items.get(i), i == 0);
-            //stackFrame.getChildren().add(row);
+            stackFrame.getChildren().add(row);
             if (i == 0) topRow = row;
         }
         if (topRow == null) { isSimulating = false; return; }
@@ -678,5 +688,40 @@ public class StackVisualizerView extends BorderPane {
         appendLog("[Log]: Stack has been reset to the default state.");
         setStatus("Reinitialized successfully.", true);
         inputField.clear();
+    }
+    private void handleImport() {
+        if (isSimulating) return;
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Select file containing Stack data");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Text Files", "*.txt"));
+
+        File selectedFile = fileChooser.showOpenDialog(this.getScene().getWindow());
+
+        if (selectedFile != null) {
+            // Dùng BufferedReader để đọc file - Cách này tương thích với mọi bản Java
+            try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.FileReader(selectedFile))) {
+
+                StringBuilder content = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    content.append(line).append(" ");
+                }
+
+
+                String formattedData = content.toString()
+                        .replaceAll("\\s+", ",")
+                        .replaceAll(",+", ",")
+                        .replaceAll("^,|,$", "");
+
+                inputField.setText(formattedData);
+                setStatus("Imported: " + selectedFile.getName(), true);
+                appendLog("📂 [Import]: Data loaded from file " + selectedFile.getName());
+
+            } catch (java.io.IOException ex) {
+                setStatus("Error reading file!", false);
+                appendLog("✖ [Error]: Cannot read file: " + ex.getMessage());
+            }
+        }
     }
 }
