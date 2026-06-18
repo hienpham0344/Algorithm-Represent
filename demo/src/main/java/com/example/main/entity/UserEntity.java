@@ -8,7 +8,10 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
 import java.time.Instant;
+import com.example.main.enums.Role;
 
 @Entity
 @Table(name = "users")
@@ -22,6 +25,10 @@ public class UserEntity {
 
     @Column(name = "password_hash", nullable = false, length = 255)
     private String passwordHash;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private Role role = Role.USER;
 
     @Column(length = 50)
     private String status;
@@ -52,6 +59,7 @@ public class UserEntity {
         return new UserAccountResponse(
                 id == null ? 0L : id,
                 username,
+                role,
                 status,
                 createdAt,
                 updatedAt
@@ -62,6 +70,7 @@ public class UserEntity {
         UserEntity entity = new UserEntity();
         entity.username = request.username();
         entity.passwordHash = passwordHash;
+        entity.role = request.role() != null ? request.role() : Role.USER;
         entity.status = request.status();
         return entity;
     }
@@ -76,6 +85,10 @@ public class UserEntity {
 
     public String getPasswordHash() {
         return passwordHash;
+    }
+
+    public Role getRole() {
+        return role;
     }
 
     public String getStatus() {
@@ -100,6 +113,10 @@ public class UserEntity {
 
     public void setPasswordHash(String passwordHash) {
         this.passwordHash = passwordHash;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
 
     public void setStatus(String status) {
