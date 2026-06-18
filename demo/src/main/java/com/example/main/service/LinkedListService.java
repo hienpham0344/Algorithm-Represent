@@ -101,4 +101,68 @@ public class LinkedListService {
     public boolean isEmpty() {
         return head == null;
     }
+
+    public boolean insertAtIndex(int index, int value) {
+        if (index < 0) {
+            return false;
+        }
+
+        if (index == 0) {
+            addHead(value);
+            return true;
+        }
+
+        Node newNode = new Node(value);
+        Node current = head;
+        int currentIndex = 0;
+
+        while (current != null && currentIndex < index - 1) {
+            current = current.next;
+            currentIndex++;
+        }
+
+        if (current == null) {
+            return false;
+        }
+
+        newNode.next = current.next;
+        current.next = newNode;
+        return true;
+    }
+
+    public boolean deleteAtIndex(int index) {
+        if (head == null || index < 0) {
+            return false;
+        }
+
+        if (index == 0) {
+            head = head.next;
+            return true;
+        }
+
+        Node current = head;
+        int currentIndex = 0;
+
+        while (current != null && currentIndex < index - 1) {
+            current = current.next;
+            currentIndex++;
+        }
+
+        if (current == null || current.next == null) {
+            return false;
+        }
+
+        current.next = current.next.next;
+        return true;
+    }
+
+    public int getSize() {
+        int size = 0;
+        Node current = head;
+        while (current != null) {
+            size++;
+            current = current.next;
+        }
+        return size;
+    }
 }

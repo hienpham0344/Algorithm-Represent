@@ -1,5 +1,7 @@
 package com.example.main.ui;
 
+import com.example.main.utils.SortLayout;
+import com.example.main.view.SortViewContainer;
 import javafx.scene.control.ScrollPane;
 import org.junit.jupiter.api.Test;
 

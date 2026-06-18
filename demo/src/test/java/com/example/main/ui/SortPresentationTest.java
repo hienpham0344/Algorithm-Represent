@@ -1,8 +1,8 @@
 package com.example.main.ui;
 
-import com.example.main.dto.BarMarker;
-import com.example.main.dto.Step;
-import com.example.main.dto.StepAction;
+import com.example.main.dto.*;
+import com.example.main.enums.StepAction;
+import com.example.main.utils.*;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

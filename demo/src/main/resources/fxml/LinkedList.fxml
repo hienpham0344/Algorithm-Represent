@@ -6,13 +6,13 @@
 
 <BorderPane xmlns="http://javafx.com/javafx/17.0.12"
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.example.main.ui.LinkedListController"
+            fx:controller="com.example.main.controller.LinkedListController"
             stylesheets="@../styles/LinkedList.css"
             styleClass="linked-root">
 
     <!-- LEFT CONTROL PANEL -->
     <left>
-        <VBox prefWidth="260" spacing="16" styleClass="left-panel">
+        <VBox prefWidth="300" spacing="16" styleClass="left-panel">
             <padding>
                 <Insets top="18" right="16" bottom="18" left="16"/>
             </padding>
@@ -32,6 +32,12 @@
                        promptText="e.g. 42"
                        styleClass="input-field"/>
 
+            <Label text="Index Position" styleClass="small-label"/>
+
+            <TextField fx:id="indexField"
+                       promptText="e.g. 0, 1, 2..."
+                       styleClass="input-field"/>
+
             <GridPane hgap="8" vgap="8">
                 <Button text="← Add Head" onAction="#handleAddHead" styleClass="btn-add-head" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
                 <Button text="→ Add Tail" onAction="#handleAddTail" styleClass="btn-add-tail" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
@@ -39,8 +45,11 @@
                 <Button text="🗑 Delete Head" onAction="#handleDeleteHead" styleClass="btn-delete" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
                 <Button text="🗑 Delete Tail" onAction="#handleDeleteTail" styleClass="btn-delete" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
-                <Button text="🔍 Search" onAction="#handleSearch" styleClass="btn-search" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-                <Button text="↻ Reset" onAction="#handleReset" styleClass="btn-reset" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                <Button text="➕ Insert At Index" onAction="#handleInsertAtIndex" styleClass="btn-add-head" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                <Button text="✂ Delete At Index" onAction="#handleDeleteAtIndex" styleClass="btn-delete" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+                <Button text="🔍 Search" onAction="#handleSearch" styleClass="btn-search" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                <Button text="↻ Reset" onAction="#handleReset" styleClass="btn-reset" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
             </GridPane>
 
 
@@ -48,12 +57,12 @@
             <VBox spacing="8" styleClass="status-card">
 
                 <Label text="SIMULATION STATUS"
-                    styleClass="status-title"/>
+                       styleClass="status-title"/>
 
                 <Label fx:id="statusLabel"
-                    text="Ready. Choose a linked list operation."
-                    wrapText="true"
-                    styleClass="status-text"/>
+                       text="Ready. Choose a linked list operation."
+                       wrapText="true"
+                       styleClass="status-text"/>
 
             </VBox>
         </VBox>
@@ -68,56 +77,56 @@
 
     <!-- BOTTOM PANEL -->
     <bottom>
-    <HBox  styleClass="bottom-area" prefHeight="210">
+        <HBox  styleClass="bottom-area" prefHeight="210">
 
-        <!-- PSEUDO-CODE -->
-        <VBox spacing="8" HBox.hgrow="ALWAYS"  VBox.vgrow="ALWAYS" styleClass="bottom-card">
-            <HBox  alignment="CENTER_LEFT">
-                <Label text="&lt;&gt; PSEUDO-CODE" styleClass="section-title"/>
-                <Region HBox.hgrow="ALWAYS"/>
-                <Label text="Java code" styleClass="tag-label"/>
-            </HBox>
+            <!-- PSEUDO-CODE -->
+            <VBox spacing="8" HBox.hgrow="ALWAYS"  VBox.vgrow="ALWAYS" styleClass="bottom-card">
+                <HBox  alignment="CENTER_LEFT">
+                    <Label text="&lt;&gt; PSEUDO-CODE" styleClass="section-title"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label text="Java code" styleClass="tag-label"/>
+                </HBox>
 
-            <TextArea fx:id="pseudoCodeArea"
-                      text="// Choose an operation to view pseudo-code."
-                      editable="false"
-                      styleClass="code-area"
-                      VBox.vgrow="ALWAYS"/>
-        </VBox>
+                <TextArea fx:id="pseudoCodeArea"
+                          text="// Choose an operation to view pseudo-code."
+                          editable="false"
+                          styleClass="code-area"
+                          VBox.vgrow="ALWAYS"/>
+            </VBox>
 
-        <!-- EXPLANATION -->
-        <VBox spacing="8"
-              HBox.hgrow="ALWAYS"
-              VBox.vgrow="ALWAYS"
-              styleClass="bottom-card">
+            <!-- EXPLANATION -->
+            <VBox spacing="8"
+                  HBox.hgrow="ALWAYS"
+                  VBox.vgrow="ALWAYS"
+                  styleClass="bottom-card">
 
-            <HBox alignment="CENTER_LEFT">
-                <Label text="? EXPLANATION" styleClass="section-title"/>
-            </HBox>
+                <HBox alignment="CENTER_LEFT">
+                    <Label text="? EXPLANATION" styleClass="section-title"/>
+                </HBox>
 
-            <TextArea fx:id="explanationArea"
-                      text="Select an operation to see a step-by-step explanation."
-                      editable="false"
-                      styleClass="code-area"
-                      VBox.vgrow="ALWAYS"/>
-        </VBox>
+                <TextArea fx:id="explanationArea"
+                          text="Select an operation to see a step-by-step explanation."
+                          editable="false"
+                          styleClass="code-area"
+                          VBox.vgrow="ALWAYS"/>
+            </VBox>
 
-        <!-- ACTIVITY LOG -->
-        <VBox spacing="8" HBox.hgrow="ALWAYS"  VBox.vgrow="ALWAYS" styleClass="bottom-card">
-            <HBox  alignment="CENTER_LEFT">
-                <Label text="&gt; ACTIVITY LOG" styleClass="section-title"/>
-                <Region HBox.hgrow="ALWAYS"/>
-                <Label text="Clear" styleClass="clear-label"/>
-            </HBox>
+            <!-- ACTIVITY LOG -->
+            <VBox spacing="8" HBox.hgrow="ALWAYS"  VBox.vgrow="ALWAYS" styleClass="bottom-card">
+                <HBox  alignment="CENTER_LEFT">
+                    <Label text="&gt; ACTIVITY LOG" styleClass="section-title"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label text="Clear" styleClass="clear-label"/>
+                </HBox>
 
-            <TextArea fx:id="logArea"
-                      text="[SYSTEM] DSA Visualizer initialized. Ready."
-                      editable="false"
-                      styleClass="code-area"
-                      VBox.vgrow="ALWAYS"/>
-        </VBox>
+                <TextArea fx:id="logArea"
+                          text="[SYSTEM] DSA Visualizer initialized. Ready."
+                          editable="false"
+                          styleClass="code-area"
+                          VBox.vgrow="ALWAYS"/>
+            </VBox>
 
-    </HBox>
-</bottom>
+        </HBox>
+    </bottom>
 
 </BorderPane>

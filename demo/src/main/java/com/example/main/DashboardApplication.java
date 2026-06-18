@@ -1,11 +1,7 @@
 package com.example.main;
 
 import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
@@ -17,17 +13,9 @@ public final class DashboardApplication extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        Parent root = FXMLLoader.load(
-                DashboardApplication.class.getResource("/fxml/dashboard-view.fxml")
-        );
-
-        Scene scene = new Scene(root);
-        scene.getStylesheets().add(
-                DashboardApplication.class.getResource("/styles/dashboard.css").toExternalForm()
-        );
+        SceneManager.setPrimaryStage(stage);
 
         stage.setTitle("Algorithm Visualizer");
-        stage.setScene(scene);
         stage.setMinWidth(MIN_WINDOW_WIDTH);
         stage.setMinHeight(MIN_WINDOW_HEIGHT);
 
@@ -37,13 +25,18 @@ public final class DashboardApplication extends Application {
         stage.setY(screenBounds.getMinY());
         stage.setWidth(screenBounds.getWidth());
         stage.setHeight(screenBounds.getHeight());
-        stage.setMaximized(true);
-        stage.show();
 
-        // Cập nhật lại CSS và layout khi phóng to cửa sổ
-        Platform.runLater(() -> {
-            root.applyCss();
-            root.layout();
-        });
+        // Bắt đầu ở màn hình đăng nhập
+        SceneManager.showLogin();
+    }
+
+    @Override
+    public void stop() throws Exception {
+        super.stop();
+        var context = SortAlgorithmPresentApplication.context();
+        if (context == null) {
+            return;
+        }
+        context.close();
     }
 }

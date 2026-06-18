@@ -4,7 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane styleClass="queue-root" stylesheets="@../styles/queue.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.main.ui.QueueController">
+<BorderPane styleClass="queue-root" stylesheets="@../styles/queue.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.main.controller.QueueController">
 
     <left>
         <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" maxWidth="280" minWidth="280" prefWidth="280" styleClass="left-scroll-pane" vbarPolicy="AS_NEEDED">
@@ -53,6 +53,7 @@
                         <Label styleClass="status-header" text="ℹ  SIMULATION STATUS" />
                         <Label fx:id="statusText" styleClass="status-text" text="System is ready. Please select an operation." wrapText="true" />
                     </VBox>
+                    <Button maxWidth="1.7976931348623157E308" onAction="#handleNotes" styleClass="note-button" text="Notes" />
                 </VBox>
             </content>
         </ScrollPane>
@@ -138,3 +139,4 @@
         </HBox>
     </bottom>
 </BorderPane>
+
