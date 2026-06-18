@@ -25,6 +25,21 @@ public final class AlgorithmSeeder {
         seedCodeSnippets(codeSnippetRepository);
     }
 
+    public static CodeSnippet defaultCodeSnippet(String algorithmCode) {
+        List<String[]> lines = switch (algorithmCode == null ? "" : algorithmCode.toLowerCase()) {
+            case "bubble" -> bubbleLines();
+            case "selection" -> selectionLines();
+            case "insertion" -> insertionLines();
+            case "heap" -> heapLines();
+            case "quick" -> quickLines();
+            case "merge" -> mergeLines();
+            default -> List.<String[]>of(new String[]{null, "// No code"});
+        };
+        return new CodeSnippet(lines.stream()
+                .map(line -> line[0] != null ? CodeLine.line(line[0], line[1]) : CodeLine.text(line[1]))
+                .toList());
+    }
+
     // ── Algorithm metadata ───────────────────────────────────────────────
     private static void seedAlgorithms(AlgorithmRepository repository) {
         List<AlgorithmEntity> algorithms = List.of(

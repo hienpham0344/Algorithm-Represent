@@ -2,6 +2,7 @@ package com.example.main.dto;
 
 import com.example.main.SortAlgorithmPresentApplication;
 import com.example.main.service.AlgorithmDataService;
+import com.example.main.service.AlgorithmSeeder;
 
 import java.util.List;
 
@@ -15,7 +16,7 @@ public final class CodeSnippets {
             AlgorithmDataService service = SortAlgorithmPresentApplication.context().getBean(AlgorithmDataService.class);
             return service.getCodeSnippet(algorithm);
         }
-        return new CodeSnippet(List.of(CodeLine.text("// No code")));
+        return AlgorithmSeeder.defaultCodeSnippet(algorithm);
     }
 
     public static boolean containsLine(String algorithm, String lineId) {

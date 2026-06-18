@@ -214,10 +214,14 @@ public class StackVisualizerView extends BorderPane {
         statusBox.setPadding(new Insets(12, 14, 12, 14));
         VBox.setVgrow(statusBox, Priority.ALWAYS);  //Luôn kéo giãn hộp để lấp đầy khoản trống thừa
 
+        Button btnNotes = makeBtn("Notes", "note-button");
+        btnNotes.setMaxWidth(Double.MAX_VALUE);
+        btnNotes.setOnAction(e -> NoteDialog.show(getScene().getWindow(), "Stack"));
+
         panel.getChildren().addAll(
                 title, desc, divider(),
                 sectionOp, inputLabel, inputWrapper,
-                row1, row2,pauseRow, divider(), statusBox
+                row1, row2,pauseRow, divider(), statusBox, btnNotes
         );
         return panel;
     }

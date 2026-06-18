@@ -1,5 +1,6 @@
 package com.example.main.ui;
 
+import com.example.main.utils.SortSpeed;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

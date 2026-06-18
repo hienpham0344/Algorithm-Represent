@@ -22,6 +22,29 @@
     -fx-background-color: #334155;
 }
 
+.top-report-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #FCA5A5;
+    -fx-border-color: #DC2626;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-font-weight: bold;
+    -fx-padding: 7 14;
+    -fx-cursor: hand;
+}
+
+.top-report-btn:hover {
+    -fx-background-color: #DC2626;
+    -fx-text-fill: #FFFFFF;
+}
+
+.top-report-btn:pressed {
+    -fx-background-color: #991B1B;
+    -fx-border-color: #991B1B;
+    -fx-text-fill: #FFFFFF;
+}
+
 .sidebar {
     -fx-background-color: #1E293B;
     -fx-border-width: 0;

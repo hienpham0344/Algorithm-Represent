@@ -56,6 +56,11 @@
                     styleClass="status-text"/>
 
             </VBox>
+
+            <Button text="Notes"
+                    onAction="#handleNotes"
+                    maxWidth="1.7976931348623157E308"
+                    styleClass="note-button"/>
         </VBox>
     </left>
 

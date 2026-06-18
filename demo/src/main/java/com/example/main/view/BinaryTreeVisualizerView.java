@@ -108,10 +108,12 @@ public class BinaryTreeVisualizerView extends BorderPane {
         VBox statusBox = new VBox(8, lblStatusHeader, statusText);
         statusBox.getStyleClass().add("status-box");
         statusBox.setPadding(new Insets(12));
+        Button btnNotes = createButton("Notes", "note-button");
+        btnNotes.setOnAction(e -> NoteDialog.show(getScene().getWindow(), "Binary Tree"));
         Region spacer = new Region();
         VBox.setVgrow(spacer, Priority.ALWAYS);
         panel.getChildren().addAll(title, desc, new Separator(), lblOps, inputWrapper, btnGrid,
-                new Label("TRAVERSAL"), traversalBox, btnTraverse, statusBox, spacer);
+                new Label("TRAVERSAL"), traversalBox, btnTraverse, statusBox, spacer, btnNotes);
 
         btnInsert.setOnAction(e -> executeOp("INSERT"));
         btnSearch.setOnAction(e -> executeOp("SEARCH"));
@@ -421,4 +423,5 @@ public class BinaryTreeVisualizerView extends BorderPane {
         pseudoCodeArea.setText(code);
     }
 }
+
 

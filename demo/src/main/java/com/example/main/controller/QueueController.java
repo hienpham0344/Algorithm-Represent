@@ -1,6 +1,7 @@
 package com.example.main.controller;
 
 import com.example.main.service.QueueService;
+import com.example.main.view.NoteDialog;
 import javafx.animation.*;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -460,5 +461,10 @@ public class QueueController implements Initializable {
                 logArea.appendText("✖ [Error]: Không thể đọc file: " + ex.getMessage() + "\n");
             }
         }
+    }
+
+    @FXML
+    private void handleNotes() {
+        NoteDialog.show(inputField.getScene().getWindow(), "Queue");
     }
 }

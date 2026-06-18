@@ -3,6 +3,7 @@ package com.example.main.controller;
 import com.example.main.utils.*;
 import com.example.main.dto.*;
 import com.example.main.enums.*;
+import com.example.main.view.NoteDialog;
 
 import java.util.List;
 
@@ -359,5 +360,9 @@ public class LinkedListController {
 
         inputField.clear();
     }
-}
 
+    @FXML
+    private void handleNotes() {
+        NoteDialog.show(inputField.getScene().getWindow(), "Linked List");
+    }
+}
