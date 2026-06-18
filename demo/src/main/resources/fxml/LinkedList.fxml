@@ -50,6 +50,9 @@
 
                 <Button text="🔍 Search" onAction="#handleSearch" styleClass="btn-search" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
                 <Button text="↻ Reset" onAction="#handleReset" styleClass="btn-reset" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+                <Button text="📝 Notes" onAction="#handleNotes" styleClass="btn-search" maxWidth="Infinity" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                <Button text="📂 Import .txt" onAction="#handleImportTxt" styleClass="btn-add-tail" maxWidth="Infinity" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
             </GridPane>
 
 

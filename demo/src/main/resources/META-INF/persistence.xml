@@ -9,6 +9,8 @@
         <class>com.example.main.entity.UserEntity</class>
         <class>com.example.main.entity.UserSessionEntity</class>
         <class>com.example.main.entity.UserNoteEntity</class>
+        <class>com.example.main.entity.UserReportEntity</class>
+        <class>com.example.main.entity.UserModuleNoteEntity</class>
         <properties>
             <property name="hibernate.hbm2ddl.auto" value="update"/>
             <property name="hibernate.show_sql" value="false"/>

@@ -6,6 +6,8 @@ import com.example.main.dto.response.UserAccountResponse;
 import com.example.main.enums.Role;
 import com.example.main.service.UserAccountService;
 
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -19,19 +21,24 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
-import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 /**
- * Màn hình quản lý tài khoản dành cho ADMIN: thêm / sửa / xóa dựa trên CRUD database.
+ * Màn hình quản lý tài khoản dành cho ADMIN: hiển thị danh sách, sửa mật khẩu / vai trò
+ * / trạng thái và xóa tài khoản. Cùng concept (theme tối, style-class qua admin.css)
+ * với các page data-structure khác.
  */
 public class AccountManagementView extends VBox {
+
+    private static final DateTimeFormatter TIME_FORMAT =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneId.systemDefault());
 
     private final TableView<UserAccountResponse> table = new TableView<>();
     private final ObservableList<UserAccountResponse> data = FXCollections.observableArrayList();
@@ -40,51 +47,63 @@ public class AccountManagementView extends VBox {
     private final PasswordField passwordField = new PasswordField();
     private final ComboBox<Role> roleCombo = new ComboBox<>();
     private final TextField statusField = new TextField();
+    private final Button saveBtn = button("Thêm mới", "btn-primary");
 
     private Long editingId = null;
 
     public AccountManagementView() {
         setSpacing(16);
         setPadding(new Insets(20));
-        setStyle("-fx-background-color: #F8FAFC;");
+        getStyleClass().add("admin-root");
+        getStylesheets().add(getClass().getResource("/styles/admin.css").toExternalForm());
 
         Label title = new Label("Quản lý tài khoản");
-        title.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1E293B;");
+        title.getStyleClass().add("admin-title");
+
+        Label subtitle = new Label("Chọn một tài khoản trong bảng để sửa mật khẩu / vai trò / trạng thái hoặc xóa.");
+        subtitle.getStyleClass().add("admin-subtitle");
 
         buildTable();
         VBox form = buildForm();
 
-        getChildren().addAll(title, table, form);
+        getChildren().addAll(title, subtitle, table, form);
         VBox.setVgrow(table, Priority.ALWAYS);
 
         reload();
     }
 
-    @SuppressWarnings("unchecked")
     private void buildTable() {
-        TableColumn<UserAccountResponse, Long> idCol = new TableColumn<>("ID");
-        idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
+        TableColumn<UserAccountResponse, String> idCol = new TableColumn<>("ID");
+        idCol.setCellValueFactory(c -> new SimpleStringProperty(String.valueOf(c.getValue().id())));
         idCol.setPrefWidth(60);
 
         TableColumn<UserAccountResponse, String> userCol = new TableColumn<>("Tên đăng nhập");
-        userCol.setCellValueFactory(new PropertyValueFactory<>("username"));
+        userCol.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().username()));
         userCol.setPrefWidth(220);
 
-        TableColumn<UserAccountResponse, Role> roleCol = new TableColumn<>("Vai trò");
-        roleCol.setCellValueFactory(new PropertyValueFactory<>("role"));
+        TableColumn<UserAccountResponse, String> roleCol = new TableColumn<>("Vai trò");
+        roleCol.setCellValueFactory(c -> new SimpleStringProperty(
+                c.getValue().role() == null ? "" : c.getValue().role().name()));
         roleCol.setPrefWidth(120);
 
         TableColumn<UserAccountResponse, String> statusCol = new TableColumn<>("Trạng thái");
-        statusCol.setCellValueFactory(new PropertyValueFactory<>("status"));
+        statusCol.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().status()));
         statusCol.setPrefWidth(140);
 
-        TableColumn<UserAccountResponse, Instant> createdCol = new TableColumn<>("Ngày tạo");
-        createdCol.setCellValueFactory(new PropertyValueFactory<>("createdAt"));
-        createdCol.setPrefWidth(220);
+        TableColumn<UserAccountResponse, String> createdCol = new TableColumn<>("Ngày tạo");
+        createdCol.setCellValueFactory(c -> new SimpleStringProperty(
+                c.getValue().createdAt() == null ? "-" : TIME_FORMAT.format(c.getValue().createdAt())));
+        createdCol.setPrefWidth(190);
 
-        table.getColumns().addAll(idCol, userCol, roleCol, statusCol, createdCol);
+        table.getColumns().add(idCol);
+        table.getColumns().add(userCol);
+        table.getColumns().add(roleCol);
+        table.getColumns().add(statusCol);
+        table.getColumns().add(createdCol);
         table.setItems(data);
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        table.setPlaceholder(new Label("Chưa có tài khoản nào."));
+        table.getStyleClass().add("admin-table");
 
         table.getSelectionModel().selectedItemProperty().addListener((obs, old, selected) -> {
             if (selected != null) {
@@ -96,9 +115,16 @@ public class AccountManagementView extends VBox {
     private VBox buildForm() {
         roleCombo.getItems().setAll(Role.values());
         roleCombo.setValue(Role.USER);
+        roleCombo.getStyleClass().add("admin-combo");
+        roleCombo.getStylesheets().add(getClass().getResource("/styles/admin.css").toExternalForm());
+        // Áp style cho popup của ComboBox.
+        roleCombo.setStyle("-fx-font-size: 13px;");
         statusField.setPromptText("ACTIVE");
         usernameField.setPromptText("Tên đăng nhập");
-        passwordField.setPromptText("Mật khẩu (để trống khi sửa = giữ nguyên)");
+        passwordField.setPromptText("Mật khẩu mới (để trống khi sửa = giữ nguyên)");
+        usernameField.getStyleClass().add("input-field");
+        passwordField.getStyleClass().add("input-field");
+        statusField.getStyleClass().add("input-field");
 
         HBox row1 = new HBox(10, labeled("Tên đăng nhập", usernameField), labeled("Mật khẩu", passwordField));
         HBox row2 = new HBox(10, labeled("Vai trò", roleCombo), labeled("Trạng thái", statusField));
@@ -108,38 +134,31 @@ public class AccountManagementView extends VBox {
         HBox.setHgrow(statusField, Priority.ALWAYS);
         roleCombo.setMaxWidth(Double.MAX_VALUE);
 
-        Button addBtn = primary("Thêm mới");
-        addBtn.setOnAction(e -> handleSave());
+        saveBtn.setOnAction(e -> handleSave());
 
-        Button clearBtn = secondary("Làm mới form");
+        Button clearBtn = button("Làm mới form", "btn-secondary");
         clearBtn.setOnAction(e -> clearForm());
 
-        Button deleteBtn = danger("Xóa");
+        Button deleteBtn = button("Xóa", "btn-danger");
         deleteBtn.setOnAction(e -> handleDelete());
 
-        Button reloadBtn = secondary("Tải lại danh sách");
+        Button reloadBtn = button("Tải lại danh sách", "btn-secondary");
         reloadBtn.setOnAction(e -> reload());
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
-        HBox actions = new HBox(10, addBtn, clearBtn, deleteBtn, spacer, reloadBtn);
+        HBox actions = new HBox(10, saveBtn, clearBtn, deleteBtn, spacer, reloadBtn);
         actions.setAlignment(Pos.CENTER_LEFT);
 
         VBox form = new VBox(12, row1, row2, actions);
         form.setPadding(new Insets(16));
-        form.setStyle("""
-                -fx-background-color: white;
-                -fx-background-radius: 12;
-                -fx-border-radius: 12;
-                -fx-border-color: #E2E8F0;
-                -fx-border-width: 1;
-                """);
+        form.getStyleClass().add("admin-card");
         return form;
     }
 
     private VBox labeled(String text, Region field) {
         Label label = new Label(text);
-        label.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #475569;");
+        label.getStyleClass().add("field-label");
         VBox box = new VBox(4, label, field);
         HBox.setHgrow(box, Priority.ALWAYS);
         return box;
@@ -213,6 +232,7 @@ public class AccountManagementView extends VBox {
         passwordField.clear();
         roleCombo.setValue(user.role());
         statusField.setText(user.status());
+        saveBtn.setText("Cập nhật");
     }
 
     private void clearForm() {
@@ -222,11 +242,13 @@ public class AccountManagementView extends VBox {
         roleCombo.setValue(Role.USER);
         statusField.clear();
         table.getSelectionModel().clearSelection();
+        saveBtn.setText("Thêm mới");
     }
 
     private void reload() {
         UserAccountService service = service();
         if (service == null) {
+            warn("Không kết nối được cơ sở dữ liệu.");
             return;
         }
         data.setAll(service.findAll());
@@ -245,30 +267,9 @@ public class AccountManagementView extends VBox {
         return SortAlgorithmPresentApplication.context().getBean(UserAccountService.class);
     }
 
-    private Button primary(String text) {
+    private Button button(String text, String styleClass) {
         Button b = new Button(text);
-        b.setStyle("""
-                -fx-background-color: #4F46E5; -fx-text-fill: white; -fx-font-weight: bold;
-                -fx-background-radius: 8; -fx-padding: 9 16; -fx-cursor: hand;
-                """);
-        return b;
-    }
-
-    private Button secondary(String text) {
-        Button b = new Button(text);
-        b.setStyle("""
-                -fx-background-color: #E2E8F0; -fx-text-fill: #1E293B; -fx-font-weight: bold;
-                -fx-background-radius: 8; -fx-padding: 9 16; -fx-cursor: hand;
-                """);
-        return b;
-    }
-
-    private Button danger(String text) {
-        Button b = new Button(text);
-        b.setStyle("""
-                -fx-background-color: #DC2626; -fx-text-fill: white; -fx-font-weight: bold;
-                -fx-background-radius: 8; -fx-padding: 9 16; -fx-cursor: hand;
-                """);
+        b.getStyleClass().add(styleClass);
         return b;
     }
 }

@@ -1,5 +1,12 @@
 package com.example.main.view;
 
+import com.example.main.SortAlgorithmPresentApplication;
+import com.example.main.dto.request.UserReportRequest;
+import com.example.main.dto.response.UserAccountResponse;
+import com.example.main.dto.response.UserReportResponse;
+import com.example.main.service.ReportService;
+import com.example.main.session.Session;
+
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
@@ -13,17 +20,15 @@ import javafx.scene.control.TextArea;
 import javafx.scene.layout.VBox;
 import javafx.stage.Window;
 
-import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 public final class ReportDialog {
 
     private static final DateTimeFormatter TIME_FORMAT =
-            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    private static final List<ReportEntry> HISTORY = new ArrayList<>();
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneId.systemDefault());
 
     private ReportDialog() {
     }
@@ -54,12 +59,21 @@ public final class ReportDialog {
 
         Optional<ButtonType> result = dialog.showAndWait();
         if (result.isPresent() && result.get() == submitButton) {
-            HISTORY.add(0, new ReportEntry(
-                    LocalDateTime.now().format(TIME_FORMAT),
-                    currentModule,
-                    reportInput.getText().trim()
-            ));
+            String content = reportInput.getText().trim();
+            if (!content.isEmpty()) {
+                saveReport(currentModule, content);
+            }
         }
+    }
+
+    private static void saveReport(String module, String content) {
+        ReportService service = reportService();
+        if (service == null) {
+            return;
+        }
+        UserAccountResponse user = Session.currentUser();
+        Long userId = user == null ? null : user.id();
+        service.create(new UserReportRequest(userId, module, content));
     }
 
     private static VBox buildNewReportTab(String moduleName, TextArea reportInput) {
@@ -77,12 +91,13 @@ public final class ReportDialog {
         list.setPadding(new Insets(14));
         list.setStyle("-fx-background-color: #0F172A;");
 
-        if (HISTORY.isEmpty()) {
+        List<UserReportResponse> history = loadHistory();
+        if (history.isEmpty()) {
             Label empty = new Label("No reports yet.");
             empty.setStyle("-fx-text-fill: #64748B; -fx-font-weight: bold;");
             list.getChildren().add(empty);
         } else {
-            for (ReportEntry entry : HISTORY) {
+            for (UserReportResponse entry : history) {
                 list.getChildren().add(createHistoryCard(entry));
             }
         }
@@ -93,11 +108,30 @@ public final class ReportDialog {
         return scrollPane;
     }
 
-    private static VBox createHistoryCard(ReportEntry entry) {
-        Label meta = new Label(entry.time() + "  |  " + entry.module());
+    private static List<UserReportResponse> loadHistory() {
+        ReportService service = reportService();
+        if (service == null) {
+            return List.of();
+        }
+        // Admin xem toàn bộ lịch sử; người dùng thường chỉ xem report của mình.
+        if (Session.isAdmin()) {
+            return service.findAll();
+        }
+        UserAccountResponse user = Session.currentUser();
+        if (user == null) {
+            return List.of();
+        }
+        return service.findByUser(user.id());
+    }
+
+    private static VBox createHistoryCard(UserReportResponse entry) {
+        String time = entry.createdAt() == null ? "-" : TIME_FORMAT.format(entry.createdAt());
+        String who = entry.username() == null ? "" : "  |  " + entry.username();
+        Label meta = new Label(time + "  |  " + entry.module() + who);
         meta.setStyle("-fx-text-fill: #A5B4FC; -fx-font-size: 11px; -fx-font-weight: bold;");
 
-        Label content = new Label(entry.content().isBlank() ? "(No description)" : entry.content());
+        Label content = new Label(entry.content() == null || entry.content().isBlank()
+                ? "(No description)" : entry.content());
         content.setWrapText(true);
         content.setStyle("-fx-text-fill: #E2E8F0; -fx-font-size: 12px;");
 
@@ -128,6 +162,13 @@ public final class ReportDialog {
                 -fx-font-family: "Segoe UI";
                 """);
         return reportInput;
+    }
+
+    private static ReportService reportService() {
+        if (SortAlgorithmPresentApplication.context() == null) {
+            return null;
+        }
+        return SortAlgorithmPresentApplication.context().getBean(ReportService.class);
     }
 
     private static void styleDialogPane(Dialog<?> dialog) {
@@ -171,8 +212,5 @@ public final class ReportDialog {
                 -fx-padding: 8 14;
                 -fx-cursor: hand;
                 """);
-    }
-
-    private record ReportEntry(String time, String module, String content) {
     }
 }

@@ -57,6 +57,8 @@
 
             <Button fx:id="btnAccounts" managed="false" visible="false" onAction="#openAccountManagement" styleClass="sidebar-btn" text="👤  Quản lý tài khoản" />
 
+            <Button fx:id="btnReports" managed="false" visible="false" onAction="#openReportManagement" styleClass="sidebar-btn" text="📋  Tất cả báo cáo" />
+
         </VBox>
     </left>
 
