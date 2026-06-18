@@ -38,6 +38,7 @@ public class ArrayVisualizerView {
     @FXML private Button btnRandomize;
     @FXML private Button btnReset;
     @FXML private Button btnClearLog;
+    @FXML private Button btnNotes;
     private Timeline animation;
     private int highlightedIndex = -1;
     private int foundIndex = -1;
@@ -131,6 +132,7 @@ public class ArrayVisualizerView {
         btnRandomize.setOnAction(e -> handleRandomize());
         btnReset.setOnAction(e -> handleReset());
         btnClearLog.setOnAction(e -> handleClearLog());
+        btnNotes.setOnAction(e -> handleNotes());
     }
 
     @FXML
@@ -603,5 +605,10 @@ public class ArrayVisualizerView {
                 }
             }
         }
+    }
+
+    @FXML
+    private void handleNotes() {
+        NoteDialog.show(btnNotes.getScene().getWindow(), "Array");
     }
 }

@@ -355,4 +355,9 @@ public class LinkedListController {
 
         inputField.clear();
     }
+
+    @FXML
+    private void handleNotes() {
+        NoteDialog.show(inputField.getScene().getWindow(), "Linked List");
+    }
 }

@@ -53,6 +53,7 @@
                         <Label styleClass="status-header" text="ℹ  SIMULATION STATUS" />
                         <Label fx:id="statusText" styleClass="status-text" text="System is ready. Please select an operation." wrapText="true" />
                     </VBox>
+                    <Button maxWidth="1.7976931348623157E308" onAction="#handleNotes" styleClass="note-button" text="Notes" />
                 </VBox>
             </content>
         </ScrollPane>

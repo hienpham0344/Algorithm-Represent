@@ -461,4 +461,9 @@ public class QueueController implements Initializable {
             }
         }
     }
+
+    @FXML
+    private void handleNotes() {
+        NoteDialog.show(inputField.getScene().getWindow(), "Queue");
+    }
 }

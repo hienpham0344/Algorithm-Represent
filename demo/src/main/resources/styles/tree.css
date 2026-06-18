@@ -193,3 +193,26 @@
     -fx-stroke-width: 3;
     -fx-effect: dropshadow(gaussian, rgba(74,222,128,0.5), 15, 0.4, 0, 0);
 }
+
+.note-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #A5B4FC;
+    -fx-border-color: #4F46E5;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-font-weight: bold;
+    -fx-padding: 8 12;
+    -fx-cursor: hand;
+}
+
+.note-button:hover {
+    -fx-background-color: #4F46E5;
+    -fx-text-fill: #FFFFFF;
+}
+
+.note-button:pressed {
+    -fx-background-color: #3730A3;
+    -fx-border-color: #3730A3;
+    -fx-text-fill: #FFFFFF;
+}

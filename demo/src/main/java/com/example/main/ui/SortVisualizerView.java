@@ -362,6 +362,11 @@ public class    SortVisualizerView extends VBox {
         Label codeLabel = new Label("Code java");
         codeLabel.getStyleClass().add("section-title");
 
+        Button noteButton = new Button("Notes");
+        noteButton.getStyleClass().add("note-button");
+        noteButton.setMaxWidth(Double.MAX_VALUE);
+        noteButton.setOnAction(e -> NoteDialog.show(getScene().getWindow(), "Sorting"));
+
         VBox codeCard = new VBox(10, codeLabel, codeScroll);
         codeCard.getStyleClass().add("card");
         codeCard.setPadding(new Insets(16));
@@ -372,10 +377,17 @@ public class    SortVisualizerView extends VBox {
         HBox.setHgrow(codeCard, Priority.SOMETIMES);
         VBox.setVgrow(codeScroll, Priority.ALWAYS);
 
-        HBox row = new HBox(12, chartCard, codeCard);
+        VBox codeColumn = new VBox(10, codeCard, noteButton);
+        codeColumn.setPrefWidth(SortLayout.CODE_PANEL_PREF_WIDTH);
+        codeColumn.setMinWidth(SortLayout.CODE_PANEL_MIN_WIDTH);
+        codeColumn.setMaxWidth(SortLayout.CODE_PANEL_MAX_WIDTH);
+        HBox.setHgrow(codeColumn, Priority.SOMETIMES);
+        VBox.setVgrow(codeCard, Priority.ALWAYS);
+
+        HBox row = new HBox(12, chartCard, codeColumn);
         HBox.setHgrow(chartCard, Priority.ALWAYS);
         VBox.setVgrow(chartCard, Priority.ALWAYS);
-        VBox.setVgrow(codeCard, Priority.ALWAYS);
+        VBox.setVgrow(codeColumn, Priority.ALWAYS);
         return row;
     }
 

@@ -104,6 +104,11 @@
                         <Label text="SIMULATION STATUS" styleClass="status-header" />
                         <Label fx:id="statusText" wrapText="true" styleClass="status-text" />
                     </VBox>
+
+                    <Button fx:id="btnNotes"
+                            maxWidth="1.7976931348623157E308"
+                            styleClass="note-button"
+                            text="Notes" />
                 </VBox>
         </ScrollPane>
     </left>
