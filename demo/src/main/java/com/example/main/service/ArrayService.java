@@ -1,5 +1,9 @@
 package com.example.main.service;
 
+import com.example.main.utils.*;
+import com.example.main.dto.*;
+import com.example.main.enums.*;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -129,3 +133,4 @@ public class ArrayService {
         return array.size() >= MAX_CAPACITY;
     }
 }
+

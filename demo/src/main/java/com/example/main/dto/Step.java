@@ -1,5 +1,6 @@
 package com.example.main.dto;
 
+import com.example.main.enums.StepAction;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;

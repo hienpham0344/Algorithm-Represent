@@ -2,8 +2,8 @@ package com.example.main.service;
 
 import com.example.main.dto.BarMarker;
 import com.example.main.dto.Step;
-import com.example.main.dto.StepAction;
-import com.example.main.ui.CodeSnippets;
+import com.example.main.enums.StepAction;
+import com.example.main.dto.CodeSnippets;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -154,3 +154,6 @@ class SortTraceContractTest {
         return step.markers().stream().anyMatch(marker -> marker.label().equals(label));
     }
 }
+
+
+

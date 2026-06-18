@@ -4,7 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane styleClass="queue-root" stylesheets="@../styles/queue.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.main.ui.QueueController">
+<BorderPane styleClass="queue-root" stylesheets="@../styles/queue.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.main.controller.QueueController">
 
     <left>
         <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" maxWidth="280" minWidth="280" prefWidth="280" styleClass="left-scroll-pane" vbarPolicy="AS_NEEDED">
@@ -138,3 +138,4 @@
         </HBox>
     </bottom>
 </BorderPane>
+

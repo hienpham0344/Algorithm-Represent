@@ -1,7 +1,11 @@
 package com.example.main.service;
 
+import com.example.main.utils.*;
+import com.example.main.dto.*;
+import com.example.main.enums.*;
+
 import com.example.main.dto.Step;
-import com.example.main.dto.StepAction;
+import com.example.main.enums.StepAction;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -108,3 +112,5 @@ public class QuickSortService implements SortStrategy {
         a[right] = temp;
     }
 }
+
+

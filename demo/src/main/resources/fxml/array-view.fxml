@@ -6,7 +6,7 @@
 
 <BorderPane xmlns="http://javafx.com/javafx/17.0.12"
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.example.main.ui.ArrayVisualizerView"
+            fx:controller="com.example.main.controller.ArrayVisualizerView"
             stylesheets="@../styles/array.css"
             styleClass="array-root">
 
@@ -189,3 +189,4 @@
         </HBox>
     </bottom>
 </BorderPane>
+
