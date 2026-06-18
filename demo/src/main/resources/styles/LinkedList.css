@@ -195,8 +195,8 @@
 
 .note-button {
     -fx-background-color: transparent;
-    -fx-text-fill: #A5B4FC;
-    -fx-border-color: #4F46E5;
+    -fx-text-fill: #FDE68A;
+    -fx-border-color: #F59E0B;
     -fx-border-width: 1.5;
     -fx-border-radius: 8;
     -fx-background-radius: 8;
@@ -206,12 +206,12 @@
 }
 
 .note-button:hover {
-    -fx-background-color: #4F46E5;
-    -fx-text-fill: #FFFFFF;
+    -fx-background-color: #F59E0B;
+    -fx-text-fill: #111827;
 }
 
 .note-button:pressed {
-    -fx-background-color: #3730A3;
-    -fx-border-color: #3730A3;
+    -fx-background-color: #B45309;
+    -fx-border-color: #B45309;
     -fx-text-fill: #FFFFFF;
 }

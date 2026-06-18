@@ -23,6 +23,7 @@ public class DashboardController {
     @FXML private Button btnBinaryTree;
 
     private boolean sidebarVisible = false;
+    private String currentModule = "Sorting";
 
     @FXML
     public void initialize() {
@@ -62,6 +63,7 @@ public class DashboardController {
 
     @FXML
     public void openSortingVisualizer() {
+        currentModule = "Sorting";
         SortVisualizerView visualizer = new SortVisualizerView();
         SortViewContainer container = new SortViewContainer(visualizer);
 
@@ -78,6 +80,7 @@ public class DashboardController {
 
     @FXML
     public void openArray() {
+        currentModule = "Array";
         try {
             Parent view = FXMLLoader.load(
                     getClass().getResource("/fxml/array-view.fxml")
@@ -92,6 +95,7 @@ public class DashboardController {
 
     @FXML
     public void openLinkedList() {
+        currentModule = "Linked List";
         try {
             Parent view = FXMLLoader.load(
                     getClass().getResource("/fxml/LinkedList.fxml")
@@ -107,6 +111,7 @@ public class DashboardController {
 
     @FXML
     public void openStack() {
+        currentModule = "Stack";
         StackVisualizerView view = new StackVisualizerView();
         contentPane.getChildren().setAll(view);
 
@@ -117,6 +122,7 @@ public class DashboardController {
 
     @FXML
     public void openQueue() {
+        currentModule = "Queue";
         try {
             Parent view = FXMLLoader.load(
                     getClass().getResource("/fxml/queue-view.fxml")
@@ -132,12 +138,18 @@ public class DashboardController {
 
     @FXML
     public void openBinaryTree() {
+        currentModule = "Binary Tree";
         BinaryTreeVisualizerView view = new BinaryTreeVisualizerView();
         contentPane.getChildren().setAll(view);
 
         setActiveButton(btnBinaryTree);
 
         closeSidebar();
+    }
+
+    @FXML
+    public void openReports() {
+        ReportDialog.show(contentPane.getScene().getWindow(), currentModule);
     }
 
     private void closeSidebar() {
