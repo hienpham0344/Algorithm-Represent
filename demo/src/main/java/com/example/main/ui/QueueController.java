@@ -139,7 +139,7 @@ public class QueueController implements Initializable {
             step.setOnFinished(e -> {
                 // Kiểm tra xem hàng đợi tại thời điểm chèn này đã bị đầy hay chưa
                 if (service.size() >= 20) {
-                    appendLog("✖ [Error]: Cannot enqueue " + val + ". Queue is full (Maximum 10 elements).");
+                    appendLog("✖ [Error]: Cannot enqueue " + val + ". Queue is full (Maximum 20 elements).");
                     setStatus("Queue is full. Stopping insertion of the remaining elements.", false);
 
                     // Nếu gặp lỗi đầy hàng đợi, hủy bỏ toàn bộ các bước chèn phía sau ngay lập tức

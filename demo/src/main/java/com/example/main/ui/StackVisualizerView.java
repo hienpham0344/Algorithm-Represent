@@ -64,6 +64,9 @@ public class StackVisualizerView extends BorderPane {
         getStyleClass().add("stack-root");
 
         VBox leftContent = buildLeftPanel();
+        leftContent.setPrefWidth(280);
+        leftContent.setMinWidth(280);
+        leftContent.setMaxWidth(280);
         ScrollPane leftScrollPane = new ScrollPane(leftContent);
         leftScrollPane.setFitToWidth(true);
         leftScrollPane.setFitToHeight(true);
@@ -612,12 +615,12 @@ public class StackVisualizerView extends BorderPane {
         appendLog("⚡ [Processing]: Popping " + topVal + " from the Stack...");
         setStatus("Extracting data from the top (POP)...");
 
-        stackFrame.getChildren().clear();
+        //stackFrame.getChildren().clear();
         List<Integer> items = service.toList();
         HBox topRow = null;
         for (int i = 0; i < items.size(); i++) {
             HBox row = buildCellRow(items.get(i), i == 0);
-            stackFrame.getChildren().add(row);
+            //stackFrame.getChildren().add(row);
             if (i == 0) topRow = row;
         }
         if (topRow == null) { isSimulating = false; return; }

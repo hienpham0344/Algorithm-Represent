@@ -408,19 +408,18 @@
 
 .left-scroll-pane .scroll-bar:vertical {
     -fx-background-color: transparent;
-    -fx-width: 6px;
+    -fx-width: 4px;
 }
 
 .left-scroll-pane .scroll-bar:vertical .thumb {
-    -fx-background-color: #1E293B;
-    -fx-background-radius: 3px;
+    -fx-background-color: #334155;
+    -fx-background-radius: 4px;
 }
 
 .left-scroll-pane .scroll-bar:vertical .thumb:hover {
     -fx-background-color: #334155;
 }
 
-.left-scroll-pane .scroll-bar:vertical .track,
 .left-scroll-pane .scroll-bar:vertical .increment-button,
 .left-scroll-pane .scroll-bar:vertical .decrement-button {
     -fx-background-color: transparent;
