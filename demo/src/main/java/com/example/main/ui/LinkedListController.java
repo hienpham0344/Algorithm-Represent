@@ -21,6 +21,7 @@ import javafx.animation.SequentialTransition;
 public class LinkedListController {
 
     @FXML private TextField inputField;
+    @FXML private TextField indexField;
     @FXML private Pane canvasPane;
     @FXML private Label statusLabel;
     @FXML private TextArea pseudoCodeArea;
@@ -343,6 +344,127 @@ public class LinkedListController {
     }
 
     @FXML
+    private void handleInsertAtIndex() {
+        try {
+            int value = Integer.parseInt(inputField.getText());
+            int index = Integer.parseInt(indexField.getText());
+
+            if (index < 0) {
+                statusLabel.setText("Index must be >= 0.");
+                return;
+            }
+
+            if (index > service.getSize()) {
+                statusLabel.setText("Index out of bounds. Max index: " + service.getSize());
+                return;
+            }
+
+            boolean success = service.insertAtIndex(index, value);
+
+            if (success) {
+                statusLabel.setText("Inserted " + value + " at index " + index + ".");
+                logArea.appendText("\n[Insert At Index]: " + value + " at index " + index);
+
+                pseudoCodeArea.setText("""
+                    if (index == 0) {
+                        addHead(value);
+                        return;
+                    }
+                    
+                    Node newNode = new Node(value);
+                    Node current = head;
+                    int currentIndex = 0;
+                    
+                    while (currentIndex < index - 1) {
+                        current = current.next;
+                        currentIndex++;
+                    }
+                    
+                    newNode.next = current.next;
+                    current.next = newNode;
+                    """);
+
+                if (explanationArea != null) {
+                    explanationArea.setText("""
+                        Step 1: If index == 0, insert at head.
+                        Step 2: Create a new node with value %d.
+                        Step 3: Traverse to node at position (index - 1).
+                        Step 4: Link new node to the next node.
+                        Step 5: Link previous node to the new node.
+                        """.formatted(value));
+                }
+
+                renderList();
+                inputField.clear();
+                indexField.clear();
+            } else {
+                statusLabel.setText("Failed to insert at index " + index + ".");
+            }
+
+        } catch (NumberFormatException e) {
+            statusLabel.setText("Invalid input. Enter both value and index.");
+        }
+    }
+
+    @FXML
+    private void handleDeleteAtIndex() {
+        try {
+            int index = Integer.parseInt(indexField.getText());
+
+            if (index < 0) {
+                statusLabel.setText("Index must be >= 0.");
+                return;
+            }
+
+            if (index >= service.getSize()) {
+                statusLabel.setText("Index out of bounds. Max index: " + (service.getSize() - 1));
+                return;
+            }
+
+            boolean success = service.deleteAtIndex(index);
+
+            if (success) {
+                statusLabel.setText("Deleted node at index " + index + ".");
+                logArea.appendText("\n[Delete At Index]: Removed node at index " + index);
+
+                pseudoCodeArea.setText("""
+                    if (index == 0) {
+                        head = head.next;
+                        return;
+                    }
+                    
+                    Node current = head;
+                    int currentIndex = 0;
+                    
+                    while (currentIndex < index - 1) {
+                        current = current.next;
+                        currentIndex++;
+                    }
+                    
+                    current.next = current.next.next;
+                    """);
+
+                if (explanationArea != null) {
+                    explanationArea.setText("""
+                        Step 1: If index == 0, delete head.
+                        Step 2: Traverse to node at position (index - 1).
+                        Step 3: Link current node to the node after the target.
+                        Step 4: The target node is now removed from the chain.
+                        """);
+                }
+
+                renderList();
+                indexField.clear();
+            } else {
+                statusLabel.setText("Failed to delete at index " + index + ".");
+            }
+
+        } catch (NumberFormatException e) {
+            statusLabel.setText("Invalid index input.");
+        }
+    }
+
+    @FXML
     private void handleReset() {
          service.reset();
 
@@ -354,5 +476,6 @@ public class LinkedListController {
         logArea.appendText("\n[Reset]: Cleared linked list.");
 
         inputField.clear();
+        indexField.clear();
     }
 }

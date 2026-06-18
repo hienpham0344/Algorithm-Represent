@@ -1,5 +1,6 @@
 package com.example.main;
 
+import com.example.main.service.DatabaseService;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -17,33 +18,21 @@ public final class DashboardApplication extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
+        // Khởi tạo database
+        DatabaseService.getInstance();
+        
+        // Bắt đầu từ login screen
         Parent root = FXMLLoader.load(
-                DashboardApplication.class.getResource("/fxml/dashboard-view.fxml")
+                DashboardApplication.class.getResource("/fxml/login-view.fxml")
         );
 
-        Scene scene = new Scene(root);
-        scene.getStylesheets().add(
-                DashboardApplication.class.getResource("/styles/dashboard.css").toExternalForm()
-        );
+        Scene scene = new Scene(root, 800, 600);
 
-        stage.setTitle("Algorithm Visualizer");
+        stage.setTitle("Algorithm Visualizer - Login");
         stage.setScene(scene);
-        stage.setMinWidth(MIN_WINDOW_WIDTH);
-        stage.setMinHeight(MIN_WINDOW_HEIGHT);
-
-        // Đặt lại vị trí và kích thước cửa sổ theo màn hình chính để tránh bị lệch hoặc cắt
-        Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
-        stage.setX(screenBounds.getMinX());
-        stage.setY(screenBounds.getMinY());
-        stage.setWidth(screenBounds.getWidth());
-        stage.setHeight(screenBounds.getHeight());
-        stage.setMaximized(true);
+        stage.setMinWidth(500);
+        stage.setMinHeight(500);
+        stage.centerOnScreen();
         stage.show();
-
-        // Cập nhật lại CSS và layout khi phóng to cửa sổ
-        Platform.runLater(() -> {
-            root.applyCss();
-            root.layout();
-        });
     }
 }

@@ -16,6 +16,10 @@
             <Button onAction="#toggleSidebar" styleClass="menu-btn" text="☰" />
 
             <Label styleClass="dashboard-title" text="Algorithm Visualizer" />
+            
+            <Region HBox.hgrow="ALWAYS" />
+            
+            <Button onAction="#handleLogout" styleClass="logout-btn" text="🚪 Logout" />
         </HBox>
     </top>
 

@@ -1,0 +1,150 @@
+/* Root */
+.login-root {
+    -fx-background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+}
+
+/* Container */
+.login-container {
+    -fx-background-color: rgba(30, 41, 59, 0.8);
+    -fx-background-radius: 16px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 20, 0, 0, 4);
+    -fx-border-color: rgba(124, 58, 237, 0.3);
+    -fx-border-width: 1px;
+    -fx-border-radius: 16px;
+    -fx-max-width: 420px;
+    -fx-min-width: 420px;
+}
+
+/* Logo Icon */
+.logo-icon {
+    -fx-font-size: 48px;
+}
+
+/* App Title */
+.app-title {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+/* Subtitle */
+.subtitle {
+    -fx-font-size: 14px;
+    -fx-text-fill: #94a3b8;
+}
+
+/* Form Container */
+.form-container {
+    -fx-min-width: 340px;
+}
+
+/* Input Label */
+.input-label {
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #cbd5e1;
+}
+
+/* Input Field */
+.input-field {
+    -fx-background-color: #1e293b;
+    -fx-text-fill: white;
+    -fx-prompt-text-fill: #64748b;
+    -fx-font-size: 14px;
+    -fx-padding: 12px 16px;
+    -fx-background-radius: 8px;
+    -fx-border-color: #334155;
+    -fx-border-width: 1.5px;
+    -fx-border-radius: 8px;
+}
+
+.input-field:focused {
+    -fx-border-color: #7c3aed;
+    -fx-background-color: #0f172a;
+}
+
+/* Primary Button */
+.btn-primary {
+    -fx-background-color: #7c3aed;
+    -fx-text-fill: white;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-padding: 12px 24px;
+    -fx-background-radius: 8px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(124, 58, 237, 0.4), 8, 0, 0, 2);
+}
+
+.btn-primary:hover {
+    -fx-background-color: #8b5cf6;
+    -fx-effect: dropshadow(gaussian, rgba(124, 58, 237, 0.6), 12, 0, 0, 4);
+}
+
+.btn-primary:pressed {
+    -fx-background-color: #6d28d9;
+    -fx-translate-y: 1px;
+}
+
+/* Link Label */
+.link-label {
+    -fx-font-size: 13px;
+    -fx-text-fill: #94a3b8;
+}
+
+/* Hyperlink */
+.link {
+    -fx-font-size: 13px;
+    -fx-text-fill: #a78bfa;
+    -fx-underline: false;
+    -fx-padding: 0;
+}
+
+.link:hover {
+    -fx-text-fill: #c4b5fd;
+    -fx-underline: true;
+}
+
+/* Error Label */
+.error-label {
+    -fx-text-fill: #f87171;
+    -fx-font-size: 13px;
+    -fx-background-color: rgba(248, 113, 113, 0.1);
+    -fx-padding: 10px 14px;
+    -fx-background-radius: 6px;
+    -fx-border-color: rgba(248, 113, 113, 0.3);
+    -fx-border-width: 1px;
+    -fx-border-radius: 6px;
+}
+
+.success-label {
+    -fx-text-fill: #34d399;
+    -fx-font-size: 13px;
+    -fx-background-color: rgba(52, 211, 153, 0.1);
+    -fx-padding: 10px 14px;
+    -fx-background-radius: 6px;
+    -fx-border-color: rgba(52, 211, 153, 0.3);
+    -fx-border-width: 1px;
+    -fx-border-radius: 6px;
+}
+
+/* Info Box */
+.info-box {
+    -fx-background-color: rgba(59, 130, 246, 0.1);
+    -fx-padding: 12px 16px;
+    -fx-background-radius: 8px;
+    -fx-border-color: rgba(59, 130, 246, 0.3);
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
+}
+
+.info-title {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #60a5fa;
+}
+
+.info-text {
+    -fx-font-size: 11px;
+    -fx-text-fill: #93c5fd;
+    -fx-font-family: 'Consolas', 'Monaco', monospace;
+}

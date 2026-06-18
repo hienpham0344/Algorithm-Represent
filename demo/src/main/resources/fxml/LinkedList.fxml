@@ -12,7 +12,7 @@
 
     <!-- LEFT CONTROL PANEL -->
     <left>
-        <VBox prefWidth="260" spacing="16" styleClass="left-panel">
+        <VBox prefWidth="300" spacing="16" styleClass="left-panel">
             <padding>
                 <Insets top="18" right="16" bottom="18" left="16"/>
             </padding>
@@ -32,6 +32,12 @@
                        promptText="e.g. 42"
                        styleClass="input-field"/>
 
+            <Label text="Index Position" styleClass="small-label"/>
+
+            <TextField fx:id="indexField"
+                       promptText="e.g. 0, 1, 2..."
+                       styleClass="input-field"/>
+
             <GridPane hgap="8" vgap="8">
                 <Button text="← Add Head" onAction="#handleAddHead" styleClass="btn-add-head" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
                 <Button text="→ Add Tail" onAction="#handleAddTail" styleClass="btn-add-tail" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
@@ -39,8 +45,11 @@
                 <Button text="🗑 Delete Head" onAction="#handleDeleteHead" styleClass="btn-delete" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
                 <Button text="🗑 Delete Tail" onAction="#handleDeleteTail" styleClass="btn-delete" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
-                <Button text="🔍 Search" onAction="#handleSearch" styleClass="btn-search" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-                <Button text="↻ Reset" onAction="#handleReset" styleClass="btn-reset" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                <Button text="➕ Insert At Index" onAction="#handleInsertAtIndex" styleClass="btn-add-head" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                <Button text="✂ Delete At Index" onAction="#handleDeleteAtIndex" styleClass="btn-delete" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+                <Button text="🔍 Search" onAction="#handleSearch" styleClass="btn-search" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                <Button text="↻ Reset" onAction="#handleReset" styleClass="btn-reset" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
             </GridPane>
 
 

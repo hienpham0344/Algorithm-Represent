@@ -1,11 +1,18 @@
 package com.example.main.ui;
 
+import com.example.main.DashboardApplication;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+
+import java.util.Optional;
 
 public class DashboardController {
 
@@ -40,6 +47,32 @@ public class DashboardController {
         sidebarVisible = !sidebarVisible;
         sidebar.setVisible(sidebarVisible);
         sidebar.setManaged(sidebarVisible);
+    }
+
+    @FXML
+    public void handleLogout() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Logout");
+        alert.setHeaderText("Are you sure you want to logout?");
+        alert.setContentText("You will need to login again to access the application.");
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            // Clear session
+            SessionManager.logout();
+
+            // Return to login screen
+            try {
+                Stage stage = (Stage) contentPane.getScene().getWindow();
+                FXMLLoader loader = new FXMLLoader(DashboardApplication.class.getResource("/fxml/login-view.fxml"));
+                Scene scene = new Scene(loader.load(), 800, 600);
+                stage.setScene(scene);
+                stage.setTitle("Algorithm Visualizer - Login");
+                stage.centerOnScreen();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     // Hàm dùng chung để đổi màu nút đang chọn

@@ -22,6 +22,27 @@
     -fx-background-color: #334155;
 }
 
+.logout-btn {
+    -fx-font-size: 13px;
+    -fx-background-color: transparent;
+    -fx-text-fill: #f87171;
+    -fx-cursor: hand;
+    -fx-padding: 8 14 8 14;
+    -fx-background-radius: 6;
+    -fx-border-color: #f87171;
+    -fx-border-width: 1px;
+    -fx-border-radius: 6;
+    -fx-font-weight: bold;
+}
+
+.logout-btn:hover {
+    -fx-background-color: rgba(248, 113, 113, 0.1);
+}
+
+.logout-btn:pressed {
+    -fx-background-color: rgba(248, 113, 113, 0.2);
+}
+
 .sidebar {
     -fx-background-color: #1E293B;
     -fx-border-width: 0;

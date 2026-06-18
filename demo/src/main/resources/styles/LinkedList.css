@@ -52,7 +52,7 @@
 /* BUTTON */
 
 .button {
-    -fx-pref-width: 108px;
+    -fx-pref-width: 120px;
     -fx-pref-height: 36px;
 
     -fx-text-fill: white;
