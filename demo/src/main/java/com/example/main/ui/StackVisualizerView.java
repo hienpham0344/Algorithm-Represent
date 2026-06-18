@@ -156,12 +156,12 @@ public class StackVisualizerView extends BorderPane {
                     btnPause.setText("Resume");
                     btnPause.setStyle("-fx-background-color: #EAB308; -fx-text-fill: #FFFFFF;");
 
-                    setStatus("⏸ Đã tạm dừng mô phỏng.");
+                    setStatus("⏸ Simulation paused.");
                 } else if (batchTransition.getStatus() == Animation.Status.PAUSED) {
                     batchTransition.play();
                     btnPause.setText("Pause");
                     btnPause.setStyle("");
-                    setStatus("▶ Đang tiếp tục mô phỏng loạt số...");
+                    setStatus("▶ Resuming batch push simulation...");
                 }
             }
         });
@@ -638,8 +638,8 @@ public class StackVisualizerView extends BorderPane {
     private void handlePeek() {
         if (isSimulating) return;
         if (service.isEmpty()) {
-            appendLog("✖ [Lỗi]: Ngăn xếp rỗng. Peek = NULL!");
-            setStatus("Ngăn xếp rỗng.", false);
+            appendLog("✖ [Error]: Stack is empty. Peek = NULL!");
+            setStatus("Stack is empty.", false);
             return;
         }
         isSimulating = true;

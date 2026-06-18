@@ -2,28 +2,37 @@ package com.example.main.ui;
 
 import com.example.main.service.ArrayService;
 import javafx.animation.*;
-import javafx.geometry.Insets; // kiểu giống padding hoặc margin trong css
+import javafx.fxml.FXML;
 import javafx.geometry.Pos; // căn vị trí (vd: giữa, trái , phải)
-import javafx.scene.Node; // class cha của button, label, textfield, vbox, hbox, pane
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.util.Duration;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-public class ArrayVisualizerView extends BorderPane {
+public class ArrayVisualizerView {
 
     private final ArrayService service = new ArrayService();
     private final List<Button> actionButtons = new ArrayList<>();
 
-    private TextField valueField;
-    private TextField indexField;
-    private HBox arrayFrame;
-    private Label statusText;
-    private TextArea codeArea;
-    private TextArea explanationArea;
-    private TextArea logArea;
+    @FXML private TextField valueField;
+    @FXML private TextField indexField;
+    @FXML private HBox arrayFrame;
+    @FXML private Label statusText;
+    @FXML private TextArea codeArea;
+    @FXML private TextArea explanationArea;
+    @FXML private TextArea logArea;
+    @FXML private Button btnInsertEnd;
+    @FXML private Button btnDeleteEnd;
+    @FXML private Button btnInsertAt;
+    @FXML private Button btnDeleteAt;
+    @FXML private Button btnUpdateAt;
+    @FXML private Button btnSearch;
+    @FXML private Button btnRandomize;
+    @FXML private Button btnReset;
+    @FXML private Button btnClearLog;
     private Timeline animation;
     private int highlightedIndex = -1;
     private int foundIndex = -1;
@@ -83,24 +92,9 @@ public class ArrayVisualizerView extends BorderPane {
                     "    return -1;\n" +
                     "}\n";
 
-    public ArrayVisualizerView() {
-        getStylesheets().add(getClass().getResource("/styles/array.css").toExternalForm());
-        getStyleClass().add("array-root");
-
-        ScrollPane leftScrollPane = new ScrollPane(buildLeftPanel());
-        leftScrollPane.getStyleClass().add("left-scroll-pane");
-        leftScrollPane.setFitToWidth(true);
-        leftScrollPane.setFitToHeight(true);
-        leftScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        leftScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        leftScrollPane.setPrefWidth(285);
-        leftScrollPane.setMinWidth(285);
-        leftScrollPane.setMaxWidth(285);
-
-        setLeft(leftScrollPane);
-        setCenter(buildVizArea());
-        setBottom(buildBottomPanel());
-
+    @FXML
+    private void initialize() {
+        initializeControls();
         redrawArray();
         setStatus("Ready. Choose an array operation.");
         setCode(CODE_IDLE);
@@ -112,58 +106,17 @@ public class ArrayVisualizerView extends BorderPane {
         addLog("[SYSTEM] Array visualizer loaded.");
     }
 
-    private VBox buildLeftPanel() {
-        VBox panel = new VBox(14);
-        panel.getStyleClass().add("left-panel");
-        panel.setPrefWidth(285);
-        panel.setMinWidth(285);
-        panel.setMaxWidth(285);
-        panel.setPadding(new Insets(22, 18, 22, 18));
-
-        Label title = new Label("ARRAY");
-        title.getStyleClass().add("ds-title");
-        title.setWrapText(true);
-
-        Label desc = new Label(
-                "Arrays store values in indexed positions. Access by index is O(1), " +
-                        "while inserting or deleting in the middle costs O(n) because values must shift."
-        );
-        desc.getStyleClass().add("ds-desc");
-        desc.setWrapText(true);
-
-        Label sectionOp = new Label("OPERATIONS");
-        sectionOp.getStyleClass().add("section-label");
-
-        Label valueLabel = new Label("Element Value(s)");
-        valueLabel.getStyleClass().add("input-label");
-
-        valueField = new TextField();
-        valueField.setPromptText("Example: 42 or 10, 20, 30");
-        valueField.getStyleClass().add("input-field");
-        valueField.setMaxWidth(Double.MAX_VALUE);
-        VBox valueBox = new VBox(5, valueLabel, valueField);
-
-        Label indexLabel = new Label("Index");
-        indexLabel.getStyleClass().add("input-label");
-
-        indexField = new TextField();
-        indexField.setPromptText("Example: 2");
-        indexField.getStyleClass().add("input-field");
-        indexField.setMaxWidth(Double.MAX_VALUE);
-        VBox indexBox = new VBox(5, indexLabel, indexField);
-
-        Region operationGap = new Region();
-        operationGap.setPrefHeight(5);
-
-        Button btnInsertEnd = makeBtn("Insert End", "btn-array-insert");
-        Button btnDeleteEnd = makeBtn("Delete End", "btn-array-delete");
-        Button btnInsertAt = makeBtn("Insert at Index", "btn-array-insert");
-        Button btnDeleteAt = makeBtn("Delete at Index", "btn-array-delete");
-        Button btnUpdateAt = makeBtn("Update at Index", "btn-array-update");
-        Button btnSearch = makeBtn("Search", "btn-array-search");
-        Button btnRandomize = makeBtn("Randomize", "btn-array-random");
-        Button btnReset = makeBtn("Reset", "btn-reset");
-
+    private void initializeControls() {
+        actionButtons.addAll(Arrays.asList(
+                btnInsertEnd,
+                btnDeleteEnd,
+                btnInsertAt,
+                btnDeleteAt,
+                btnUpdateAt,
+                btnSearch,
+                btnRandomize,
+                btnReset
+        ));
         btnInsertEnd.setOnAction(e -> handleInsertEnd());
         btnDeleteEnd.setOnAction(e -> handleDeleteEnd());
         btnInsertAt.setOnAction(e -> handleInsertAt());
@@ -172,133 +125,10 @@ public class ArrayVisualizerView extends BorderPane {
         btnSearch.setOnAction(e -> handleSearch());
         btnRandomize.setOnAction(e -> handleRandomize());
         btnReset.setOnAction(e -> handleReset());
-
-        Label statusHeader = new Label("SIMULATION STATUS");
-        statusHeader.getStyleClass().add("status-header");
-        statusText = new Label();
-        statusText.getStyleClass().add("status-text");
-        statusText.setWrapText(true);
-
-        VBox statusBox = new VBox(6, statusHeader, statusText);
-        statusBox.getStyleClass().add("status-box");
-        statusBox.setPadding(new Insets(12, 14, 12, 14));
-        VBox.setVgrow(statusBox, Priority.ALWAYS);  //Luôn kéo giãn hộp để lấp đầy khoản trống thừa
-
-        panel.getChildren().addAll(
-                title, desc, divider(),
-                sectionOp, valueBox,
-                indexBox, operationGap,
-                hRow(btnInsertEnd, btnDeleteEnd),
-                hRow(btnInsertAt, btnDeleteAt),
-                hRow(btnUpdateAt, btnSearch),
-                hRow(btnRandomize, btnReset),
-                divider(), statusBox
-        );
-        return panel;
+        btnClearLog.setOnAction(e -> handleClearLog());
     }
 
-    private Node buildVizArea() {
-        arrayFrame = new HBox(10);
-        arrayFrame.setAlignment(Pos.CENTER);
-        arrayFrame.getStyleClass().add("array-frame");
-
-        StackPane wrapper = new StackPane(arrayFrame);
-        wrapper.setAlignment(Pos.CENTER);
-        wrapper.getStyleClass().add("viz-area");
-
-        ScrollPane scrollPane = new ScrollPane(wrapper);
-        scrollPane.getStyleClass().add("array-viz-scroll");
-        scrollPane.setFitToHeight(true);
-        scrollPane.setFitToWidth(true);
-        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        scrollPane.setPannable(true);
-        return scrollPane;
-    }
-
-    private HBox buildBottomPanel() {
-        HBox codeHeader = panelHeader("<>  PSEUDO-CODE", "Java code");
-        codeArea = new TextArea();
-        codeArea.getStyleClass().add("code-area");
-        codeArea.setEditable(false);
-        codeArea.setWrapText(false);
-        VBox.setVgrow(codeArea, Priority.ALWAYS);
-        VBox.setMargin(codeArea, new Insets(12, 12, 12, 12));
-        VBox codeBox = new VBox(codeHeader, codeArea);
-        codeBox.getStyleClass().add("bottom-section");
-        HBox.setHgrow(codeBox, Priority.ALWAYS);
-        codeBox.setPrefWidth(0);
-        codeBox.setMaxHeight(Double.MAX_VALUE);
-
-        Region divider = new Region();
-        divider.getStyleClass().add("bottom-divider");
-
-        HBox explanationHeader = panelHeader("?  EXPLANATION", "Guide");
-        explanationArea = new TextArea();
-        explanationArea.getStyleClass().add("explanation-area");
-        explanationArea.setEditable(false);
-        explanationArea.setWrapText(true);
-        VBox.setVgrow(explanationArea, Priority.ALWAYS);
-        VBox.setMargin(explanationArea, new Insets(12));
-        VBox explanationBox = new VBox(explanationHeader, explanationArea);
-        explanationBox.getStyleClass().add("bottom-section");
-        HBox.setHgrow(explanationBox, Priority.ALWAYS);
-        explanationBox.setPrefWidth(0);
-        explanationBox.setMaxHeight(Double.MAX_VALUE);
-
-        Region divider2 = new Region();
-        divider2.getStyleClass().add("bottom-divider");
-
-        HBox logHeader = panelHeader(">_  ACTIVITY LOG", null);
-        Button clearBtn = new Button("Clear");
-        clearBtn.getStyleClass().add("btn-clear-log");
-        clearBtn.setOnAction(e -> logArea.clear());
-        logHeader.getChildren().add(clearBtn);
-
-        logArea = new TextArea();
-        logArea.getStyleClass().add("log-area");
-        logArea.setEditable(false);
-        logArea.setWrapText(true);
-        VBox.setVgrow(logArea, Priority.ALWAYS);
-        VBox.setMargin(logArea, new Insets(12, 12, 12, 12));
-        VBox logBox = new VBox(logHeader, logArea);
-        logBox.getStyleClass().add("bottom-section");
-        HBox.setHgrow(logBox, Priority.ALWAYS);
-        logBox.setPrefWidth(0);
-        logBox.setMaxHeight(Double.MAX_VALUE);
-
-        HBox bottom = new HBox(codeBox, divider, explanationBox, divider2, logBox);
-        bottom.getStyleClass().add("bottom-dock");
-        bottom.setPrefHeight(210);
-        bottom.setMinHeight(180);
-        bottom.setMaxHeight(260);
-        bottom.setFillHeight(true);
-        return bottom;
-    }
-
-    private HBox panelHeader(String title, String badgeText) {
-        HBox header = new HBox();
-        header.getStyleClass().add("panel-header-box");
-        header.setAlignment(Pos.CENTER_LEFT);
-        header.setPrefHeight(40);
-        header.setMinHeight(40);
-        header.setMaxHeight(40);
-
-        Label titleLabel = new Label(title);
-        titleLabel.getStyleClass().add("panel-header-label");
-
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-        header.getChildren().addAll(titleLabel, spacer);
-
-        if (badgeText != null) {
-            Label badge = new Label(badgeText);
-            badge.getStyleClass().add("panel-lang-badge");
-            header.getChildren().add(badge);
-        }
-        return header;
-    }
-
+    @FXML
     private void handleInsertEnd() {
         List<Integer> values = readValues();
         if (values == null) return;
@@ -357,6 +187,7 @@ public class ArrayVisualizerView extends BorderPane {
         animation.play();
     }
 
+    @FXML
     private void handleDeleteEnd() {
         setCode(CODE_DELETE_END);
         foundIndex = -1;
@@ -373,6 +204,7 @@ public class ArrayVisualizerView extends BorderPane {
         });
     }
 
+    @FXML
     private void handleInsertAt() {
         Integer value = readValue();
         Integer index = readIndex();
@@ -410,6 +242,7 @@ public class ArrayVisualizerView extends BorderPane {
         });
     }
 
+    @FXML
     private void handleDeleteAt() {
         Integer index = readIndex();
         if (index == null) return;
@@ -437,6 +270,7 @@ public class ArrayVisualizerView extends BorderPane {
         });
     }
 
+    @FXML
     private void handleUpdateAt() {
         Integer value = readValue();
         Integer index = readIndex();
@@ -466,6 +300,7 @@ public class ArrayVisualizerView extends BorderPane {
         });
     }
 
+    @FXML
     private void handleSearch() {
         Integer value = readValue();
         if (value == null) return;
@@ -492,6 +327,7 @@ public class ArrayVisualizerView extends BorderPane {
         });
     }
 
+    @FXML
     private void handleRandomize() {
         stopAnimation();
         ArrayService.Result result = service.randomize();
@@ -506,6 +342,7 @@ public class ArrayVisualizerView extends BorderPane {
         afterAction(result);
     }
 
+    @FXML
     private void handleReset() {
         stopAnimation();
         ArrayService.Result result = service.reset();
@@ -684,29 +521,6 @@ public class ArrayVisualizerView extends BorderPane {
         return box;
     }
 
-    private Button makeBtn(String text, String styleClass) {
-        Button button = new Button(text);
-        button.getStyleClass().addAll("array-op-button", styleClass);
-        button.setWrapText(true);
-        button.setAlignment(Pos.CENTER);
-        actionButtons.add(button);
-        return button;
-    }
-
-    private HBox hRow(Button a, Button b) {
-        HBox row = new HBox(8, a, b);
-        a.setPrefSize(118, 38);
-        b.setPrefSize(118, 38);
-        return row;
-    }
-
-    private Region divider() {
-        Region region = new Region();
-        region.getStyleClass().add("divider-line");
-        region.setMaxWidth(Double.MAX_VALUE);
-        return region;
-    }
-
     private void setControlsDisabled(boolean disabled) {
         actionButtons.forEach(button -> button.setDisable(disabled));
         valueField.setDisable(disabled);
@@ -732,5 +546,10 @@ public class ArrayVisualizerView extends BorderPane {
         if (logArea == null) return;
         logArea.appendText(message + "\n");
         logArea.positionCaret(logArea.getText().length());
+    }
+
+    @FXML
+    private void handleClearLog() {
+        logArea.clear();
     }
 }

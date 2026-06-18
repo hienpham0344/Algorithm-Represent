@@ -22,7 +22,7 @@ public class QuickSortService implements SortStrategy {
         Set<Integer> sorted = new LinkedHashSet<>();
         quickSort(a, 0, a.length - 1, asc, steps, sorted);
         steps.add(step(a, StepAction.COMPLETE, "quick.complete",
-                "Quick Sort hoàn tất.", List.of(), Set.of(), allIndices(a.length)));
+                "Quick Sort complete.", List.of(), Set.of(), allIndices(a.length)));
         return steps;
     }
 
@@ -36,15 +36,15 @@ public class QuickSortService implements SortStrategy {
             int pivotIndex = partition(a, low, high, asc, steps, sorted);
             sorted.add(pivotIndex);
             steps.add(step(a, StepAction.MARK_SORTED, "quick.partition.return",
-                    "Pivot ở a[" + pivotIndex + "] = " + a[pivotIndex] + " đã đúng vị trí.",
+                    "Pivot at a[" + pivotIndex + "] = " + a[pivotIndex] + " is in its final position.",
                     markers(pivotIndex, "pivot"), indices(pivotIndex), sorted));
             quickSort(a, low, pivotIndex - 1, asc, steps, sorted);
             quickSort(a, pivotIndex + 1, high, asc, steps, sorted);
         } else if (low == high) {
             sorted.add(low);
             steps.add(step(a, StepAction.MARK_SORTED, "quick.singleton",
-                    "Vùng chỉ có a[" + low + "] nên phần tử này đã được sắp xếp.",
-                    markers(low, "đã xếp"), indices(low), sorted));
+                    "Region contains only a[" + low + "], so this element is already sorted.",
+                    markers(low, "sorted"), indices(low), sorted));
         }
     }
 
@@ -60,22 +60,22 @@ public class QuickSortService implements SortStrategy {
         for (int j = low; j < high; j++) {
             boolean belongsBefore = asc ? a[j] <= pivot : a[j] >= pivot;
             steps.add(step(a, StepAction.CONDITION, "quick.partition.condition",
-                    "So sánh a[" + j + "] = " + a[j] + " với pivot = " + pivot
-                            + ": phần tử " + (belongsBefore ? "thuộc" : "không thuộc") + " vùng bên trái.",
+                    "Compare a[" + j + "] = " + a[j] + " with pivot = " + pivot
+                            + ": element " + (belongsBefore ? "belongs" : "does not belong") + " in the left region.",
                     markers(i, "i", j, "j", high, "pivot"),
                     indices(j, high), sorted));
 
             if (belongsBefore) {
                 i++;
                 steps.add(step(a, StepAction.VARIABLE_UPDATE, "quick.partition.incrementI",
-                        "Tăng i lên " + i + " để mở rộng vùng bên trái pivot.",
+                        "Increment i to " + i + " to expand the left region of the pivot.",
                         markers(i, "i", j, "j", high, "pivot"),
                         indices(i, j, high), sorted));
 
                 boolean needsSwap = i != j;
                 steps.add(step(a, StepAction.CONDITION, "quick.partition.swapCondition",
-                        needsSwap ? "i khác j nên đưa phần tử đang xét vào vùng bên trái."
-                                : "i trùng j nên phần tử đã nằm đúng vùng.",
+                        needsSwap ? "i differs from j, move the current element into the left region."
+                                : "i equals j, the element is already in the correct region.",
                         markers(i, "i", j, "j", high, "pivot"),
                         indices(i, j), sorted));
                 if (needsSwap) {
@@ -83,7 +83,7 @@ public class QuickSortService implements SortStrategy {
                     int current = a[j];
                     swap(a, i, j);
                     steps.add(step(a, StepAction.SWAP, "quick.partition.swap",
-                            "Đổi chỗ " + left + " và " + current + " tại i = " + i + ", j = " + j + ".",
+                            "Swap " + left + " and " + current + " at i = " + i + ", j = " + j + ".",
                             markers(i, "i", j, "j", high, "pivot"),
                             indices(i, j), sorted));
                 }
@@ -95,8 +95,8 @@ public class QuickSortService implements SortStrategy {
         swap(a, pivotIndex, high);
         steps.add(step(a, StepAction.SWAP, "quick.partition.placePivot",
                 pivotIndex == high
-                        ? "Pivot đã ở đúng vị trí a[" + high + "], không phát sinh đổi chỗ thực."
-                        : "Đưa pivot " + pivot + " vào a[" + pivotIndex + "] và chuyển " + displaced + " sang a[" + high + "].",
+                        ? "Pivot is already at a[" + high + "]; no actual swap occurred."
+                        : "Place pivot " + pivot + " at a[" + pivotIndex + "] and move " + displaced + " to a[" + high + "].",
                 markers(pivotIndex, "i + 1", high, "pivot"),
                 indices(pivotIndex, high), sorted));
         return pivotIndex;

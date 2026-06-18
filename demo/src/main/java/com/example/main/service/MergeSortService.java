@@ -20,7 +20,7 @@ public class MergeSortService implements SortStrategy {
         int[] a = arr.clone();
         mergeSort(a, 0, a.length - 1, asc, steps);
         steps.add(step(a, StepAction.COMPLETE, "merge.complete",
-                "Merge Sort hoàn tất.", List.of(), Set.of(), allIndices(a.length)));
+                "Merge Sort complete.", List.of(), Set.of(), allIndices(a.length)));
         return steps;
     }
 
@@ -45,8 +45,8 @@ public class MergeSortService implements SortStrategy {
             int rightIndex = mid + 1 + j;
             boolean chooseLeft = asc ? leftValues[i] <= rightValues[j] : leftValues[i] >= rightValues[j];
             steps.add(step(a, StepAction.CONDITION, "merge.work.condition",
-                    "So sánh L[" + i + "] = " + leftValues[i] + " và R[" + j + "] = " + rightValues[j]
-                            + "; chọn " + (chooseLeft ? "L" : "R") + " để ghi vào a[" + k + "].",
+                    "Compare L[" + i + "] = " + leftValues[i] + " and R[" + j + "] = " + rightValues[j]
+                            + "; choose " + (chooseLeft ? "L" : "R") + " to write into a[" + k + "].",
                     markers(leftIndex, "i", rightIndex, "j", k, "k"),
                     indices(leftIndex, rightIndex, k), Set.of()));
 
@@ -54,7 +54,7 @@ public class MergeSortService implements SortStrategy {
                 int value = leftValues[i];
                 a[k] = value;
                 steps.add(step(a, StepAction.WRITE, "merge.work.writeLeft",
-                        "Ghi L[" + i + "] = " + value + " vào a[" + k + "].",
+                        "Write L[" + i + "] = " + value + " into a[" + k + "].",
                         markers(leftIndex, "i", rightIndex, "j", k, "k"),
                         indices(k), Set.of()));
                 i++;
@@ -62,7 +62,7 @@ public class MergeSortService implements SortStrategy {
                 int value = rightValues[j];
                 a[k] = value;
                 steps.add(step(a, StepAction.WRITE, "merge.work.writeRight",
-                        "Ghi R[" + j + "] = " + value + " vào a[" + k + "].",
+                        "Write R[" + j + "] = " + value + " into a[" + k + "].",
                         markers(leftIndex, "i", rightIndex, "j", k, "k"),
                         indices(k), Set.of()));
                 j++;
@@ -75,7 +75,7 @@ public class MergeSortService implements SortStrategy {
             int sourceIndex = left + i;
             a[k] = value;
             steps.add(step(a, StepAction.WRITE, "merge.work.writeLeftRemainder",
-                    "R không còn phần tử; ghi L[" + i + "] = " + value + " vào a[" + k + "].",
+                    "R has no remaining elements; write L[" + i + "] = " + value + " into a[" + k + "].",
                     markers(sourceIndex, "i", k, "k"), indices(k), Set.of()));
             i++;
             k++;
@@ -86,7 +86,7 @@ public class MergeSortService implements SortStrategy {
             int sourceIndex = mid + 1 + j;
             a[k] = value;
             steps.add(step(a, StepAction.WRITE, "merge.work.writeRightRemainder",
-                    "L không còn phần tử; ghi R[" + j + "] = " + value + " vào a[" + k + "].",
+                    "L has no remaining elements; write R[" + j + "] = " + value + " into a[" + k + "].",
                     markers(sourceIndex, "j", k, "k"), indices(k), Set.of()));
             j++;
             k++;

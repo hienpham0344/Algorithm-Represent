@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17.0.12"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.main.ui.ArrayVisualizerView"
+            stylesheets="@../styles/array.css"
+            styleClass="array-root">
+
+    <left>
+        <ScrollPane fitToHeight="true"
+                    fitToWidth="true"
+                    hbarPolicy="NEVER"
+                    maxWidth="285"
+                    minWidth="285"
+                    prefWidth="285"
+                    styleClass="left-scroll-pane">
+                <VBox spacing="14" styleClass="left-panel">
+                    <padding>
+                        <Insets bottom="22" left="18" right="18" top="22" />
+                    </padding>
+
+                    <Label text="ARRAY" wrapText="true" styleClass="ds-title" />
+                    <Label text="Arrays store values in indexed positions. Access by index is O(1), while inserting or deleting in the middle costs O(n) because values must shift."
+                           wrapText="true"
+                           styleClass="ds-desc" />
+
+                    <Region styleClass="divider-line" />
+
+                    <Label text="OPERATIONS" styleClass="section-label" />
+
+                    <VBox spacing="5">
+                        <Label text="Element Value(s)" styleClass="input-label" />
+                        <TextField fx:id="valueField"
+                                   promptText="Example: 42 or 10, 20, 30"
+                                   styleClass="input-field" />
+                    </VBox>
+
+                    <VBox spacing="5">
+                        <Label text="Index" styleClass="input-label" />
+                        <TextField fx:id="indexField"
+                                   promptText="Example: 2"
+                                   styleClass="input-field" />
+                    </VBox>
+
+                    <Region prefHeight="5" />
+
+                    <HBox spacing="8">
+                        <Button fx:id="btnInsertEnd"
+                                styleClass="array-op-button, btn-array-insert"
+                                text="Insert End"
+                                wrapText="true" />
+                        <Button fx:id="btnDeleteEnd"
+                                styleClass="array-op-button, btn-array-delete"
+                                text="Delete End"
+                                wrapText="true" />
+                    </HBox>
+
+                    <HBox spacing="8">
+                        <Button fx:id="btnInsertAt"
+                                styleClass="array-op-button, btn-array-insert"
+                                text="Insert at Index"
+                                wrapText="true" />
+                        <Button fx:id="btnDeleteAt"
+                                styleClass="array-op-button, btn-array-delete"
+                                text="Delete at Index"
+                                wrapText="true" />
+                    </HBox>
+
+                    <HBox spacing="8">
+                        <Button fx:id="btnUpdateAt"
+                                styleClass="array-op-button, btn-array-update"
+                                text="Update at Index"
+                                wrapText="true" />
+                        <Button fx:id="btnSearch"
+                                styleClass="array-op-button, btn-array-search"
+                                text="Search"
+                                wrapText="true" />
+                    </HBox>
+
+                    <HBox spacing="8">
+                        <Button fx:id="btnRandomize"
+                                styleClass="array-op-button, btn-array-random"
+                                text="Randomize"
+                                wrapText="true" />
+                        <Button fx:id="btnReset"
+                                styleClass="btn-reset"
+                                text="Reset"
+                                wrapText="true" />
+                    </HBox>
+
+                    <Region styleClass="divider-line" />
+
+                    <VBox spacing="6" styleClass="status-box" VBox.vgrow="ALWAYS">
+                        <padding>
+                            <Insets bottom="12" left="14" right="14" top="12" />
+                        </padding>
+                        <Label text="SIMULATION STATUS" styleClass="status-header" />
+                        <Label fx:id="statusText" wrapText="true" styleClass="status-text" />
+                    </VBox>
+                </VBox>
+        </ScrollPane>
+    </left>
+
+    <center>
+        <ScrollPane fitToHeight="true"
+                    fitToWidth="true"
+                    pannable="true"
+                    styleClass="array-viz-scroll"
+                    vbarPolicy="NEVER">
+                <StackPane styleClass="viz-area">
+                    <HBox fx:id="arrayFrame" alignment="CENTER" spacing="10" styleClass="array-frame" />
+                </StackPane>
+        </ScrollPane>
+    </center>
+
+    <bottom>
+        <HBox maxHeight="260"
+              minHeight="180"
+              prefHeight="210"
+              styleClass="bottom-dock">
+                <VBox styleClass="bottom-section"
+                      HBox.hgrow="ALWAYS">
+                        <HBox alignment="CENTER_LEFT"
+                              styleClass="panel-header-box">
+                                <Label text="&lt;&gt;  PSEUDO-CODE" styleClass="panel-header-label" />
+                                <Region HBox.hgrow="ALWAYS" />
+                                <Label text="Java code" styleClass="panel-lang-badge" />
+                        </HBox>
+                        <TextArea fx:id="codeArea"
+                                  editable="false"
+                                  styleClass="code-area"
+                                  VBox.vgrow="ALWAYS">
+                            <VBox.margin>
+                                <Insets bottom="12" left="12" right="12" top="12" />
+                            </VBox.margin>
+                        </TextArea>
+                </VBox>
+
+                <Region styleClass="bottom-divider" />
+
+                <VBox styleClass="bottom-section"
+                      HBox.hgrow="ALWAYS">
+                        <HBox alignment="CENTER_LEFT"
+                              styleClass="panel-header-box">
+                                <Label text="?  EXPLANATION" styleClass="panel-header-label" />
+                                <Region HBox.hgrow="ALWAYS" />
+                                <Label text="Guide" styleClass="panel-lang-badge" />
+                        </HBox>
+                        <TextArea fx:id="explanationArea"
+                                  editable="false"
+                                  styleClass="explanation-area"
+                                  wrapText="true"
+                                  VBox.vgrow="ALWAYS">
+                            <VBox.margin>
+                                <Insets bottom="12" left="12" right="12" top="12" />
+                            </VBox.margin>
+                        </TextArea>
+                </VBox>
+
+                <Region styleClass="bottom-divider" />
+
+                <VBox styleClass="bottom-section"
+                      HBox.hgrow="ALWAYS">
+                        <HBox alignment="CENTER_LEFT"
+                              styleClass="panel-header-box">
+                                <Label text="&gt;_  ACTIVITY LOG" styleClass="panel-header-label" />
+                                <Region HBox.hgrow="ALWAYS" />
+                                <Button fx:id="btnClearLog"
+                                        styleClass="btn-clear-log"
+                                        text="Clear" />
+                        </HBox>
+                        <TextArea fx:id="logArea"
+                                  editable="false"
+                                  styleClass="log-area"
+                                  wrapText="true"
+                                  VBox.vgrow="ALWAYS">
+                            <VBox.margin>
+                                <Insets bottom="12" left="12" right="12" top="12" />
+                            </VBox.margin>
+                        </TextArea>
+                </VBox>
+        </HBox>
+    </bottom>
+</BorderPane>

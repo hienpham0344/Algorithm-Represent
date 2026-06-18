@@ -26,8 +26,8 @@ public class BubbleSortService implements SortStrategy {
                 boolean shouldSwap = asc ? a[j] > a[j + 1] : a[j] < a[j + 1];
                 String operator = asc ? ">" : "<";
                 steps.add(step(a, StepAction.CONDITION, "bubble.condition",
-                        "So sánh a[" + j + "] = " + a[j] + " " + operator + " a[" + (j + 1)
-                                + "] = " + a[j + 1] + ": điều kiện " + (shouldSwap ? "đúng." : "sai."),
+                        "Compare a[" + j + "] = " + a[j] + " " + operator + " a[" + (j + 1)
+                                + "] = " + a[j + 1] + ": condition is " + (shouldSwap ? "true." : "false."),
                         markers(i, "i", j, "j", j + 1, "j + 1"),
                         indices(j, j + 1), sorted));
 
@@ -36,7 +36,7 @@ public class BubbleSortService implements SortStrategy {
                     int right = a[j + 1];
                     swap(a, j, j + 1);
                     steps.add(step(a, StepAction.SWAP, "bubble.swap",
-                            "Đổi chỗ " + left + " và " + right + " tại a[" + j + "] và a[" + (j + 1) + "].",
+                            "Swap " + left + " and " + right + " at a[" + j + "] and a[" + (j + 1) + "].",
                             markers(i, "i", j, "j", j + 1, "j + 1"),
                             indices(j, j + 1), sorted));
                 }
@@ -45,12 +45,12 @@ public class BubbleSortService implements SortStrategy {
             int finalIndex = a.length - i - 1;
             sorted.add(finalIndex);
             steps.add(step(a, StepAction.MARK_SORTED, "bubble.markSorted",
-                    "a[" + finalIndex + "] = " + a[finalIndex] + " đã ở vị trí cuối cùng.",
-                    markers(finalIndex, "đã xếp"), indices(finalIndex), sorted));
+                    "a[" + finalIndex + "] = " + a[finalIndex] + " is in its final position.",
+                    markers(finalIndex, "sorted"), indices(finalIndex), sorted));
         }
 
         steps.add(step(a, StepAction.COMPLETE, "bubble.complete",
-                "Bubble Sort hoàn tất.", List.of(), Set.of(), allIndices(a.length)));
+                "Bubble Sort complete.", List.of(), Set.of(), allIndices(a.length)));
         return steps;
     }
 

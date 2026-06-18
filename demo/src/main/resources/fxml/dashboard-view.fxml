@@ -27,12 +27,12 @@
             </padding>
 
             <!-- Sorting Section -->
-            <Label styleClass="sidebar-section" text="THUẬT TOÁN" />
+            <Label styleClass="sidebar-section" text="ALGORITHMS" />
 
-            <Button fx:id="btnSort" onAction="#openSortingVisualizer" styleClass="sidebar-btn" text="⚙  Mô phỏng sắp xếp" />
+            <Button fx:id="btnSort" onAction="#openSortingVisualizer" styleClass="sidebar-btn" text="⚙  Sorting Visualizer" />
 
             <!-- Data Structures Section -->
-            <Label styleClass="sidebar-section" text="CẤU TRÚC DỮ LIỆU" />
+            <Label styleClass="sidebar-section" text="DATA STRUCTURES" />
 
             <Button fx:id="btnArray" onAction="#openArray" styleClass="sidebar-btn" text="▦  Array" />
 
