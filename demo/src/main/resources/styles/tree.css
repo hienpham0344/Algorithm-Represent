@@ -170,3 +170,26 @@
 .explanation-area{
     -fx-text-fill: #E2E8F0;
 }
+.tree-node-outer{
+    -fx-fill:#020817;
+    -fx-stroke: #bb00ff;
+    -fx-stroke-width:3;
+}
+.tree-node-inner{
+    -fx-fill: #020817;
+    -fx-stroke: #38BDF8;
+    -fx-stroke-width:2;
+}
+.tree-node-highlight-outer {
+    -fx-fill: #020817;
+    -fx-stroke: #FBBF24;
+    -fx-stroke-width: 3;
+    -fx-effect: dropshadow(gaussian, rgba(251,191,36,0.5), 15, 0.4, 0, 0);
+}
+
+.tree-node-found-outer {
+    -fx-fill: #020817;
+    -fx-stroke: #4ADE80;
+    -fx-stroke-width: 3;
+    -fx-effect: dropshadow(gaussian, rgba(74,222,128,0.5), 15, 0.4, 0, 0);
+}

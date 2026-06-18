@@ -137,7 +137,7 @@ public class StackVisualizerView extends BorderPane {
         inputField.getStyleClass().add("input-field");
         //inputField.setMaxWidth(Double.MAX_VALUE);
 
-        Button btnImport = new Button("Import .txt");
+        Button btnImport = new Button("Import");
         btnImport.getStyleClass().add("import-btn");
         btnImport.setOnAction(e -> handleImport());
 

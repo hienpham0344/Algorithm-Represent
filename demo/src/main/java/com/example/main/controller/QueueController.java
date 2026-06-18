@@ -1,9 +1,5 @@
 package com.example.main.controller;
 
-import com.example.main.utils.*;
-import com.example.main.dto.*;
-import com.example.main.enums.*;
-
 import com.example.main.service.QueueService;
 import javafx.animation.*;
 import javafx.fxml.FXML;
@@ -11,8 +7,13 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.stage.FileChooser;
 import javafx.util.Duration;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -426,5 +427,38 @@ public class QueueController implements Initializable {
         //st.setRate(speedSlider.getValue());
         st.play();
     }
-}
+    @FXML
+    private void handleImport() {
+        if (isSimulating) return;
 
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Chọn file dữ liệu Queue");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Text Files", "*.txt"));
+
+        File selectedFile = fileChooser.showOpenDialog(inputField.getScene().getWindow());
+
+        if (selectedFile != null) {
+            try (BufferedReader reader = new BufferedReader(new FileReader(selectedFile))) {
+                StringBuilder content = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    content.append(line).append(" ");
+                }
+
+                // Xử lý dữ liệu: thay khoảng trắng/xuống dòng bằng dấu phẩy
+                String formattedData = content.toString()
+                        .replaceAll("\\s+", ",")
+                        .replaceAll(",+", ",")
+                        .replaceAll("^,|,$", "");
+
+                inputField.setText(formattedData);
+                statusText.setText("Đã import: " + selectedFile.getName());
+                logArea.appendText("📂 [Import]: Đã nạp dữ liệu từ file " + selectedFile.getName() + "\n");
+
+            } catch (IOException ex) {
+                statusText.setText("Lỗi khi đọc file!");
+                logArea.appendText("✖ [Error]: Không thể đọc file: " + ex.getMessage() + "\n");
+            }
+        }
+    }
+}

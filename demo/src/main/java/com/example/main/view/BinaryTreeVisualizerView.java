@@ -14,7 +14,8 @@ import javafx.scene.layout.*;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.util.Duration;
-
+import javafx.stage.FileChooser;
+import java.io.File;
 import java.util.List;
 
 public class BinaryTreeVisualizerView extends BorderPane {
@@ -69,6 +70,13 @@ public class BinaryTreeVisualizerView extends BorderPane {
         inputField.setPromptText("Enter value...");
         inputField.getStyleClass().add("input-field");
 
+        Button btnImport = new Button("Import .txt");
+        btnImport.getStyleClass().addAll("btn-action", "btn-reset");
+        btnImport.setOnAction(e -> handleImport());
+
+        HBox inputWrapper = new HBox(8, inputField, btnImport);
+        HBox.setHgrow(inputField, Priority.ALWAYS);
+
         GridPane btnGrid = new GridPane();
         btnGrid.setHgap(8);
         btnGrid.setVgap(8);
@@ -102,7 +110,7 @@ public class BinaryTreeVisualizerView extends BorderPane {
         statusBox.setPadding(new Insets(12));
         Region spacer = new Region();
         VBox.setVgrow(spacer, Priority.ALWAYS);
-        panel.getChildren().addAll(title, desc, new Separator(), lblOps, inputField, btnGrid,
+        panel.getChildren().addAll(title, desc, new Separator(), lblOps, inputWrapper, btnGrid,
                 new Label("TRAVERSAL"), traversalBox, btnTraverse, statusBox, spacer);
 
         btnInsert.setOnAction(e -> executeOp("INSERT"));
@@ -190,16 +198,21 @@ public class BinaryTreeVisualizerView extends BorderPane {
             drawNode(node.right, x + hGap, y + 80, hGap / 2);
         }
 
-        Circle c = new Circle(22);
-        c.getStyleClass().add(node.value == foundValue ? "tree-node-found" :
+        Circle outerCircle = new Circle(28);
+        outerCircle.getStyleClass().add(
+                node.value == foundValue ? "tree-node-found-outer" :
+                        (node.value == currentSearchValue ? "tree-node-highlight-outer" : "tree-node-outer"));
+        Circle innerCircle = new Circle(22);
+        innerCircle.getStyleClass().add(node.value == foundValue ? "tree-node-found" :
                 (node.value == currentSearchValue ? "tree-node-highlight" : "tree-node"));
 
         Label l = new Label(String.valueOf(node.value));
         l.getStyleClass().add("tree-value");
 
-        StackPane sp = new StackPane(c, l);
-        sp.setLayoutX(x - 22);
-        sp.setLayoutY(y - 22);
+        StackPane sp = new StackPane(outerCircle, innerCircle, l);
+        
+        sp.setLayoutX(x - 28);
+        sp.setLayoutY(y - 28);
 
         vizPane.getChildren().add(sp);
     }
@@ -375,7 +388,35 @@ public class BinaryTreeVisualizerView extends BorderPane {
         );
         redrawTree();
     }
+    private void handleImport() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Select file containing Binary Tree data");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Text Files", "*.txt"));
 
+        File selectedFile = fileChooser.showOpenDialog(this.getScene().getWindow());
+
+        if (selectedFile != null) {
+            try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.FileReader(selectedFile))) {
+                StringBuilder content = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    content.append(line).append(" ");
+                }
+                String formattedData = content.toString()
+                        .replaceAll("\\s+", ",")
+                        .replaceAll(",+", ",")
+                        .replaceAll("^,|,$", "");
+
+                inputField.setText(formattedData);
+                statusText.setText("Imported: " + selectedFile.getName());
+                logActivity("📂 [Import]: Data loaded from file " + selectedFile.getName());
+
+            } catch (java.io.IOException ex) {
+                statusText.setText("Error reading file.");
+                logActivity("✖ [Error]: Cannot read file: " + ex.getMessage());
+            }
+        }
+    }
     private void setPseudoCode(String code) {
         pseudoCodeArea.setText(code);
     }

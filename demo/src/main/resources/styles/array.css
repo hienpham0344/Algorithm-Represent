@@ -405,3 +405,16 @@
     -fx-min-width: 1;
     -fx-max-width: 1;
 }
+.import-btn {
+    -fx-background-color: #99FFFF;
+    -fx-text-fill: #0F172A;
+    -fx-font-weight: bold;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-padding: 5px 12px;
+    -fx-cursor: hand;
+}
+
+.import-btn:hover {
+    -fx-background-color: #7DFFFF;
+}

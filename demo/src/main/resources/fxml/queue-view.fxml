@@ -21,7 +21,11 @@
 
                     <Label styleClass="section-label" text="OPERATIONS" />
                     <Label styleClass="input-label" text="Element Value:" />
-                    <TextField fx:id="inputField" maxWidth="1.7976931348623157E308" promptText="Example: 42" styleClass="input-field" />
+
+                    <HBox spacing="5" alignment="CENTER_LEFT">
+                    <TextField fx:id="inputField" maxWidth="1.7976931348623157E308" prefWidth="157.0" promptText="Example: 42" styleClass="input-field" />
+                    <Button text="Import" onAction="#handleImport" styleClass="import-btn" />
+                    </HBox>
 
                     <HBox spacing="8">
                         <Button fx:id="enqueueBtn" maxWidth="1.7976931348623157E308" onAction="#handleEnqueue" prefWidth="120" styleClass="btn-enqueue" text="Enqueue" HBox.hgrow="ALWAYS" />
