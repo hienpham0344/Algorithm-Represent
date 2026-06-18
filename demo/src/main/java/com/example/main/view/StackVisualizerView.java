@@ -707,7 +707,6 @@ public class StackVisualizerView extends BorderPane {
         File selectedFile = fileChooser.showOpenDialog(this.getScene().getWindow());
 
         if (selectedFile != null) {
-            // Dùng BufferedReader để đọc file - Cách này tương thích với mọi bản Java
             try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.FileReader(selectedFile))) {
 
                 StringBuilder content = new StringBuilder();

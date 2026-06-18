@@ -19,7 +19,11 @@
 
             <Region HBox.hgrow="ALWAYS" />
 
+            <Label fx:id="userLabel" styleClass="user-label" text="" />
+
             <Button onAction="#openReports" styleClass="top-report-btn" text="Reports" />
+
+            <Button onAction="#handleLogout" styleClass="top-logout-btn" text="Đăng xuất" />
         </HBox>
     </top>
 
@@ -47,6 +51,11 @@
             <Button fx:id="btnQueue" onAction="#openQueue" styleClass="sidebar-btn" text="△  Queue" />
 
             <Button fx:id="btnBinaryTree" onAction="#openBinaryTree" styleClass="sidebar-btn" text="⌥  Binary Tree" />
+
+            <!-- Admin Section (chỉ hiển thị cho ADMIN) -->
+            <Label fx:id="adminSection" managed="false" visible="false" styleClass="sidebar-section" text="QUẢN TRỊ" />
+
+            <Button fx:id="btnAccounts" managed="false" visible="false" onAction="#openAccountManagement" styleClass="sidebar-btn" text="👤  Quản lý tài khoản" />
 
         </VBox>
     </left>
