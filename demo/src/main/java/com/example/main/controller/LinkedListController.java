@@ -3,6 +3,7 @@ package com.example.main.controller;
 import java.util.List;
 
 import com.example.main.service.LinkedListService;
+import com.example.main.view.NoteDialog;
 import javafx.scene.control.Label;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextArea;
@@ -13,8 +14,12 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
 import javafx.util.Duration;
+import java.io.File;
+import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 import javafx.animation.PauseTransition;
 import javafx.animation.SequentialTransition;
 
@@ -461,6 +466,54 @@ public class LinkedListController {
 
         } catch (NumberFormatException e) {
             statusLabel.setText("Invalid index input.");
+        }
+    }
+
+    @FXML
+    private void handleNotes() {
+        NoteDialog.show(inputField.getScene().getWindow(), "Linked List");
+    }
+
+    @FXML
+    private void handleImportTxt() {
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Import Linked List from .txt");
+        chooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("Text files", "*.txt"));
+
+        File file = chooser.showOpenDialog(inputField.getScene().getWindow());
+        if (file == null) {
+            return;
+        }
+
+        try {
+            String raw = Files.readString(file.toPath());
+            // Tách theo dấu phẩy, khoảng trắng, xuống dòng, tab...
+            String[] tokens = Pattern.compile("[\\s,;]+").split(raw.trim());
+
+            int imported = 0;
+            int skipped = 0;
+            for (String token : tokens) {
+                if (token.isBlank()) {
+                    continue;
+                }
+                try {
+                    int value = Integer.parseInt(token.trim());
+                    service.addTail(value);
+                    imported++;
+                } catch (NumberFormatException ex) {
+                    skipped++;
+                }
+            }
+
+            renderList();
+            statusLabel.setText("Imported " + imported + " value(s) from "
+                    + file.getName() + (skipped > 0 ? " (" + skipped + " bỏ qua)" : "") + ".");
+            logArea.appendText("\n[Import .txt]: " + imported + " value(s) from " + file.getName()
+                    + (skipped > 0 ? ", skipped " + skipped : ""));
+        } catch (Exception e) {
+            statusLabel.setText("Không đọc được file: " + e.getMessage());
+            logArea.appendText("\n[Import .txt]: lỗi đọc file " + file.getName());
         }
     }
 

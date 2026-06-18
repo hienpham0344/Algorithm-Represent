@@ -31,6 +31,7 @@ public class DashboardController {
     @FXML private Button btnQueue;
     @FXML private Button btnBinaryTree;
     @FXML private Button btnAccounts;
+    @FXML private Button btnReports;
     @FXML private Label adminSection;
     @FXML private Label userLabel;
 
@@ -62,6 +63,10 @@ public class DashboardController {
             btnAccounts.setVisible(admin);
             btnAccounts.setManaged(admin);
         }
+        if (btnReports != null) {
+            btnReports.setVisible(admin);
+            btnReports.setManaged(admin);
+        }
         if (adminSection != null) {
             adminSection.setVisible(admin);
             adminSection.setManaged(admin);
@@ -87,6 +92,18 @@ public class DashboardController {
     }
 
     @FXML
+    public void openReportManagement() {
+        if (!Session.isAdmin()) {
+            return;
+        }
+        currentModule = "Report Management";
+        ReportManagementView view = new ReportManagementView();
+        contentPane.getChildren().setAll(view);
+        setActiveButton(btnReports);
+        closeSidebar();
+    }
+
+    @FXML
     public void toggleSidebar() {
         sidebarVisible = !sidebarVisible;
         sidebar.setVisible(sidebarVisible);
@@ -96,7 +113,7 @@ public class DashboardController {
     // Hàm dùng chung để đổi màu nút đang chọn
     private void setActiveButton(Button activeButton) {
         // Danh sách tất cả các nút sidebar
-        Button[] allButtons = {btnSort, btnArray, btnLinkedList, btnStack, btnQueue, btnBinaryTree, btnAccounts};
+        Button[] allButtons = {btnSort, btnArray, btnLinkedList, btnStack, btnQueue, btnBinaryTree, btnAccounts, btnReports};
 
         for (Button btn : allButtons) {
             if (btn != null) {

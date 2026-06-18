@@ -1,5 +1,10 @@
 package com.example.main.view;
 
+import com.example.main.SortAlgorithmPresentApplication;
+import com.example.main.dto.response.UserAccountResponse;
+import com.example.main.service.ModuleNoteService;
+import com.example.main.session.Session;
+
 import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -10,13 +15,9 @@ import javafx.scene.control.TextArea;
 import javafx.scene.layout.VBox;
 import javafx.stage.Window;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 public final class NoteDialog {
-
-    private static final Map<String, String> NOTES_BY_MODULE = new HashMap<>();
 
     private NoteDialog() {
     }
@@ -30,7 +31,7 @@ public final class NoteDialog {
         }
         styleDialogPane(dialog);
 
-        TextArea noteInput = new TextArea(NOTES_BY_MODULE.getOrDefault(moduleName, ""));
+        TextArea noteInput = new TextArea(loadNote(moduleName));
         noteInput.setPromptText("Write your notes here...");
         noteInput.setWrapText(true);
         noteInput.setPrefRowCount(6);
@@ -55,9 +56,62 @@ public final class NoteDialog {
 
         Optional<ButtonType> result = dialog.showAndWait();
         if (result.isPresent() && result.get() == saveButton) {
-            NOTES_BY_MODULE.put(moduleName, noteInput.getText());
-            showSavedMessage(owner);
+            if (saveNote(moduleName, noteInput.getText())) {
+                showSavedMessage(owner);
+            } else {
+                showErrorMessage(owner, "Không lưu được ghi chú. Vui lòng đăng nhập và thử lại.");
+            }
         }
+    }
+
+    /** Đọc ghi chú gần nhất của người dùng cho module từ DB. */
+    private static String loadNote(String moduleName) {
+        ModuleNoteService service = moduleNoteService();
+        UserAccountResponse user = Session.currentUser();
+        if (service == null || user == null) {
+            return "";
+        }
+        try {
+            return service.getNote(user.id(), moduleName);
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    /** Lưu (tạo mới hoặc cập nhật) ghi chú của người dùng cho module vào DB. */
+    private static boolean saveNote(String moduleName, String content) {
+        ModuleNoteService service = moduleNoteService();
+        UserAccountResponse user = Session.currentUser();
+        if (service == null || user == null) {
+            return false;
+        }
+        try {
+            service.saveNote(user.id(), moduleName, content);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private static ModuleNoteService moduleNoteService() {
+        if (SortAlgorithmPresentApplication.context() == null) {
+            return null;
+        }
+        return SortAlgorithmPresentApplication.context().getBean(ModuleNoteService.class);
+    }
+
+    private static void showErrorMessage(Window owner, String message) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Notes");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        if (owner != null) {
+            alert.initOwner(owner);
+        }
+        styleDialogPane(alert);
+        styleAlertButton(alert);
+        alert.showAndWait();
     }
 
     private static void showSavedMessage(Window owner) {
