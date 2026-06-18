@@ -6,8 +6,13 @@ import javafx.fxml.FXML;
 import javafx.geometry.Pos; // căn vị trí (vd: giữa, trái , phải)
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.stage.FileChooser;
 import javafx.util.Duration;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -551,5 +556,52 @@ public class ArrayVisualizerView {
     @FXML
     private void handleClearLog() {
         logArea.clear();
+    }
+    @FXML
+    private void handleImport() {
+
+        if (animation != null && animation.getStatus() == Animation.Status.RUNNING) {
+            return;
+        }
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Chọn file dữ liệu Array");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Text Files", "*.txt"));
+
+        File selectedFile = fileChooser.showOpenDialog(valueField.getScene().getWindow());
+
+        if (selectedFile != null) {
+            try (BufferedReader reader = new BufferedReader(new FileReader(selectedFile))) {
+                StringBuilder content = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    content.append(line).append(" ");
+                }
+
+                // Xử lý dữ liệu: lọc khoảng trắng và chuyển thành dấu phẩy chuẩn format
+                String formattedData = content.toString()
+                        .replaceAll("\\s+", ",")
+                        .replaceAll(",+", ",")
+                        .replaceAll("^,|,$", "");
+
+                valueField.setText(formattedData);
+
+                // Cập nhật trạng thái thông báo và log
+                if (statusText != null) {
+                    statusText.setText("Đã import: " + selectedFile.getName());
+                }
+                if (logArea != null) {
+                    logArea.appendText("📂 [Import]: Đã nạp dữ liệu từ file " + selectedFile.getName() + "\n");
+                }
+
+            } catch (IOException ex) {
+                if (statusText != null) {
+                    statusText.setText("Lỗi khi đọc file!");
+                }
+                if (logArea != null) {
+                    logArea.appendText("✖ [Error]: Không thể đọc file: " + ex.getMessage() + "\n");
+                }
+            }
+        }
     }
 }

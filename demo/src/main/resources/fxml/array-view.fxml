@@ -34,9 +34,12 @@
 
                     <VBox spacing="5">
                         <Label text="Element Value(s)" styleClass="input-label" />
+                        <HBox spacing="5" alignment="CENTER_LEFT">
                         <TextField fx:id="valueField"
                                    promptText="Example: 42 or 10, 20, 30"
                                    styleClass="input-field" />
+                        <Button text="Import" onAction="#handleImport" styleClass="import-btn" />
+                    </HBox>
                     </VBox>
 
                     <VBox spacing="5">
