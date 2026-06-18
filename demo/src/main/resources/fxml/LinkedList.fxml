@@ -6,7 +6,7 @@
 
 <BorderPane xmlns="http://javafx.com/javafx/17.0.12"
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.example.main.ui.LinkedListController"
+            fx:controller="com.example.main.controller.LinkedListController"
             stylesheets="@../styles/LinkedList.css"
             styleClass="linked-root">
 
