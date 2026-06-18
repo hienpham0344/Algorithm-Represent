@@ -46,4 +46,14 @@ public final class DashboardApplication extends Application {
             root.layout();
         });
     }
+
+    @Override
+    public void stop() throws Exception {
+        super.stop();
+        var context = SortAlgorithmPresentApplication.context();
+        if (context == null) {
+            return;
+        }
+        context.close();
+    }
 }

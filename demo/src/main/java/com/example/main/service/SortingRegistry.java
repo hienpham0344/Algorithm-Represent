@@ -1,5 +1,9 @@
 package com.example.main.service;
 
+import com.example.main.utils.*;
+import com.example.main.dto.*;
+import com.example.main.enums.*;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -19,3 +23,4 @@ public final class SortingRegistry {
         return strategies;
     }
 }
+
